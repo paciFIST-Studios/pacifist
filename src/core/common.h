@@ -5,7 +5,7 @@
 
 
 // Asserts -------------------------------------------------------------------------------------------------------------
-#include <cstdio>
+#include <stdio.h>
 
 #define BUILD_SETTING_ALLOW_ASSERTS 1
 
@@ -72,6 +72,8 @@ typedef uint64_t uint64;
 typedef float real32;
 typedef double real64;
 
+typedef size_t MemoryIndex_t;
+
 #define TRUE 1
 #define FALSE 0
 
@@ -84,6 +86,7 @@ typedef double real64;
 #define PI_32 = 3.14159265359f
 // The value of Tau (2PI) in 32 bits
 #define TAU_32 = 6.28318530718f 
+
 
 
 // Counts the number of elements in an array
@@ -103,8 +106,51 @@ typedef double real64;
 } while(0);                                         \
 
 
-
+// 2/16bit
 #define TWO_OVER_SHORT 0.000030518f 
+
+
+
+#define EPSILON 0.00001f
+
+#define R32_APPROX_EQUAL(a, b) (bool32) is_approximately_equal_R32(a, b, EPSILON)
+// https://stackoverflow.com/a/253874
+internal bool32
+is_approximately_equal_R32(real32 a, real32 b, real32 epsilon){
+    return __builtin_fabs(a - b) <= (
+            __builtin_fabs(a) < __builtin_fabs(b)
+                ? __builtin_fabs(b)
+                : __builtin_fabs(a) * epsilon
+    );
+}
+
+#define R32_EQUAL(a, b) (bool32) is_essentially_equal_R32(a, b, EPSILON)
+// https://stackoverflow.com/a/253874
+internal bool32
+is_essentially_equal_R32(real32 a, real32 b, real32 epsilon){
+    return __builtin_fabs(a - b) <= (
+            __builtin_fabs(a) > __builtin_fabs(b)
+                ? __builtin_fabs(b)
+                : __builtin_fabs(a) * epsilon
+    );
+}
+
+
+// little endian
+// https://stackoverflow.com/a/3974138 
+internal void
+print_bits_le(size_t const size, void const * const ptr){
+uint8 * b = (uint8 *) ptr;
+uint8 byte;
+
+for(size_t i = size-1; i > 0; i--){
+        for(size_t j = 7; j > 0; j--){
+            byte = (b[i] >> j) & 1;
+            printf("%u", byte);
+        }
+    }
+    puts("");
+}
 
 
 #endif //COMMON_H
