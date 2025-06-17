@@ -33,8 +33,11 @@ set(ENGINE_LIB_SOURCE_FILES
         # log
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log_utility.h
         # memory
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/LinkedList.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/LinkedList.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/MemoryArena.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/RedBlackTree.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/RedBlackTree.c
         # os
         ${CMAKE_CURRENT_SOURCE_DIR}/os/path.h
         # parsers
@@ -43,6 +46,7 @@ set(ENGINE_LIB_SOURCE_FILES
 
 # "proper" headers go here
 set(ENGINE_LIB_INCLUDE_FILES
+
 )
 
 # all the dependencies the engine library uses go here

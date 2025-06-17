@@ -16,7 +16,8 @@ set(TEST_LIB_SOURCE_FILES
         
         # memory_tests
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/RedBlackTree.test.c
-        
+        memory_tests/LinkedList.test.c
+
 )
 
 # the run_unit_tests_engine is an executable that you could just run from the
