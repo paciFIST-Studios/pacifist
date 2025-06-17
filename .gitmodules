@@ -13,3 +13,12 @@
 [submodule "vendor/SDL_mixer"]
 	path = vendor/SDL_mixer
 	url = https://github.com/libsdl-org/SDL_mixer.git
+[submodule "vendor/doxygen"]
+	path = vendor/doxygen
+	url = https://github.com/doxygen/doxygen.git
+[submodule "vendor/cscout"]
+	path = vendor/cscout
+	url = https://github.com/dspinellis/cscout.git
+[submodule "vendor/analyzer"]
+	path = vendor/analyzer
+	url = https://github.com/goblint/analyzer.git
