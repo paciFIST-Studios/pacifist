@@ -22,3 +22,12 @@
 [submodule "vendor/analyzer"]
 	path = vendor/analyzer
 	url = https://github.com/goblint/analyzer.git
+[submodule "vendor/valgrind"]
+	path = vendor/valgrind
+	url = https://sourceware.org/git/valgrind.git
+[submodule "vendor/--recursive"]
+	path = vendor/--recursive
+	url = https://github.com/cimgui/cimgui.git
+[submodule "vendor/cimgui"]
+	path = vendor/cimgui
+	url = https://github.com/cimgui/cimgui.git
