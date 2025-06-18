@@ -3,6 +3,22 @@ cmake_minimum_required(VERSION 3.31)
 # name of the project at large
 project(paciFIST VERSION 0.1 LANGUAGES C)
 
+# Generate files used in compilation ----------------------------------------------------------------------------------
+
+# todo: run this script when setting up cmake, to prepare for a build
+#find_package(Python3 REQUIRED)
+#execute_process(
+#        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/py_tools/generateTypesHeader/generateTypesHeader.py
+#        RESULT_VARIABLE _return_code
+#        #OUTPUT_VARIABLE _output
+#        #ERROR_VARIABLE _error
+#)
+#if (NOT _return_code EQUAL 0)
+#    message(FATAL_ERROR "generateTypesHeader.py failed with error: ${_error}")
+#else ()
+#    message(STATUS "generateTypesHeader.py has rebuilt project types header")
+#endif ()
+
 
 # Compiler strictness settings --------------------------------------------------------------------
 

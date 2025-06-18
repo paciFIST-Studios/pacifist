@@ -42,6 +42,10 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/os/path.h
         # parsers
         ${CMAKE_CURRENT_SOURCE_DIR}/parsers/ConfigFileParser.h
+        io/read.c
+        io/read.h
+        os/os_utility.h
+        project_types.h
 )
 
 # "proper" headers go here
