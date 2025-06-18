@@ -68,22 +68,39 @@ char * global_module;
  */
 
 // Test Includes: Manually include your code here.  (keep it in alphabetical order)
+#include "../test/algo_tests/search.test.c"
 #include "../test/memory_tests/RedBlackTree.test.c"
+#include "../test/memory_tests/LinkedList.test.c"
 
 
 
 int main(void) {
     int fail_count = 0;
-
+    
     // Framework Test Suite ----------------------------------------------
     BUILD_SUITE("SystemCheck");
     ADD_TEST(unit_test_system_check);
     RUN_SUITE(fail_count);
 
+    // Algorithm Test Suite ----------------------------------------------
+    BUILD_SUITE("Algo")
+    ADD_TEST(stdlib_bsearch_example__int32);
+    RUN_SUITE(fail_count);
+
+    
     // Memory Test Suite -------------------------------------------------
     BUILD_SUITE("Memory");
-    ADD_TEST(struct_has_correct_members_RedBlackTree_t);
-    ADD_TEST(struct_is_of_correct_size_RedBlackTree_t);
+    // RedBlackTree
+    ADD_TEST(enum_has_correct_members__ERedBlackTreeNodeColor_t);
+    ADD_TEST(enum_has_correct_members__ERedBlackTreeNodeDirection_t);
+    ADD_TEST(struct_has_correct_members__RedBlackTree_t);
+    ADD_TEST(struct_is_of_correct_size__RedBlackTree_t);
+    ADD_TEST(struct_has_correct_members__RedBlackTreeNode_t);
+
+    // LinkedList
+    ADD_TEST(struct_has_correct_members__LinkedListNode_t);
+    ADD_TEST(struct_is_of_correct_size__LinkedListNode_t);
+    
     RUN_SUITE(fail_count);
 
     

@@ -46,6 +46,8 @@ set(ENGINE_LIB_SOURCE_FILES
         io/read.h
         os/os_utility.h
         project_types.h
+        algo/search.h
+        algo/search.c
 )
 
 # "proper" headers go here

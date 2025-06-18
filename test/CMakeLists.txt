@@ -17,6 +17,7 @@ set(TEST_LIB_SOURCE_FILES
         # memory_tests
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/RedBlackTree.test.c
         memory_tests/LinkedList.test.c
+        algo_tests/search.test.c
 
 )
 
