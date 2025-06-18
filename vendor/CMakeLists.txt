@@ -14,9 +14,10 @@
 add_subdirectory(check)
 add_library(check_lib INTERFACE)
 target_link_libraries(check_lib INTERFACE check)
-
 # cimgui for immediate mode gui
 add_subdirectory(cimgui)
+add_library(cimgui_lib INTERFACE)
+target_link_libraries(cimgui_lib INTERFACE cimgui)
 
 # cscout static analysis
 #add_subdirectory(cscout)
