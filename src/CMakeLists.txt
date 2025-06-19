@@ -48,6 +48,10 @@ set(ENGINE_LIB_SOURCE_FILES
         project_types.h
         algo/search.h
         algo/search.c
+        reflection/metadata_reflection_system.c
+        reflection/metadata_reflection_system.h
+        memory/HashTable.c
+        memory/HashTable.h
 )
 
 # "proper" headers go here
