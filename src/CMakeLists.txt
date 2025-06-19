@@ -26,37 +26,39 @@
 # goes in this list too
 # TODO: Update so we automatically get files, but we need an "allow list" and a "block list", and for something to be included it needs to be on the "allow list" and NOT on the "block list":w
 set(ENGINE_LIB_SOURCE_FILES
-        
+
+        # algo
+        ${CMAKE_CURRENT_SOURCE_DIR}/algo/search.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/algo/search.c
         # core 
         ${CMAKE_CURRENT_SOURCE_DIR}/core/common.h
         ${CMAKE_CURRENT_SOURCE_DIR}/core/WindowConfigStruct.h
         # log
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log_utility.h
+        # io
+        ${CMAKE_CURRENT_SOURCE_DIR}/io/read.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/io/read.h
         # memory
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/LinkedList.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/LinkedList.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/HashTable.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/HashTable.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/MemoryArena.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/RedBlackTree.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/RedBlackTree.c
         # os
         ${CMAKE_CURRENT_SOURCE_DIR}/os/path.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/os/os_utility.h
         # parsers
         ${CMAKE_CURRENT_SOURCE_DIR}/parsers/ConfigFileParser.h
-        io/read.c
-        io/read.h
-        os/os_utility.h
-        project_types.h
-        algo/search.h
-        algo/search.c
-        reflection/metadata_reflection_system.c
-        reflection/metadata_reflection_system.h
-        memory/HashTable.c
-        memory/HashTable.h
+        # project_types.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/project_types.h
+        # reflection
+        ${CMAKE_CURRENT_SOURCE_DIR}/reflection/metadata_reflection_system.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/reflection/metadata_reflection_system.h
 )
 
-# "proper" headers go here
-set(ENGINE_LIB_INCLUDE_FILES
-
+set(ENGINE_LIB_INCLUDE_DIRECTORIES
 )
 
 # all the dependencies the engine library uses go here
