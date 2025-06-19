@@ -70,6 +70,7 @@ char * global_module;
 // Test Includes: Manually include your code here.  (keep it in alphabetical order)
 #include "../test/algo_tests/search.test.c"
 #include "../test/memory_tests/RedBlackTree.test.c"
+#include "../test/memory_tests/HashTable.test.c"
 #include "../test/memory_tests/LinkedList.test.c"
 
 
@@ -90,14 +91,67 @@ int main(void) {
     
     // Memory Test Suite -------------------------------------------------
     BUILD_SUITE("Memory");
-    // RedBlackTree
+
+    //--------------//
+    // RedBlackTree //
+    //--------------//
+
     ADD_TEST(enum_has_correct_members__ERedBlackTreeNodeColor_t);
     ADD_TEST(enum_has_correct_members__ERedBlackTreeNodeDirection_t);
     ADD_TEST(struct_has_correct_members__RedBlackTree_t);
     ADD_TEST(struct_is_of_correct_size__RedBlackTree_t);
     ADD_TEST(struct_has_correct_members__RedBlackTreeNode_t);
 
-    // LinkedList
+    // ----------//
+    // HashTable //
+    // ----------//
+
+    // struct HashTableEntry_t
+    ADD_TEST(struct_HashTableEntry_t__is_defined);
+    ADD_TEST(struct_HashTableEntry_t__has_correct_properties);
+    ADD_TEST(struct_HashTableEntry_t__has_correct_size);
+
+    // struct HashTable_t
+    ADD_TEST(struct_HashTable_t__is_defined);
+    ADD_TEST(struct_HashTable_t__has_correct_properties);
+
+    // fn hash_table_create
+    ADD_TEST(fn_hash_table_create__is_defined);
+    ADD_TEST(fn_hash_table_create__returns_valid_hash_table);
+    ADD_TEST(fn_hash_table_create__returns_null__for_nomem_cannot_create_table);
+    ADD_TEST(fn_hash_table_create__returns_null__for_nomem_cannot_create_elements);
+
+    // fn hash_table_destroy
+    ADD_TEST(fn_hash_table_destroy__is_defined);
+    ADD_TEST(fn_hash_table_destroy__will_destory_the_table_and_entries);
+
+    // fn hash_table_expand
+    ADD_TEST(fn_hash_table_expand__is_defined);
+
+    
+    // fn hash_table_lookup
+    ADD_TEST(fn_hash_table_lookup__is_defined);
+
+    // fn hash_table_insert
+    ADD_TEST(fn_hash_table_insert__is_defined);
+
+    // fn hash_table_count
+    ADD_TEST(fn_hash_table_count__is_defined);
+
+    // struct HashTableIterator_t
+    ADD_TEST(struct_HashTableIterator_t__is_defined);
+
+    // fn hash_table_create_iterator
+    ADD_TEST(fn_hash_table_create_iterator__is_defined);
+
+    // fn hash_table_next
+    ADD_TEST(fn_hash_table_next__is_defined);
+
+
+    //------------//
+    // LinkedList //
+    //------------//
+    
     ADD_TEST(struct_has_correct_members__LinkedListNode_t);
     ADD_TEST(struct_is_of_correct_size__LinkedListNode_t);
     
