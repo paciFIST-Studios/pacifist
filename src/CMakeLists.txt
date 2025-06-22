@@ -41,8 +41,8 @@ set(ENGINE_LIB_SOURCE_FILES
         # memory
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/LinkedList.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/LinkedList.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/memory/HashTable.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/memory/HashTable.h
+        memory/hash_table/HashTable.c
+        memory/hash_table/HashTable.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/MemoryArena.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/RedBlackTree.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/RedBlackTree.c
@@ -56,6 +56,10 @@ set(ENGINE_LIB_SOURCE_FILES
         # reflection
         ${CMAKE_CURRENT_SOURCE_DIR}/reflection/metadata_reflection_system.c
         ${CMAKE_CURRENT_SOURCE_DIR}/reflection/metadata_reflection_system.h
+        type/typed_pointer.h
+        bit/bitfield.h
+        memory/hash_table/QuickHashTable.h
+        memory/hash_table/CompactHashTable.h
 )
 
 set(ENGINE_LIB_INCLUDE_DIRECTORIES

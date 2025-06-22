@@ -4,6 +4,7 @@
 # rathr than as just a library
 include_directories(${CMAKE_SOURCE_DIR}/vendor/check/include)
 
+
 # NOTE: same problem as noted in the src/CMakeList.  We have to add files manually
 set(TEST_LIB_SOURCE_FILES
         # In order to register a test with check, you have to add that in
@@ -15,10 +16,13 @@ set(TEST_LIB_SOURCE_FILES
         # /src/memory to /test/memory --- especially if we're using this path generator
         
         # memory_tests
+        ${CMAKE_CURRENT_SOURCE_DIR}/algo_tests/search.test.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/bit/bitfield.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/RedBlackTree.test.c
-        memory_tests/LinkedList.test.c
-        algo_tests/search.test.c
-        memory_tests/HashTable.test.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/CompactHashTable.test.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/HashTable.test.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/LinkedList.test.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/MemoryArena.test.c
 
 )
 
@@ -28,7 +32,7 @@ set(TEST_LIB_SOURCE_FILES
 add_executable(run_unit_tests_engine ${TEST_LIB_SOURCE_FILES})
 target_link_libraries(run_unit_tests_engine PRIVATE 
         ${PROJECT_NAME}_engine_lib
-       check 
+        check
 )
 
 # this adds a some kind of command to CMake, which we can call

@@ -30,6 +30,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 set(CMAKE_LINK_WARNING_AS_ERROR ON)
 
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
 
 # Compiler output settings ------------------------------------------------------------------------
 
