@@ -68,28 +68,69 @@ char * global_module;
  */
 
 // Test Includes: Manually include your code here.  (keep it in alphabetical order)
+
+// Algo
 #include "../test/algo_tests/search.test.c"
+
+// Bit
+#include "../test/bit/bitfield.test.c"
+
+// Memory
 #include "../test/memory_tests/RedBlackTree.test.c"
+#include "../test/memory_tests/CompactHashTable.test.c"
 #include "../test/memory_tests/HashTable.test.c"
 #include "../test/memory_tests/LinkedList.test.c"
-
+#include "../test/memory_tests/MemoryArena.test.c"
 
 
 int main(void) {
+    /*  Setting NO_FORK here allows us to ensure that check does not spin up child processes to handle
+     *  test execution.  One the one hand, this means we're now running the tests serially (I guess),
+     *  and it's slower.  But on the other hand, we can set break points in the tests, and debug them, and
+     *  that's easily worth the slowdown.  If we need to, we can leave this commented out in the depot.
+     *  This can also be set in the IDE's env vars, but I wanted someplace that I knew would make it
+     *  into the depot.  EBarrett
+     */
+    //enum fork_status const fs = CK_NOFORK;
+    //srunner_set_fork_status(global_runner, fs);
+
     int fail_count = 0;
     
-    // Framework Test Suite ----------------------------------------------
+    // -------------------------------------------------------------------//
+    // Framework Test Suite                                               //
+    // -------------------------------------------------------------------//
     BUILD_SUITE("SystemCheck");
     ADD_TEST(unit_test_system_check);
     RUN_SUITE(fail_count);
-
-    // Algorithm Test Suite ----------------------------------------------
-    BUILD_SUITE("Algo")
-    ADD_TEST(stdlib_bsearch_example__int32);
-    RUN_SUITE(fail_count);
+    // -------------------------------------------------------------------//
+    // End Framework Test Suite                                           //
+    // -------------------------------------------------------------------//
 
     
-    // Memory Test Suite -------------------------------------------------
+    // -------------------------------------------------------------------//
+    // Algorithm Test Suite                                               //
+    // -------------------------------------------------------------------//
+    BUILD_SUITE("Algo")
+    ADD_TEST(stdlib_bsearch_example__int32);
+    RUN_SUITE(fail_count); 
+    // -------------------------------------------------------------------//
+    // End Algorithm Test Suite                                           //
+    // -------------------------------------------------------------------//
+
+    
+    // -------------------------------------------------------------------//
+    // Bit Test Suite                                                     //
+    // -------------------------------------------------------------------//
+    BUILD_SUITE("Bit");
+    RUN_SUITE(fail_count);
+    // -------------------------------------------------------------------//
+    // End Bit Test Suite                                                 //
+    // -------------------------------------------------------------------//
+
+    
+    // -------------------------------------------------------------------//
+    // Memory Test Suite                                                  //
+    // -------------------------------------------------------------------//
     BUILD_SUITE("Memory");
 
     //--------------//
@@ -101,6 +142,28 @@ int main(void) {
     ADD_TEST(struct_has_correct_members__RedBlackTree_t);
     ADD_TEST(struct_is_of_correct_size__RedBlackTree_t);
     ADD_TEST(struct_has_correct_members__RedBlackTreeNode_t);
+
+    // -----------------//
+    // CompactHashTable //
+    // -----------------//
+
+    // defines
+    ADD_TEST(define_DELETED_ENTRY__is_defined);
+    ADD_TEST(typedef_StringCopyFunction__is_defined);
+    ADD_TEST(typedef_StringCopyFunction__can_be_set_to_strncpy);
+
+    
+    // hash fns
+    ADD_TEST(fn_interface_HashFunction__is_defined);
+    ADD_TEST(fn_hash_polynomial_64__is_defined);
+    ADD_TEST(fn_hash_polynomial_64__returns_uint64_max__for_zero_table_length);
+    
+    // CompactHashTable_t
+    ADD_TEST(struct_CompactHashTable_t__is_defined);
+    ADD_TEST(fn_compact_hash_table_create__is_defined);
+    ADD_TEST(fn_compact_hash_table_create__allocates_memory_for_hash_table);
+
+    
 
     // ----------//
     // HashTable //
@@ -123,11 +186,10 @@ int main(void) {
 
     // fn hash_table_destroy
     ADD_TEST(fn_hash_table_destroy__is_defined);
-    ADD_TEST(fn_hash_table_destroy__will_destory_the_table_and_entries);
+    ADD_TEST(fn_hash_table_destroy__will_destroy_the_table_correctly);
 
     // fn hash_table_expand
     ADD_TEST(fn_hash_table_expand__is_defined);
-
     
     // fn hash_table_lookup
     ADD_TEST(fn_hash_table_lookup__is_defined);
@@ -154,8 +216,26 @@ int main(void) {
     
     ADD_TEST(struct_has_correct_members__LinkedListNode_t);
     ADD_TEST(struct_is_of_correct_size__LinkedListNode_t);
+
+    //-------------//
+    // MemoryArena //
+    //-------------//
+
+    // MemoryArena_t
+    ADD_TEST(struct_MemoryArena_t__is_defined);
+    ADD_TEST(struct_MemoryArena_t__has_correct_members);
+    ADD_TEST(struct_MemoryArena_t__is_correct_size);
+
+    // fn memory_arena_create
+    ADD_TEST(fn_memory_arena_create__is_defined);
+    ADD_TEST(fn_memory_arena_create__returns_MemoryArena_t_with_initialized_settings);
+
     
+
     RUN_SUITE(fail_count);
+    // -------------------------------------------------------------------//
+    // End Memory Test Suite                                              //
+    // -------------------------------------------------------------------//
 
     
     return fail_count == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
