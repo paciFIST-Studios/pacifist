@@ -29,7 +29,7 @@ END_TEST
 
 
 START_TEST(typedef_StringCopyFunction__can_be_set_to_strncpy) {
-    StringCopyFunction* p = strncpy;
+    StringCopyFunction* p = strndup;
     ck_assert_ptr_nonnull(p);
 }
 END_TEST
@@ -63,7 +63,7 @@ START_TEST(fn_hash_polynomial_64__returns_uint64_max__for_zero_table_length) {
 END_TEST
 
 
-// struct CompactHashTable.t -------------------------------------------------------------------------------------------
+// struct CompactHashTable_t -------------------------------------------------------------------------------------------
 
 START_TEST(struct_CompactHashTable_t__is_defined) {
     CompactHashTable_t * table = compact_hash_table_create(0, NULL);
@@ -99,15 +99,42 @@ START_TEST(fn_compact_hash_table_create__correctly_sets_starting_params) {
     ck_assert_ptr_nonnull(table->hash_fn);
     ck_assert_ptr_eq(table->hash_fn, hash_polynomial_64); /* sets the supplied fn */
     ck_assert_ptr_nonnull(table->string_copy_fn);
-    ck_assert_ptr_eq(table->string_copy_fn, strncpy); /* sets correct default */
+    ck_assert_ptr_eq(table->string_copy_fn, strndup); /* sets correct default */
     ck_assert_ptr_nonnull(table->entries);
-    for (int32_t i = 0; i < table->size; i++) {
-        if (table->entries[i].key != NULL) {
-            free(table->entries[i].key);
-            table->entries[i].key = NULL;
+
+    // make sure all of the entries are correctly zeroed out before start
+    size_t const table_size = table->size;
+    size_t const entry_size = sizeof(CompactHashTableEntry_t);
+
+    
+    for (int32_t i = 0; i < table_size; i++) {
+        /* Okay so here's the deal.  All of the memory for the hash table, is given
+         * in one allocation.  The first like, 56 bytes are for the table, and the
+         * rest of the memory---increments of 24 bytes---are given over to the array
+         * of table entries.
+         *
+         * In order to iterate those entries, I think we need to manually re-cast the
+         * memory, which is done here.
+         *
+         * TODO: add an iterator for the entries
+         */
+        CompactHashTableEntry_t * entry = (table->entries + i * entry_size);
+        ck_assert_ptr_null(entry->key);
+        ck_assert_int_eq(entry->key_len, 0);
+        ck_assert_ptr_null(entry->value);
+    }
+
+    // teardown
+
+    for (int32_t i = 0; i < table_size; i++) {
+        CompactHashTableEntry_t * entry = (table->entries + i * entry_size);
+        if (entry->key != NULL) {
+            free(entry->key);
+            entry->key = NULL;
         }
     }
-    free(table->entries);
+
+    // we can't free the entries, b/c it's the same allocation as the table
     table->entries = NULL;
     free(table);
     table = NULL;
@@ -119,17 +146,50 @@ END_TEST
 // fn compact_hash_table_destroy ---------------------------------------------------------------------------------------
 
 START_TEST(fn_compact_hash_table_destroy__is_defined) {
-    void (*fptr)(CompactHashTable_t*) = &compact_hash_table_destroy;
+    bool (*fptr)(CompactHashTable_t*) = &compact_hash_table_destroy;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
 
-START_TEST(fn_hash_table_destroy__will_destroy_the_table_correctly) {
+START_TEST(fn_compact_hash_table_destroy__will_destroy_the_table_correctly) {
     CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     ck_assert_ptr_nonnull(ht);
-    
-    //compact_hash_table_destroy(ht);
-    //ck_assert_ptr_null(ht);
+    char* test_key = "test_key";
+    char* res = compact_hash_table_insert(ht, test_key, strlen(test_key), (void*) 5);
+    // the key has been copied, so these pointers shouldn't be the same
+    ck_assert_ptr_ne(res, test_key);
+    // but they should have the same value
+    ck_assert(strcmp(res, test_key) == 0);
+    ck_assert_int_eq(compact_hash_table_destroy(ht), true);
 }
+END_TEST
+
+
+// fn compact_hash_table_insert ----------------------------------------------------------------------------------------
+
+START_TEST(fn_compact_hash_table_insert__is_defined) {
+    char*(*fptr)(CompactHashTable_t*, char const *, size_t, void*) = &compact_hash_table_insert;
+    ck_assert_ptr_nonnull(fptr);    
+}
+END_TEST
+
+
+START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for_null_table) {
+
+    char* key = compact_hash_table_insert(NULL, "key", 4, NULL);
+    ck_assert_ptr_null(key);
+    ck_assert_ptr_eq(_global_error_message, ERROR_NO_PTR_TO_HASH_TABLE);
+}
+END_TEST
+
+
+START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for__null_key) {
+    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    ck_assert_ptr_null(compact_hash_table_insert(ht, NULL, 0, NULL));
+    ck_assert_ptr_eq(_global_error_message, ERROR_NO_PTR_TO_KEY);
+    compact_hash_table_destroy(ht);
+}
+END_TEST
+
 

@@ -163,6 +163,17 @@ int main(void) {
     ADD_TEST(fn_compact_hash_table_create__is_defined);
     ADD_TEST(fn_compact_hash_table_create__allocates_memory_for_hash_table);
 
+    // compact_hash_table_create
+    ADD_TEST(fn_compact_hash_table_create__is_defined);
+    ADD_TEST(fn_compact_hash_table_create__allocates_memory_for_hash_table);
+    ADD_TEST(fn_compact_hash_table_create__correctly_sets_starting_params);
+
+    // compact_hash_table_destroy
+    ADD_TEST(fn_compact_hash_table_destroy__is_defined);
+    ADD_TEST(fn_compact_hash_table_destroy__will_destroy_the_table_correctly);
+    
+    
+    // compact_hash_table
     
 
     // ----------//
@@ -186,7 +197,6 @@ int main(void) {
 
     // fn hash_table_destroy
     ADD_TEST(fn_hash_table_destroy__is_defined);
-    ADD_TEST(fn_hash_table_destroy__will_destroy_the_table_correctly);
 
     // fn hash_table_expand
     ADD_TEST(fn_hash_table_expand__is_defined);

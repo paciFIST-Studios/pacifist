@@ -28,9 +28,25 @@
 #define DELETED_ENTRY_LEN 34
 
 
+#define ERROR_COULD_NOT_ALLOCATE_MEMORY_FOR_HASH_TABLE "[error]: could not allocate memory for hash table"
+#define ERROR_NO_PTR_TO_HASH_TABLE "[error]: no ptr to hash table"
+#define ERROR_NO_PTR_TO_KEY "[error]: no ptr to key"
+#define ERROR_INVALID_KEY "[error]: invalid key"
+#define ERROR_CANNOT_STORE_NULL "[error]: cannot store NULL"
+#define ERROR_CANT_USE_DELETED_ENTRY_AS_KEY "[error]: can't use deleted entry as key"
+
+/*
+ * @brief Do Not Use.  Call get_error_message to read messages stored to this ptr.
+ */
+static char * _global_error_message;
+
+static char* get_error_message() {
+   return _global_error_message; 
+}
+
 
 // fwd declaration for string copy fn 
-typedef char* (StringCopyFunction)(char *, const char *, size_t);
+typedef char* (StringCopyFunction)(const char * src, size_t len);
 
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -43,7 +59,12 @@ typedef uint64_t (HashFunction)(char const *, size_t);
 
 // Polynomial Rolling Hash
 static uint64_t hash_polynomial_64(char const * key, size_t table_size){
-    if(key == NULL || table_size == 0){
+    if(key == NULL){
+        // error cannot hash null key
+        return UINT64_MAX;
+    }
+    if (table_size == 0) {
+        // error table size is zero
         return UINT64_MAX;
     }
 
@@ -130,11 +151,14 @@ typedef struct _CompactHashTable_t {
  * @return                 Null, on error, otherwise, an initialized CompactHashTable
  */
 static CompactHashTable_t * compact_hash_table_create(uint32_t size, HashFunction * hf) {
+    _global_error_message = NULL;
+    
     size_t const total_allocation = sizeof(CompactHashTable_t) + (sizeof(CompactHashTableEntry_t) * size);
 
-    CompactHashTable_t * table = malloc(total_allocation);
+    CompactHashTable_t * table = calloc(total_allocation, 1);
     if (table == NULL) {
         // error, could not allocate memory for hash table
+        _global_error_message = ERROR_COULD_NOT_ALLOCATE_MEMORY_FOR_HASH_TABLE;
         return NULL;
     }
 
@@ -144,36 +168,64 @@ static CompactHashTable_t * compact_hash_table_create(uint32_t size, HashFunctio
 
     // the entries start in the next byte after the table itself
     table->entries = (CompactHashTableEntry_t*)((void*)table + sizeof(CompactHashTable_t));
-
+    
+    // initialize all of these to their "zero" settings
+    for (int32_t i = 0; i < size; i++) {
+        table->entries[i].key = NULL;
+        table->entries[i].key_len = 0;
+        table->entries[i].value = NULL;
+    }
+    
     // in the future, we might want to provide support for the user to add their own allocator,
     // so they can keep 100% of the memory used within the confines of their program
-    table->string_copy_fn = strncpy;
+    table->string_copy_fn = strndup;
 
     return table;
 }
 
 
-static void compact_hash_table_destroy(CompactHashTable_t * ht){
+static bool compact_hash_table_destroy(CompactHashTable_t * ht){
+    _global_error_message = NULL;
+    
     if (ht == NULL){
-        // error, tried to destory null
-        return;
+        // error, tried to destroy null
+        return false;
     }
-   
+
+    // iterate the entries in the entries array 
     if(ht->entries != NULL) {
         int32_t const size = ht->size;
         for (int32_t i = 0; i < size; i++) {
             if (ht->entries[i].key != NULL) {
                 free(ht->entries[i].key);
                 ht->entries[i].key = NULL;
+                ht->entries[i].key_len = 0;
+                ht->entries[i].value = NULL;
             }
         }
-        free(ht->entries);
+        // these entries are the same allocation as the table itself,
+        // so we can't free them here, or it'll segfault
+        //free((void*)ht->entries);
+
+        // we don't have to zero these out, but let's do, so
+        // we remember what's in there
         ht->entries = NULL;
+        ht->used = 0;
+        ht->size = 0;
+        
+        // we're not freeing these, they're in static memory
+        ht->hash_fn = NULL;
+        ht->string_copy_fn = NULL;
+        
     } else {
         // warning, this table has no entries    
     }
+
+    // freeing the table will also free the entries
     free(ht);
     ht = NULL;
+
+    return true;
 }
 
 //void compact_hash_table_print(CompactHashTable_t * ht){
@@ -183,24 +235,31 @@ static void compact_hash_table_destroy(CompactHashTable_t * ht){
 //}
 
 static char* compact_hash_table_insert(CompactHashTable_t * ht, char const * key, size_t key_len, void * value) {
+    _global_error_message = NULL;
+    
     if (ht == NULL) {
         // error, no ptr to hash table
+        _global_error_message = ERROR_NO_PTR_TO_HASH_TABLE;
         return NULL;
     }
     if (key == NULL) {
         // error, no ptr to key
+        _global_error_message = ERROR_NO_PTR_TO_KEY;
         return NULL;
     } 
     if (key_len == 0) {
         // error, invalid key
+        _global_error_message = ERROR_INVALID_KEY;
         return NULL;
     } 
     if (value == NULL) {
-        // error, cannot store null    
+        // error, cannot store null
+        _global_error_message = ERROR_CANNOT_STORE_NULL;
         return NULL;
     }
     if (strncmp(key, DELETED_ENTRY, DELETED_ENTRY_LEN) == 0) {
         // error, you can't use the deleted entry key to store anything
+        _global_error_message = ERROR_CANT_USE_DELETED_ENTRY_AS_KEY;
         return NULL;
     }
 
@@ -242,7 +301,7 @@ static char* compact_hash_table_insert(CompactHashTable_t * ht, char const * key
 
     // we know we don't have this key, b/c we always start checking at the appropriate hash-index
 
-    char * key_copy = strdup(key);
+    char * key_copy = ht->string_copy_fn(key, key_len);
     if (key_copy == NULL) {
         // error, could not duplicate key
         return NULL;
@@ -251,6 +310,7 @@ static char* compact_hash_table_insert(CompactHashTable_t * ht, char const * key
     ht->used++;
 
     entries[index].key = key_copy;
+    entries[index].key_len = key_len;
     entries[index].value = value;
 
     return key_copy;
