@@ -28,12 +28,15 @@
 #define DELETED_ENTRY_LEN 34
 
 
-#define ERROR_COULD_NOT_ALLOCATE_MEMORY_FOR_HASH_TABLE "[error]: could not allocate memory for hash table"
-#define ERROR_NO_PTR_TO_HASH_TABLE "[error]: no ptr to hash table"
-#define ERROR_NO_PTR_TO_KEY "[error]: no ptr to key"
-#define ERROR_INVALID_KEY "[error]: invalid key"
-#define ERROR_CANNOT_STORE_NULL "[error]: cannot store NULL"
-#define ERROR_CANT_USE_DELETED_ENTRY_AS_KEY "[error]: can't use deleted entry as key"
+#define ERROR_COULD_NOT_ALLOCATE_MEMORY_FOR_HASH_TABLE "[CompactHashTable.h][error]: could not allocate memory for hash table"
+#define ERROR_NO_PTR_TO_HASH_TABLE "[CompactHashTable.h][error]: no ptr to hash table"
+#define ERROR_NO_PTR_TO_KEY "[CompactHashTable.h][error]: no ptr to key"
+#define ERROR_INVALID_KEY "[CompactHashTable.h][error]: invalid key"
+#define ERROR_CANNOT_STORE_NULL "[CompactHashTable.h][error]: cannot store NULL"
+#define ERROR_CANT_USE_DELETED_ENTRY_AS_KEY "[CompactHashTable.h][error]: can't use deleted entry as key"
+#define ERROR_TABLE_IS_ENTIRELY_FULL_BUT_HAS_NOT_BEEN_RESIZED "[CompactHashTable.h][error]: table is 100% full, but has not been resized.  Cannot insert key"
+#define ERROR_COULD_NOT_DUPLICATE_KEY_STRING "[CompactHashTable.h][errror]: could not duplicate key string"
+
 
 /*
  * @brief Do Not Use.  Call get_error_message to read messages stored to this ptr.
@@ -264,6 +267,11 @@ static char* compact_hash_table_insert(CompactHashTable_t * ht, char const * key
     }
 
     // check for hash table resize here
+    /* For the CompactHashTable, make it so it can optionally resize at a
+     * specific use-%, and otherwise, it doesn't resize ever.  But,
+     * do include a resize fn, so the user can manually resize it when
+     * they like. (It just won't "help")
+     */
 
 
     // the hashed value of this key
@@ -295,6 +303,7 @@ static char* compact_hash_table_insert(CompactHashTable_t * ht, char const * key
        
         if(has_looped && index == start_index){
             // error, the table is 100% full, but has not been resized
+            _global_error_message = ERROR_TABLE_IS_ENTIRELY_FULL_BUT_HAS_NOT_BEEN_RESIZED;
             return NULL;
         }
     }
@@ -304,14 +313,16 @@ static char* compact_hash_table_insert(CompactHashTable_t * ht, char const * key
     char * key_copy = ht->string_copy_fn(key, key_len);
     if (key_copy == NULL) {
         // error, could not duplicate key
+        _global_error_message = ERROR_COULD_NOT_DUPLICATE_KEY_STRING;
         return NULL;
     } 
 
-    ht->used++;
 
     entries[index].key = key_copy;
     entries[index].key_len = key_len;
     entries[index].value = value;
+
+    ht->used++;
 
     return key_copy;
 }
