@@ -171,7 +171,10 @@ int main(void) {
     // compact_hash_table_destroy
     ADD_TEST(fn_compact_hash_table_destroy__is_defined);
     ADD_TEST(fn_compact_hash_table_destroy__will_destroy_the_table_correctly);
-    
+    ADD_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for__null_key); 
+    ADD_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for_key_len_zero);
+    ADD_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for_null_value);
+    ADD_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for_reserved_deleted_entry_as_key);
     
     // compact_hash_table
     

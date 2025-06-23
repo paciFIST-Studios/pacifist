@@ -192,4 +192,31 @@ START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for
 }
 END_TEST
 
+START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for_key_len_zero) {
+    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    char* test_key = "test_key";
+    ck_assert_ptr_null(compact_hash_table_insert(ht, test_key, 0, test_key));
+    ck_assert_ptr_eq(_global_error_message, ERROR_INVALID_KEY);
+    compact_hash_table_destroy(ht);
+}
+END_TEST
 
+START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for_null_value) {
+    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    char const * test_key = "test_key";
+    size_t const key_len = strlen(test_key);
+    ck_assert_ptr_null(compact_hash_table_insert(ht, test_key, key_len, NULL));
+    ck_assert_ptr_eq(_global_error_message, ERROR_CANNOT_STORE_NULL);
+    compact_hash_table_destroy(ht);
+}
+END_TEST
+
+START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for_reserved_deleted_entry_as_key) {
+    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    char const * test_key = DELETED_ENTRY;
+    size_t const key_len = strlen(test_key);
+    ck_assert_ptr_null(compact_hash_table_insert(ht, test_key, key_len, (void*)test_key));
+    ck_assert_ptr_eq(_global_error_message, ERROR_CANT_USE_DELETED_ENTRY_AS_KEY);
+    compact_hash_table_destroy(ht);
+}
+END_TEST
