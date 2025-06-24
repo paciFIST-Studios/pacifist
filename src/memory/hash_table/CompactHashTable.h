@@ -53,6 +53,19 @@ typedef char* (StringCopyFunction)(const char * src, size_t len);
 
 
 // ---------------------------------------------------------------------------------------------------------------------
+// Helper Functions
+// ---------------------------------------------------------------------------------------------------------------------
+
+static inline bool is_deleted_entry_key(char const * key) {
+    if  (key == NULL) {
+        return false;
+    }
+    
+    return strncmp(key, DELETED_ENTRY, DELETED_ENTRY_LEN) == 0;
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
 // Hashing Functions
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -136,6 +149,13 @@ typedef struct _CompactHashTable_t {
     StringCopyFunction * string_copy_fn;
     // ptr to the array of entries
     CompactHashTableEntry_t * entries;
+
+    // if true, hash table will automatically resize itself, when its
+    // use hits a certain fill%.  Normally, for CompactHashTable,
+    // this is set to false, and the user is asked to manually resize
+    // the hash table with the  compact_hash_table_resize fn
+    bool allow_auto_resize;
+    float auto_resize_percent;
 } CompactHashTable_t;
 
 
@@ -183,6 +203,9 @@ static CompactHashTable_t * compact_hash_table_create(uint32_t size, HashFunctio
     // so they can keep 100% of the memory used within the confines of their program
     table->string_copy_fn = strndup;
 
+    table->allow_auto_resize = false;
+    table->auto_resize_percent = 1.0f;
+    
     return table;
 }
 
@@ -237,6 +260,9 @@ static bool compact_hash_table_destroy(CompactHashTable_t * ht){
 //void compact_hash_table_write_metadata(CompactHashTable_t * ht, FILE * file){
 //}
 
+
+
+
 static char* compact_hash_table_insert(CompactHashTable_t * ht, char const * key, size_t key_len, void * value) {
     _global_error_message = NULL;
     
@@ -266,14 +292,17 @@ static char* compact_hash_table_insert(CompactHashTable_t * ht, char const * key
         return NULL;
     }
 
-    // check for hash table resize here
-    /* For the CompactHashTable, make it so it can optionally resize at a
-     * specific use-%, and otherwise, it doesn't resize ever.  But,
-     * do include a resize fn, so the user can manually resize it when
-     * they like. (It just won't "help")
-     */
+    
+    if (ht->allow_auto_resize) {
+        // do resize
+        /* For the CompactHashTable, make it so it can optionally resize at a
+         * specific use-%, and otherwise, it doesn't resize ever.  But,
+         * do include a resize fn, so the user can manually resize it when
+         * they like. (It just won't "help")
+         */
+    }
 
-
+    
     // the hashed value of this key
     uint64_t const hash = ht->hash_fn(key, key_len);
     // the *starting* index, for this hashed key.  
@@ -334,5 +363,55 @@ static char* compact_hash_table_insert(CompactHashTable_t * ht, char const * key
 //bool compact_hash_table_remove(CompactHashTable_t * ht, char const * key, size_t key_len){
 //    return false;
 //}
+
+static CompactHashTable_t* compact_hash_table_resize(CompactHashTable_t* ht, float increase_factor) {
+    if (ht == NULL) {
+        // error, null arg
+        return NULL;
+    }
+
+    if (increase_factor < 0.0f) {
+        // warn, use destroy fn to destroy table
+        return NULL;
+    }
+
+    if (increase_factor < 1.0f) {
+        // TODO: figure out what to do in this case
+        //  just shrink down until it's 100% full, and do nothing with existing entries?
+        return NULL;
+    }
+    
+    if (ht->entries == NULL) {
+        // warn, invalid entries ptr in table
+        return NULL;
+    }
+
+    // prepare to copy
+    size_t const old_table_size = ht->size;
+    size_t const new_table_size = ht->size * increase_factor + 1;
+
+    // creates a new hash table of the correct size, but it's empty
+    CompactHashTable_t* new_ht = compact_hash_table_create(new_table_size, ht->hash_fn);
+
+    new_ht->allow_auto_resize = ht->allow_auto_resize;
+    new_ht->auto_resize_percent = ht->auto_resize_percent;
+
+    // iterate all the existing entries
+    for (int32_t i = 0; i < old_table_size; i++) {
+        CompactHashTableEntry_t* entry = &ht->entries[i];
+        // skip empty entries, but also skip deleted entries, b/c those are only needed to re-find
+        // the roll-over position of something that was inserted with a collision, but then removed.
+        // we'll re-create equivalent conditions by inserting the keys and values again, simply
+        // by using the insert fn
+        if (entry->key != NULL && !is_deleted_entry_key(entry->key)) {
+            compact_hash_table_insert(new_ht, entry->key, entry->key_len, entry->value);
+        }
+    }
+
+    compact_hash_table_destroy(ht);
+
+    return new_ht;
+}
+
 
 #endif //COMPACT_HASH_TABLE_H

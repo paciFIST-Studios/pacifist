@@ -34,6 +34,29 @@ START_TEST(typedef_StringCopyFunction__can_be_set_to_strncpy) {
 }
 END_TEST
 
+// Helper Functions ----------------------------------------------------------------------------------------------------
+
+START_TEST(fn_is_deleted_entry_key__is_defined) {
+    bool(*fptr)(char const*) = &is_deleted_entry_key;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+
+START_TEST(fn_is_deleted_entry_key__returns_false__for_null_key) {
+    ck_assert_int_eq(is_deleted_entry_key(NULL), false);    
+}
+END_TEST
+
+START_TEST(fn_is_deleted_entry_key__returns_false__for_no_match) {
+    ck_assert_int_eq(is_deleted_entry_key("some_other_key"), false);    
+}
+END_TEST
+
+START_TEST(fn_is_deleted_entry_key__returns_true__for_match) {
+    ck_assert_int_eq(is_deleted_entry_key(DELETED_ENTRY), true);    
+}
+
 
 // Hashing Functions ---------------------------------------------------------------------------------------------------
 
@@ -287,10 +310,97 @@ END_TEST
 
 
 
+// fn compact_hash_table_resize ---------------------------------------------------------------------------------------- 
 
+START_TEST(fn_compact_hash_table_resize__is_defined) {
+    CompactHashTable_t*(*fptr)(CompactHashTable_t*, float) = &compact_hash_table_resize;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
 
+START_TEST(fn_compact_hash_table_resize__returns_null__for_null_hash_table_arg) {
+   ck_assert_ptr_null(compact_hash_table_resize(NULL, 2));
+}
+END_TEST
 
+START_TEST(fn_compact_hash_table_resize__returns_null__for_negative_increase_factor) {
+    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    ck_assert_ptr_null(compact_hash_table_resize(ht, -1.0));
+    compact_hash_table_destroy(ht);
+}
+END_TEST
 
+START_TEST(fn_compact_hash_table_resize__returns_null_for_increase_factor_below_one) {
+    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    ck_assert_ptr_nonnull(ht);
+    ck_assert_int_eq(ht->size, 1);
+    ck_assert_int_eq(ht->used, 0);
+    ck_assert_ptr_null(compact_hash_table_resize(ht, 0.f)); 
+    ck_assert_int_eq(ht->size, 1);
+    ck_assert_int_eq(ht->used, 0);
+}
+END_TEST
 
+START_TEST(fn_compact_hash_table_resize__returns_null__for_null_hash_table_entries_ptr) {
+    CompactHashTable_t ht = {0};
+    ht.entries = NULL;
+    ck_assert_ptr_null(compact_hash_table_resize(&ht, 2));
+}
+END_TEST
 
+START_TEST(fn_compact_hash_table_resize__returns_ptr_to_newly_allocated_hash_table) {
+    CompactHashTable_t* ht1 = compact_hash_table_create(1, hash_polynomial_64);
+    CompactHashTable_t* ht2 = compact_hash_table_resize(ht1, 2.0f);
+    ck_assert_ptr_ne(ht1, ht2);
+    compact_hash_table_destroy(ht2);
+    ht1 = NULL;
+    ht2 = NULL;
+}
+END_TEST
+
+START_TEST(fn_compact_hash_table_reszie__copies_existing_entries_into_new_table) {
+    char const * test_key = "test_key";
+    size_t const test_key_len = strlen(test_key);
+    char const * test_value = "test_value";
+    
+    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    ck_assert_int_eq(ht->used, 0);
+    ck_assert_ptr_nonnull(compact_hash_table_insert(ht, test_key, test_key_len, (void*)test_value));
+    ck_assert_int_eq(ht->used, 1);
+
+    ht = compact_hash_table_resize(ht, 10);
+    ck_assert_int_eq(ht->used, 1);
+
+    compact_hash_table_destroy(ht);
+}
+END_TEST
+
+START_TEST(fn_compact_hsah_table_resize__copies_state_values_during_resize) {
+    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    ck_assert_ptr_nonnull(ht);
+    ck_assert_int_eq(ht->size, 1);
+    ck_assert_int_eq(ht->used, 0);
+    
+    bool allow_auto_resize = true;
+    float auto_resize_percent = 0.9f;
+    StringCopyFunction* string_copy_fn = ht->string_copy_fn;
+    HashFunction* hash_fn = ht->hash_fn;
+
+    ht->allow_auto_resize = allow_auto_resize;
+    ht->auto_resize_percent = auto_resize_percent;
+
+    ht = compact_hash_table_resize(ht, 2.0f);
+    ck_assert_ptr_nonnull(ht);
+
+    // increase %+1
+    ck_assert_int_eq(ht->size, 3);
+    ck_assert_int_eq(ht->used, 0);
+    ck_assert_int_eq(ht->allow_auto_resize, allow_auto_resize);
+    ck_assert_int_eq(ht->auto_resize_percent, auto_resize_percent);
+    ck_assert_ptr_eq(ht->string_copy_fn, string_copy_fn);
+    ck_assert_ptr_eq(ht->hash_fn, hash_fn);
+
+    compact_hash_table_destroy(ht);
+}
+END_TEST
 
