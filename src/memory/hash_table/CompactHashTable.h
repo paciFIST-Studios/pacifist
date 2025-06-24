@@ -295,7 +295,7 @@ static char* compact_hash_table_insert(CompactHashTable_t * ht, char const * key
     CompactHashTableEntry_t * entries = ht->entries;
 
     // if this insertion is in the table, we should update it
-    while (entries[index].key != NULL && strncmp(entries[index].key, DELETED_ENTRY, DELETED_ENTRY_LEN) != 0){
+    while (entries[index].key != NULL && !is_deleted_entry_key(entries[index].key)){
         if (strncmp(entries[index].key, key, key_len) == 0){
            entries[index].value = value;
             return entries[index].key; 
@@ -336,9 +336,35 @@ static char* compact_hash_table_insert(CompactHashTable_t * ht, char const * key
     return key_copy;
 }
 
-//void* compact_hash_table_lookup(CompactHashTable_t * ht, char const * key, size_t key_len){
-//    return NULL;
-//}
+static void* compact_hash_table_lookup(CompactHashTable_t * ht, char const * key, size_t key_len){
+    if (ht == NULL) {
+        // error, null ptr to table
+        return NULL;
+    }
+    if (key == NULL) {
+        // error, null ptr to key
+        return NULL;
+    }
+    if (key_len == 0) {
+        // error, invalid key length
+        return NULL;
+    }
+    
+    size_t index = ht->hash_fn(key, key_len) % ht->size;
+    CompactHashTableEntry_t * entries = ht->entries;
+    while (entries[index].key != NULL && !is_deleted_entry_key(entries[index].key)) {
+        if (strncmp(entries[index].key, key, key_len) == 0){
+            return entries[index].value; 
+        }
+    } 
+
+    // not found
+    return NULL;
+}
+
+
+
+
 //
 //bool compact_hash_table_remove(CompactHashTable_t * ht, char const * key, size_t key_len){
 //    return false;
