@@ -386,17 +386,12 @@ START_TEST(fn_compact_hsah_table_resize__copies_state_values_during_resize) {
     StringCopyFunction* string_copy_fn = ht->string_copy_fn;
     HashFunction* hash_fn = ht->hash_fn;
 
-    ht->allow_auto_resize = allow_auto_resize;
-    ht->auto_resize_percent = auto_resize_percent;
-
     ht = compact_hash_table_resize(ht, 2.0f);
     ck_assert_ptr_nonnull(ht);
 
     // increase %+1
     ck_assert_int_eq(ht->size, 3);
     ck_assert_int_eq(ht->used, 0);
-    ck_assert_int_eq(ht->allow_auto_resize, allow_auto_resize);
-    ck_assert_int_eq(ht->auto_resize_percent, auto_resize_percent);
     ck_assert_ptr_eq(ht->string_copy_fn, string_copy_fn);
     ck_assert_ptr_eq(ht->hash_fn, hash_fn);
 

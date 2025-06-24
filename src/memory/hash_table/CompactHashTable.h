@@ -149,13 +149,6 @@ typedef struct _CompactHashTable_t {
     StringCopyFunction * string_copy_fn;
     // ptr to the array of entries
     CompactHashTableEntry_t * entries;
-
-    // if true, hash table will automatically resize itself, when its
-    // use hits a certain fill%.  Normally, for CompactHashTable,
-    // this is set to false, and the user is asked to manually resize
-    // the hash table with the  compact_hash_table_resize fn
-    bool allow_auto_resize;
-    float auto_resize_percent;
 } CompactHashTable_t;
 
 
@@ -203,9 +196,6 @@ static CompactHashTable_t * compact_hash_table_create(uint32_t size, HashFunctio
     // so they can keep 100% of the memory used within the confines of their program
     table->string_copy_fn = strndup;
 
-    table->allow_auto_resize = false;
-    table->auto_resize_percent = 1.0f;
-    
     return table;
 }
 
@@ -290,16 +280,6 @@ static char* compact_hash_table_insert(CompactHashTable_t * ht, char const * key
         // error, you can't use the deleted entry key to store anything
         _global_error_message = ERROR_CANT_USE_DELETED_ENTRY_AS_KEY;
         return NULL;
-    }
-
-    
-    if (ht->allow_auto_resize) {
-        // do resize
-        /* For the CompactHashTable, make it so it can optionally resize at a
-         * specific use-%, and otherwise, it doesn't resize ever.  But,
-         * do include a resize fn, so the user can manually resize it when
-         * they like. (It just won't "help")
-         */
     }
 
     
@@ -392,9 +372,6 @@ static CompactHashTable_t* compact_hash_table_resize(CompactHashTable_t* ht, flo
 
     // creates a new hash table of the correct size, but it's empty
     CompactHashTable_t* new_ht = compact_hash_table_create(new_table_size, ht->hash_fn);
-
-    new_ht->allow_auto_resize = ht->allow_auto_resize;
-    new_ht->auto_resize_percent = ht->auto_resize_percent;
 
     // iterate all the existing entries
     for (int32_t i = 0; i < old_table_size; i++) {
