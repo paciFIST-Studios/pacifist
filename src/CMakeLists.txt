@@ -30,6 +30,8 @@ set(ENGINE_LIB_SOURCE_FILES
         # algo
         ${CMAKE_CURRENT_SOURCE_DIR}/algo/search.h
         ${CMAKE_CURRENT_SOURCE_DIR}/algo/search.c
+        # bit
+        ${CMAKE_CURRENT_SOURCE_DIR}/bit/bitfield.h
         # core 
         ${CMAKE_CURRENT_SOURCE_DIR}/core/common.h
         ${CMAKE_CURRENT_SOURCE_DIR}/core/WindowConfigStruct.h
@@ -39,10 +41,13 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/io/read.c
         ${CMAKE_CURRENT_SOURCE_DIR}/io/read.h
         # memory
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/QuickHashTable.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/CompactHashTable.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/CompactHashTable.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/LinkedList.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/LinkedList.c
-        memory/hash_table/HashTable.c
-        memory/hash_table/HashTable.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/HashTable.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/HashTable.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/MemoryArena.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/RedBlackTree.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/RedBlackTree.c
@@ -52,14 +57,13 @@ set(ENGINE_LIB_SOURCE_FILES
         # parsers
         ${CMAKE_CURRENT_SOURCE_DIR}/parsers/ConfigFileParser.h
         # project_types.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/project_types.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/project_data_types.h
         # reflection
         ${CMAKE_CURRENT_SOURCE_DIR}/reflection/metadata_reflection_system.c
         ${CMAKE_CURRENT_SOURCE_DIR}/reflection/metadata_reflection_system.h
-        type/typed_pointer.h
-        bit/bitfield.h
-        memory/hash_table/QuickHashTable.h
-        memory/hash_table/CompactHashTable.h
+        # type
+        ${CMAKE_CURRENT_SOURCE_DIR}/type/typed_pointer.h
+        
 )
 
 set(ENGINE_LIB_INCLUDE_DIRECTORIES
@@ -109,3 +113,29 @@ target_include_directories(${PROJECT_NAME}_engine PRIVATE ${ENGINE_LIB_INCLUDE_F
 target_link_libraries(${PROJECT_NAME}_engine PUBLIC ${ENGINE_LIB_DEPENDENCIES})
 
 
+
+# Doxygen -------------------------------------------------------------------------------------------------------------
+
+option(BUILD_DOC "Build Documentation" ON)
+
+set(DOXYGEN_GENERATE_HTML YES)
+
+message("Doxygen build")
+
+find_package(Doxygen)
+if (DOXYGEN_FOUND)
+    set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/../docs/Doxyfile.in)
+    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+    
+    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+    message("Doxygen build")
+    
+    add_custom_target( doc ALL
+            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMENT "Generating API documentation with Doxygen"
+            VERBATIM
+    )
+else ()
+    message("Doxygen needs to be installed to generate API documentation")
+endif ()

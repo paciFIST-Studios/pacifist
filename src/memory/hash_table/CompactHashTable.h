@@ -8,11 +8,15 @@
 #ifndef COMPACT_HASH_TABLE_H
 #define COMPACT_HASH_TABLE_H
 
+// stdlib
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+// framework
+// project
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Defines
@@ -38,15 +42,12 @@
 #define ERROR_COULD_NOT_DUPLICATE_KEY_STRING "[CompactHashTable.h][errror]: could not duplicate key string"
 
 
-/*
- * @brief Do Not Use.  Call get_error_message to read messages stored to this ptr.
+/**
+ * Returns an internally set error message, giving better detail when an error has occurred
+ * during the operation of this a CompactHashTable_t
+ * @return 
  */
-static char * _global_error_message;
-
-static char* get_error_message() {
-   return _global_error_message; 
-}
-
+char* compact_hash_table_get_error_message();
 
 // fwd declaration for string copy fn 
 typedef char* (StringCopyFunction)(const char * src, size_t len);
@@ -74,6 +75,12 @@ typedef uint64_t (HashFunction)(char const *, size_t);
 
 
 // Polynomial Rolling Hash
+/**
+ * 
+ * @param key 
+ * @param table_size 
+ * @return 
+ */
 static uint64_t hash_polynomial_64(char const * key, size_t table_size){
     if(key == NULL){
         // error cannot hash null key
@@ -98,6 +105,12 @@ static uint64_t hash_polynomial_64(char const * key, size_t table_size){
 
 
 // Fowler-Noll-Vo hash
+/**
+ * 
+ * @param key 
+ * @param table_size 
+ * @return 
+ */
 static uint64_t hash_fnv1a_64(char const *key, size_t table_size){
     if(key == NULL || table_size == 0){
         return UINT64_MAX;
@@ -138,7 +151,7 @@ typedef struct CompactHashTableEntry_t {
 /**
  * @brief CompactHashTable_t prioritizes small footprint.
  */
-typedef struct _CompactHashTable_t {
+typedef struct CompactHashTable_t {
     // how many elements can fit in this table
     uint32_t size; 
     // how many elements are in this table now
@@ -162,205 +175,54 @@ typedef struct _CompactHashTable_t {
  * @brief Creates and returns a CompactHashTable.
  *
  * @param size             the number of elements to allocate for this hash table
- * @param HashFunction*    a user-supplied hashing fn
+ * @param hf                a user-supplied hashing fn
  *
  * @return                 Null, on error, otherwise, an initialized CompactHashTable
  */
-static CompactHashTable_t * compact_hash_table_create(uint32_t size, HashFunction * hf) {
-    _global_error_message = NULL;
-    
-    size_t const total_allocation = sizeof(CompactHashTable_t) + (sizeof(CompactHashTableEntry_t) * size);
-
-    CompactHashTable_t * table = calloc(total_allocation, 1);
-    if (table == NULL) {
-        // error, could not allocate memory for hash table
-        _global_error_message = ERROR_COULD_NOT_ALLOCATE_MEMORY_FOR_HASH_TABLE;
-        return NULL;
-    }
-
-    table->size = size;
-    table->used = 0;
-    table->hash_fn = hf;
-
-    // the entries start in the next byte after the table itself
-    table->entries = (CompactHashTableEntry_t*)((void*)table + sizeof(CompactHashTable_t));
-    
-    // initialize all of these to their "zero" settings
-    for (int32_t i = 0; i < size; i++) {
-        table->entries[i].key = NULL;
-        table->entries[i].key_len = 0;
-        table->entries[i].value = NULL;
-    }
-    
-    // in the future, we might want to provide support for the user to add their own allocator,
-    // so they can keep 100% of the memory used within the confines of their program
-    table->string_copy_fn = strndup;
-
-    return table;
-}
+CompactHashTable_t * compact_hash_table_create(uint32_t size, HashFunction * hf);
 
 
-static bool compact_hash_table_destroy(CompactHashTable_t * ht){
-    _global_error_message = NULL;
-    
-    if (ht == NULL){
-        // error, tried to destroy null
-        return false;
-    }
+/**
+ * @brief Destroys the supplied CompactHashTable_t and deallocates all memory used by it.
+ * 
+ * @param ht 
+ * @return 
+ */
+bool compact_hash_table_destroy(CompactHashTable_t * ht);
 
-    // iterate the entries in the entries array 
-    if(ht->entries != NULL) {
-        int32_t const size = ht->size;
-        for (int32_t i = 0; i < size; i++) {
-            if (ht->entries[i].key != NULL) {
-                free(ht->entries[i].key);
-                ht->entries[i].key = NULL;
-                ht->entries[i].key_len = 0;
-                ht->entries[i].value = NULL;
-            }
-        }
-        // these entries are the same allocation as the table itself,
-        // so we can't free them here, or it'll segfault
-        //free((void*)ht->entries);
 
-        // we don't have to zero these out, but let's do, so
-        // we remember what's in there
-        ht->entries = NULL;
-        ht->used = 0;
-        ht->size = 0;
-        
-        // we're not freeing these, they're in static memory
-        ht->hash_fn = NULL;
-        ht->string_copy_fn = NULL;
-        
-    } else {
-        // warning, this table has no entries    
-    }
+void compact_hash_table_print(CompactHashTable_t * ht);
 
-    // freeing the table will also free the entries
-    free(ht);
-    ht = NULL;
 
-    return true;
-}
-
-//void compact_hash_table_print(CompactHashTable_t * ht){
-//}
 //
 //void compact_hash_table_write_metadata(CompactHashTable_t * ht, FILE * file){
 //}
 
 
 
-
-static char* compact_hash_table_insert(CompactHashTable_t * ht, char const * key, size_t key_len, void * value) {
-    _global_error_message = NULL;
-    
-    if (ht == NULL) {
-        // error, no ptr to hash table
-        _global_error_message = ERROR_NO_PTR_TO_HASH_TABLE;
-        return NULL;
-    }
-    if (key == NULL) {
-        // error, no ptr to key
-        _global_error_message = ERROR_NO_PTR_TO_KEY;
-        return NULL;
-    } 
-    if (key_len == 0) {
-        // error, invalid key
-        _global_error_message = ERROR_INVALID_KEY;
-        return NULL;
-    } 
-    if (value == NULL) {
-        // error, cannot store null
-        _global_error_message = ERROR_CANNOT_STORE_NULL;
-        return NULL;
-    }
-    if (strncmp(key, DELETED_ENTRY, DELETED_ENTRY_LEN) == 0) {
-        // error, you can't use the deleted entry key to store anything
-        _global_error_message = ERROR_CANT_USE_DELETED_ENTRY_AS_KEY;
-        return NULL;
-    }
-
-    
-    // the hashed value of this key
-    uint64_t const hash = ht->hash_fn(key, key_len);
-    // the *starting* index, for this hashed key.  
-    // If this position is full, the index will change
-    size_t index = hash % ht->size;
-
-    size_t const start_index = index;
-    bool has_looped = false;
-
-    CompactHashTableEntry_t * entries = ht->entries;
-
-    // if this insertion is in the table, we should update it
-    while (entries[index].key != NULL && !is_deleted_entry_key(entries[index].key)){
-        if (strncmp(entries[index].key, key, key_len) == 0){
-           entries[index].value = value;
-            return entries[index].key; 
-        }
-
-        // increment the index so we can keep looping
-        ++index;
-        
-        // wrap the index so it stays inside the backing table's array
-        if (index >= ht->size) {
-            index = 0;
-            has_looped = true;
-        }
-       
-        if(has_looped && index == start_index){
-            // error, the table is 100% full, but has not been resized
-            _global_error_message = ERROR_TABLE_IS_ENTIRELY_FULL_BUT_HAS_NOT_BEEN_RESIZED;
-            return NULL;
-        }
-    }
-
-    // we know we don't have this key, b/c we always start checking at the appropriate hash-index
-
-    char * key_copy = ht->string_copy_fn(key, key_len);
-    if (key_copy == NULL) {
-        // error, could not duplicate key
-        _global_error_message = ERROR_COULD_NOT_DUPLICATE_KEY_STRING;
-        return NULL;
-    } 
+/**
+ * @brief Inserts the supplied value, using the supplied key, into the supplied table
+ *
+ * @param ht 
+ * @param key 
+ * @param key_len 
+ * @param value   
+ *
+ * @returns char const *
+ */
+char const * compact_hash_table_insert(CompactHashTable_t * ht, char const * key, size_t const key_len, void * value);
 
 
-    entries[index].key = key_copy;
-    entries[index].key_len = key_len;
-    entries[index].value = value;
-
-    ht->used++;
-
-    return key_copy;
-}
-
-static void* compact_hash_table_lookup(CompactHashTable_t * ht, char const * key, size_t key_len){
-    if (ht == NULL) {
-        // error, null ptr to table
-        return NULL;
-    }
-    if (key == NULL) {
-        // error, null ptr to key
-        return NULL;
-    }
-    if (key_len == 0) {
-        // error, invalid key length
-        return NULL;
-    }
-    
-    size_t index = ht->hash_fn(key, key_len) % ht->size;
-    CompactHashTableEntry_t * entries = ht->entries;
-    while (entries[index].key != NULL && !is_deleted_entry_key(entries[index].key)) {
-        if (strncmp(entries[index].key, key, key_len) == 0){
-            return entries[index].value; 
-        }
-    } 
-
-    // not found
-    return NULL;
-}
+/**
+ * @brief Looks up an entry in a CompactHashTable_t, and returns NULL, unless the entry is there.
+ *
+ * @param ht                        the hash table to search
+ * @param key                       the key to look for in the hash map
+ * @param key_len                   the length of the search key
+ *
+ * @returns NULL, on error, or the data associated with this key.
+ */
+void* compact_hash_table_lookup(CompactHashTable_t * ht, char const * key, size_t const key_len);
 
 
 
@@ -370,51 +232,14 @@ static void* compact_hash_table_lookup(CompactHashTable_t * ht, char const * key
 //    return false;
 //}
 
-static CompactHashTable_t* compact_hash_table_resize(CompactHashTable_t* ht, float increase_factor) {
-    if (ht == NULL) {
-        // error, null arg
-        return NULL;
-    }
 
-    if (increase_factor < 0.0f) {
-        // warn, use destroy fn to destroy table
-        return NULL;
-    }
-
-    if (increase_factor < 1.0f) {
-        // TODO: figure out what to do in this case
-        //  just shrink down until it's 100% full, and do nothing with existing entries?
-        return NULL;
-    }
-    
-    if (ht->entries == NULL) {
-        // warn, invalid entries ptr in table
-        return NULL;
-    }
-
-    // prepare to copy
-    size_t const old_table_size = ht->size;
-    size_t const new_table_size = ht->size * increase_factor + 1;
-
-    // creates a new hash table of the correct size, but it's empty
-    CompactHashTable_t* new_ht = compact_hash_table_create(new_table_size, ht->hash_fn);
-
-    // iterate all the existing entries
-    for (int32_t i = 0; i < old_table_size; i++) {
-        CompactHashTableEntry_t* entry = &ht->entries[i];
-        // skip empty entries, but also skip deleted entries, b/c those are only needed to re-find
-        // the roll-over position of something that was inserted with a collision, but then removed.
-        // we'll re-create equivalent conditions by inserting the keys and values again, simply
-        // by using the insert fn
-        if (entry->key != NULL && !is_deleted_entry_key(entry->key)) {
-            compact_hash_table_insert(new_ht, entry->key, entry->key_len, entry->value);
-        }
-    }
-
-    compact_hash_table_destroy(ht);
-
-    return new_ht;
-}
+/**
+ * 
+ * @param ht 
+ * @param increase_factor 
+ * @return 
+ */
+CompactHashTable_t* compact_hash_table_resize(CompactHashTable_t* ht, float increase_factor);
 
 
 #endif //COMPACT_HASH_TABLE_H

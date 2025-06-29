@@ -110,7 +110,7 @@ def parse_files_for_type_symbols(file_paths: list) -> list:
 
 def develop_enum_c_code_from_type_symbols(type_symbols: list) -> str:
     def _as_enum_string(value: str):
-        return f'\tEProjectType__{value},\n'
+        return f'\tEPDT__{value},\n'
    
     year = datetime.date.today().year
     _license = 'MIT License'
@@ -120,10 +120,10 @@ def develop_enum_c_code_from_type_symbols(type_symbols: list) -> str:
 // This file is auto-generated.  Don't edit it.  
 // Instead, edit `generateTypesHeader.py`
 
-#ifndef PROJECT_TYPES_H
-#define PROJECT_TYPES_H
+#ifndef PROJECT_DATA_TYPES_H
+#define PROJECT_DATA_TYPES_H
 
-typedef enum EProjectTypes_t {
+typedef enum EProjectDataTypes_t {
 '''
     
     for ts in type_symbols:
@@ -131,8 +131,8 @@ typedef enum EProjectTypes_t {
         enum_c_code += ts_val
     
     enum_c_code += '''
-} EProjectTypes_t;
-#endif // PROJECT_TYPES_H
+} EProjectDataTypes_t;
+#endif // PROJECT_DATA_TYPES_H
     '''
     return enum_c_code
 
@@ -187,7 +187,7 @@ def get_args(test_args=None):
         setattr(args, 'project_source_directory', f'{PACIFIST_ROOT}/src')
         print(f'Setting default "project_source_directory" = "{args.project_source_directory}"')
     if 'write_types_to_path' not in args or not args.write_types_to_path:
-        setattr(args, 'write_types_to_path', f'{PACIFIST_ROOT}/src/project_types.h')
+        setattr(args, 'write_types_to_path', f'{PACIFIST_ROOT}/src/project_data_types.h')
         print(f'Setting default "write_types_to_path" = "{args.write_types_to_path}"')
 
     if should_early_out(args):

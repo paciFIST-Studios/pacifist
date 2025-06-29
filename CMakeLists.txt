@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.31)
 # name of the project at large
 project(paciFIST VERSION 0.1 LANGUAGES C)
 
+
+
+
+
 # Generate files used in compilation ----------------------------------------------------------------------------------
 
 # todo: run this script when setting up cmake, to prepare for a build
@@ -55,5 +59,6 @@ add_custom_target(run_all_unit_tests
         DEPENDS run_unit_tests_engine
 )
 add_dependencies(${PROJECT_NAME}_engine run_all_unit_tests)
+
 
 
