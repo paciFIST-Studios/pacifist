@@ -13,7 +13,7 @@ char* compact_hash_table_get_error_message() {
 
 
 
-CompactHashTable_t* compact_hash_table_create(uint32_t size, HashFunction * hf) {
+CompactHashTable_t* compact_hash_table_create(uint32_t size, HashFunction_t * hf) {
     compact_hash_table_global_error_message = NULL;  
     
     size_t const total_allocation = sizeof(CompactHashTable_t) + (sizeof(CompactHashTableEntry_t) * size);
@@ -94,9 +94,24 @@ bool compact_hash_table_destroy(CompactHashTable_t* ht) {
 
 
 
+static void compact_hash_table_print_value(EProjectDataTypes_t value_type, void* value) {
+    printf("\t\tvalue_type: ");
+    char const * message = "%s\n\t\tvalue:      \"%s\"\n";
+    
+    if (value_type  == EPDT__Undefined_t) {
+        return;
+    }
+
+    if (value_type == EPDT__char_const_ptr_t) {
+        printf(message, GLOBAL_TYPE_STRING__CHAR_CONST_PTR_T, (char const *)value);
+    }
+    if (value_type == EPDT__char_ptr_t) {
+        printf(message, GLOBAL_TYPE_STRING__CHAR_PTR_T, (char*) value);
+    }
+}
+
 
 void compact_hash_table_print(CompactHashTable_t* ht) {
-    
     printf("[CompactHashTable_t] -- START\n");
     
     if (ht != NULL) {
@@ -105,7 +120,9 @@ void compact_hash_table_print(CompactHashTable_t* ht) {
         if (ht->entries != NULL) {
             for (int32_t i = 0; i < ht->used; i++) {
                 CompactHashTableEntry_t * entry = &ht->entries[i];
-                printf("\t\tmap_index:  %d\n\t\tkey:        %s\n\t\tkey_len:    %ld\n\t\tvalue_addr: %p\n\n", i, entry->key, entry->key_len, entry->value);
+                printf("\t\tmap_index:  %d\n\t\tkey:        \"%s\"\n\t\tkey_len:    %ld\n\t\tvalue_addr: %p\n", i, entry->key, entry->key_len, entry->value);
+                compact_hash_table_print_value(entry->value_type, entry->value);
+                printf("\n");
             }
         }
     }
@@ -119,7 +136,13 @@ void compact_hash_table_print(CompactHashTable_t* ht) {
 
 
 
-char const * compact_hash_table_insert(CompactHashTable_t* ht, char const * key, size_t const key_len, void * value) {
+char const * compact_hash_table_insert(
+    CompactHashTable_t* ht,
+    char const * key,
+    size_t const key_len,
+    EProjectDataTypes_t value_type,
+    void * value)
+{
     compact_hash_table_global_error_message   = NULL;
     
     if (ht == NULL) {
@@ -129,22 +152,27 @@ char const * compact_hash_table_insert(CompactHashTable_t* ht, char const * key,
     }
     if (key == NULL) {
         // error, no ptr to key
-        compact_hash_table_global_error_message   = ERROR_NO_PTR_TO_KEY;
+        compact_hash_table_global_error_message = ERROR_NO_PTR_TO_KEY;
         return NULL;
     } 
     if (key_len == 0) {
         // error, invalid key
-        compact_hash_table_global_error_message   = ERROR_INVALID_KEY;
+        compact_hash_table_global_error_message = ERROR_INVALID_KEY;
         return NULL;
-    } 
+    }
+    if (value_type == EPDT__Undefined_t) {
+        // error, undefined type
+        compact_hash_table_global_error_message = ERROR_UNDEFINED_DATA_TYPE;
+        return NULL;
+    }
     if (value == NULL) {
         // error, cannot store null
-        compact_hash_table_global_error_message   = ERROR_CANNOT_STORE_NULL;
+        compact_hash_table_global_error_message = ERROR_CANNOT_STORE_NULL;
         return NULL;
     }
     if (strncmp(key, DELETED_ENTRY, DELETED_ENTRY_LEN) == 0) {
         // error, you can't use the deleted entry key to store anything
-        compact_hash_table_global_error_message   = ERROR_CANT_USE_DELETED_ENTRY_AS_KEY;
+        compact_hash_table_global_error_message = ERROR_CANT_USE_DELETED_ENTRY_AS_KEY;
         return NULL;
     }
 
@@ -195,6 +223,7 @@ char const * compact_hash_table_insert(CompactHashTable_t* ht, char const * key,
 
     entries[index].key = key_copy;
     entries[index].key_len = key_len;
+    entries[index].value_type = value_type;
     entries[index].value = value;
 
     ht->used++;
@@ -265,7 +294,7 @@ CompactHashTable_t* compact_hash_table_resize(CompactHashTable_t* ht, float incr
         // we'll re-create equivalent conditions by inserting the keys and values again, simply
         // by using the insert fn
         if (entry->key != NULL && !is_deleted_entry_key(entry->key)) {
-            compact_hash_table_insert(new_ht, entry->key, entry->key_len, entry->value);
+            compact_hash_table_insert(new_ht, entry->key, entry->key_len, entry->value_type, entry->value);
         }
     }
 

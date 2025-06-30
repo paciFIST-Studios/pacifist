@@ -2,14 +2,10 @@
 
 import argparse
 import datetime
-import itertools
 import os
-from email.iterators import typed_subpart_iterator
 from pathlib import Path
 import re
 import sys
-from urllib.parse import ResultBase
-from xml.dom import WrongDocumentErr
 
 """ The project root is 3 directories up from this file """
 PACIFIST_ROOT = Path(__file__).parents[2]
@@ -26,6 +22,8 @@ EXIT_WITH_ERROR = 1
 """ The name of this script, as a string, which is used to name the logger """
 PROGRAM_NAME_STRING = os.path.basename(__file__)
 
+""" The name of the export file """
+GENERATED_FILE_NAME = 'project_data_types.h'
 
 
 # Utilities ------------------------------------------------------------------------------------------------------------
@@ -42,7 +40,7 @@ def discover_source_file_paths(root_path: str) -> list:
 
     def _get_ext(f) -> str:
         """ Splits a string using periods, and then returns the last portion of the results.
-         If this is a file path with an extention, it should return just the extension"""
+         If this is a file path with an extension, it should return just the extension"""
         return f.split('.')[-1]
 
     def _allowed_exts() -> list:
@@ -59,12 +57,20 @@ def discover_source_file_paths(root_path: str) -> list:
                 
                 if ext in _allowed_exts():
                     file_path = os.path.join(current, file)
+                    # the generated file lives with the rest of the code,
+                    # so we have to make sure we don't parse it, looking for new types
+                    if GENERATED_FILE_NAME in file_path:
+                        continue
                     results.append(file_path)
    
         for subdir in subdirs:
             subdir_path = os.path.join(current, subdir)
             subdir_files = discover_source_file_paths(subdir_path)
             for file in subdir_files:
+                # the generated file lives with the rest of the code,
+                # so we have to make sure we don't parse it, looking for new types
+                if GENERATED_FILE_NAME in file:
+                    continue
                 ext = _get_ext(file)
                 if ext in _allowed_exts():
                     results.append(file)
@@ -122,6 +128,7 @@ def parse_files_for_type_symbols(file_paths: list) -> list:
                 pruned = pruned.split('enum')[-1].strip()
                 pruned = pruned.split('size_t')[-1].strip()
                
+                # fn ptr types won't capture anything from the data type regex
                 if pruned == '':
                     continue
                 
@@ -133,7 +140,7 @@ def parse_files_for_type_symbols(file_paths: list) -> list:
         if fn_type_matches:
             for fn_type_matches in fn_type_matches:
                 pruned = fn_type_matches.strip()
-               
+              
                 if pruned == '':
                     continue
                 
@@ -163,6 +170,8 @@ def parse_files_for_type_symbols(file_paths: list) -> list:
     
      
     type_symbol_results.sort()
+    # add an undefined type as 0, so we can just throw in a 0 for testing
+    # if the memory was calloc'd, or global/static, then it'll also be 0 by default 
     type_symbol_results.insert(0, 'Undefined_t')
     return type_symbol_results
 
@@ -347,7 +356,7 @@ def get_args(test_args=None):
         setattr(args, 'project_source_directory', f'{PACIFIST_ROOT}/src')
         print(f'Setting default "project_source_directory" = "{args.project_source_directory}"')
     if 'write_types_to_path' not in args or not args.write_types_to_path:
-        setattr(args, 'write_types_to_path', f'{PACIFIST_ROOT}/src/project_data_types.h')
+        setattr(args, 'write_types_to_path', f'{PACIFIST_ROOT}/src/{GENERATED_FILE_NAME}')
         print(f'Setting default "write_types_to_path" = "{args.write_types_to_path}"')
 
     if should_early_out(args):

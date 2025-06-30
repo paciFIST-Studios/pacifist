@@ -16,7 +16,7 @@
 #include <string.h>
 // framework
 // project
-
+#include "../../project_data_types.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Defines
@@ -36,6 +36,7 @@
 #define ERROR_NO_PTR_TO_HASH_TABLE "[CompactHashTable.h][error]: no ptr to hash table"
 #define ERROR_NO_PTR_TO_KEY "[CompactHashTable.h][error]: no ptr to key"
 #define ERROR_INVALID_KEY "[CompactHashTable.h][error]: invalid key"
+#define ERROR_UNDEFINED_DATA_TYPE "[CompactHashTable.h][error]: undefined type for stored value"
 #define ERROR_CANNOT_STORE_NULL "[CompactHashTable.h][error]: cannot store NULL"
 #define ERROR_CANT_USE_DELETED_ENTRY_AS_KEY "[CompactHashTable.h][error]: can't use deleted entry as key"
 #define ERROR_TABLE_IS_ENTIRELY_FULL_BUT_HAS_NOT_BEEN_RESIZED "[CompactHashTable.h][error]: table is 100% full, but has not been resized.  Cannot insert key"
@@ -50,7 +51,7 @@
 char* compact_hash_table_get_error_message();
 
 // fwd declaration for string copy fn 
-typedef char* (StringCopyFunction)(const char * src, size_t len);
+typedef char* (StringCopyFunction_t)(const char * src, size_t len);
 
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -71,7 +72,7 @@ static inline bool is_deleted_entry_key(char const * key) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 // interface for hash-functions
-typedef uint64_t (HashFunction)(char const *, size_t);
+typedef uint64_t (HashFunction_t)(char const *, size_t);
 
 
 // Polynomial Rolling Hash
@@ -142,6 +143,9 @@ typedef struct CompactHashTableEntry_t {
     char * key;
     // length of the lookup key
     size_t key_len;
+
+    // the type of this value, implying how it should be deserialized
+    EProjectDataTypes_t value_type;
     
     // the value stored in this entry
     void * value;
@@ -157,9 +161,9 @@ typedef struct CompactHashTable_t {
     // how many elements are in this table now
     uint32_t used;
     // the fn to use to has new keys
-    HashFunction * hash_fn;
+    HashFunction_t * hash_fn;
     // the fn to use to duplicate a string
-    StringCopyFunction * string_copy_fn;
+    StringCopyFunction_t * string_copy_fn;
     // ptr to the array of entries
     CompactHashTableEntry_t * entries;
 } CompactHashTable_t;
@@ -179,7 +183,7 @@ typedef struct CompactHashTable_t {
  *
  * @return                 Null, on error, otherwise, an initialized CompactHashTable
  */
-CompactHashTable_t * compact_hash_table_create(uint32_t size, HashFunction * hf);
+CompactHashTable_t * compact_hash_table_create(uint32_t size, HashFunction_t * hf);
 
 
 /**
@@ -205,12 +209,18 @@ void compact_hash_table_print(CompactHashTable_t * ht);
  *
  * @param ht 
  * @param key 
- * @param key_len 
+ * @param key_len
+ * @param data_type
  * @param value   
  *
  * @returns char const *
  */
-char const * compact_hash_table_insert(CompactHashTable_t * ht, char const * key, size_t const key_len, void * value);
+char const * compact_hash_table_insert(
+    CompactHashTable_t * ht,
+    char const * key,
+    size_t const key_len,
+    EProjectDataTypes_t value_type,
+    void * value);
 
 
 /**
