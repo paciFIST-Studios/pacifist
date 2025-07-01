@@ -85,6 +85,21 @@ START_TEST(fn_hash_polynomial_64__returns_uint64_max__for_zero_table_length) {
 }
 END_TEST
 
+// struct CompactHashTableEntry_t --------------------------------------------------------------------------------------
+
+START_TEST(struct_CompactHashTableEntry_t__is_defined) {
+    CompactHashTableEntry_t entry = {0};
+    ck_assert_ptr_nonnull(&entry);
+}
+END_TEST
+
+START_TEST(struct_CompactHashTableEntry_t__is_expected_size) {
+    CompactHashTableEntry_t entry = {0};
+    ck_assert_int_eq(sizeof(entry), 32);
+}
+END_TEST
+
+
 
 // struct CompactHashTable_t -------------------------------------------------------------------------------------------
 
@@ -92,6 +107,12 @@ START_TEST(struct_CompactHashTable_t__is_defined) {
     CompactHashTable_t * table = compact_hash_table_create(0, NULL);
     ck_assert_ptr_nonnull(table);
     free(table);
+}
+END_TEST
+
+START_TEST(struct_CompactHashTable_t__is_expected_size) {
+    CompactHashTable_t table = {0};
+    ck_assert_int_eq(sizeof(table), 32);
 }
 END_TEST
 
@@ -162,6 +183,35 @@ START_TEST(fn_compact_hash_table_create__correctly_sets_starting_params) {
     free(table);
     table = NULL;
     ck_assert_ptr_null(table);
+}
+END_TEST
+
+
+START_TEST(fn_compact_hash_table_create__allocates_a_32byte_multiple_size_for_hash_table) {
+    int32_t const test_element_count = 11;
+    size_t const table_size = sizeof(CompactHashTable_t);
+    size_t const element_size = sizeof(CompactHashTableEntry_t);
+
+    // this test repeats with all of these sizes. There shouldn't(TM) be a difference
+    // between a table of 7 entries, and one of 11, but you never know
+    for (int32_t i = 0; i < test_element_count; ++i) {
+        CompactHashTable_t * ht = compact_hash_table_create(i, hash_fnv1a_64);
+
+        uint64_t const table_addr = (uint64_t)ht;
+        
+        for (int32_t j = 0; j < test_element_count; ++j) {
+
+            // checks to make sure this element is in the place we think it is
+            uint64_t const element_addr_predicted = (uint64_t)(table_addr + table_size + (j * element_size)); 
+            uint64_t const element_addr = (uint64_t)&(ht->entries[j]);
+            ck_assert_int_eq(element_addr, element_addr_predicted);
+
+            // checks to make sure this element is 32 byte aligned
+            ck_assert((element_addr - table_addr) % 32 == 0);
+        }
+        
+        compact_hash_table_destroy(ht);
+    }
 }
 END_TEST
 

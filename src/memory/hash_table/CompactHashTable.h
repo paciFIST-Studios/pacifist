@@ -77,57 +77,24 @@ typedef uint64_t (HashFunction_t)(char const *, size_t);
 
 // Polynomial Rolling Hash
 /**
+ * @brief Hashes the supplied key into a uint64_t
  * 
  * @param key 
  * @param table_size 
  * @return 
  */
-static uint64_t hash_polynomial_64(char const * key, size_t table_size){
-    if(key == NULL){
-        // error cannot hash null key
-        return UINT64_MAX;
-    }
-    if (table_size == 0) {
-        // error table size is zero
-        return UINT64_MAX;
-    }
-
-    uint64_t const prime = 27644437;
-    uint64_t power = 1;
-    uint64_t hash = 0;
-
-    for(uint64_t i = 0; i < strlen(key); i++){
-        hash = (hash + ((key[i] - 'a' + 1) * power)) % table_size;
-        power = (power * prime) % table_size;
-    }
-
-    return hash;
-}
+uint64_t hash_polynomial_64(char const * key, size_t table_size);
 
 
 // Fowler-Noll-Vo hash
 /**
+ * @brief Hashes the supplied key into a uint64_t
  * 
  * @param key 
  * @param table_size 
  * @return 
  */
-static uint64_t hash_fnv1a_64(char const *key, size_t table_size){
-    if(key == NULL || table_size == 0){
-        return UINT64_MAX;
-    }
-
-    uint64_t const OFFSET_BASIS = 2166136261U;
-    uint64_t const HASH_PRIME = 16777619U;
-    uint64_t hash = OFFSET_BASIS;
-    
-    for(uint64_t i = 0; i < strlen(key); i++){
-        hash ^= (uint64_t)key[i];
-        hash *= HASH_PRIME;
-    }
-
-    return hash;
-}
+uint64_t hash_fnv1a_64(char const *key, size_t table_size);
 
 
 
