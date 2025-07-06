@@ -4,6 +4,7 @@
 #define UNIT_TEST_RUNNER_H
 
 #include <check.h>
+#include <zlog.h>
 
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
@@ -84,6 +85,10 @@ char * global_module;
 
 
 int main(void) {
+    zlog_category_t * c;
+    // initializing zlog here
+
+    
     /*  Setting NO_FORK here allows us to ensure that check does not spin up child processes to handle
      *  test execution.  One the one hand, this means we're now running the tests serially (I guess),
      *  and it's slower.  But on the other hand, we can set break points in the tests, and debug them, and
@@ -92,8 +97,8 @@ int main(void) {
      *  into the depot.  EBarrett
      */
     //enum fork_status const fs = CK_NOFORK;
-    //srunner_set_fork_status(global_runner, fs);
-
+    //srunner_set_fork_status(global_runner, fs)
+    
     int fail_count = 0;
     
     // -------------------------------------------------------------------//
@@ -152,33 +157,94 @@ int main(void) {
     ADD_TEST(typedef_StringCopyFunction__is_defined);
     ADD_TEST(typedef_StringCopyFunction__can_be_set_to_strncpy);
 
+    // helper fns
+    ADD_TEST(fn_is_deleted_entry_key__is_defined);
+    ADD_TEST(fn_is_deleted_entry_key__returns_false__for_null_key);
+    ADD_TEST(fn_is_deleted_entry_key__returns_false__for_no_match);
+    ADD_TEST(fn_is_deleted_entry_key__returns_true__for_match);
+    
     
     // hash fns
     ADD_TEST(fn_interface_HashFunction__is_defined);
     ADD_TEST(fn_hash_polynomial_64__is_defined);
     ADD_TEST(fn_hash_polynomial_64__returns_uint64_max__for_zero_table_length);
+
+    // struct CompactHashTableEntry_t
+    ADD_TEST(struct_CompactHashTableEntry_t__is_defined);
+    ADD_TEST(struct_CompactHashTableEntry_t__is_expected_size);
     
-    // CompactHashTable_t
+    // struct CompactHashTable_t
     ADD_TEST(struct_CompactHashTable_t__is_defined);
-    ADD_TEST(fn_compact_hash_table_create__is_defined);
-    ADD_TEST(fn_compact_hash_table_create__allocates_memory_for_hash_table);
+    ADD_TEST(struct_CompactHashTable_t__is_expected_size); 
+    
 
     // compact_hash_table_create
     ADD_TEST(fn_compact_hash_table_create__is_defined);
     ADD_TEST(fn_compact_hash_table_create__allocates_memory_for_hash_table);
     ADD_TEST(fn_compact_hash_table_create__correctly_sets_starting_params);
+    ADD_TEST(fn_compact_hash_table_create__allocates_a_32byte_multiple_size_for_hash_table);
 
     // compact_hash_table_destroy
     ADD_TEST(fn_compact_hash_table_destroy__is_defined);
     ADD_TEST(fn_compact_hash_table_destroy__will_destroy_the_table_correctly);
+
+    // compact_hash_table_print
+    ADD_TEST(fn_compact_hash_table_print_is_defined);
+    //ADD_TEST(fn_compact_hash_table_print__test_usage);
+    
+    // compact_hash_table_insert
     ADD_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for__null_key); 
     ADD_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for_key_len_zero);
     ADD_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for_null_value);
+    ADD_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for_data_type_undefined);
     ADD_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for_reserved_deleted_entry_as_key);
-    
-    // compact_hash_table
-    
+    ADD_TEST(fn_compact_hash_table_insert__returns_key_of_existing_value__if_value_is_already_in_table); 
+    ADD_TEST(fn_compact_hash_table_insert__returns_null__if_called_when_table_is_100_percent_full);
+    ADD_TEST(fn_compact_hash_table_insert__returns_null__if_key_string_could_not_be_duplicated);
+    ADD_TEST(fn_compact_hash_table_insert__modifies_existing_value__if_value_is_already_in_table);
 
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    // fn compact_hash_table_lookup
+    ADD_TEST(fn_compact_hash_table_lookup__is_defined);
+    ADD_TEST(fn_compact_hash_table_lookup__returns_null__for_null_ptr_to_table);
+    ADD_TEST(fn_compact_hash_table_lookup__returns_null__for_null_ptr_to_key);
+    ADD_TEST(fn_compact_hash_table_lookup__returns_null__for_key_length_zero);
+    ADD_TEST(fn_compact_hash_table_lookup__returns_null__for_key_not_found_in_table); 
+    ADD_TEST(fn_compact_hash_table_lookup__returns_stored_value__for_correctly_looked_up_value);
+    
+    
+    // fn compact_hash_table_resize
+    ADD_TEST(fn_compact_hash_table_resize__is_defined);
+    ADD_TEST(fn_compact_hash_table_resize__returns_null__for_null_hash_table_arg);
+    ADD_TEST(fn_compact_hash_table_resize__returns_null__for_negative_increase_factor);
+    ADD_TEST(fn_compact_hash_table_resize__returns_null_for_increase_factor_below_one);
+    ADD_TEST(fn_compact_hash_table_resize__returns_null__for_null_hash_table_entries_ptr);
+    ADD_TEST(fn_compact_hash_table_resize__returns_ptr_to_newly_allocated_hash_table);
+    ADD_TEST(fn_compact_hash_table_reszie__copies_existing_entries_into_new_table);
+    ADD_TEST(fn_compact_hsah_table_resize__copies_state_values_during_resize);
+    
+    
+    
+    
+    
+    
+    
+    
+    
     // ----------//
     // HashTable //
     // ----------//

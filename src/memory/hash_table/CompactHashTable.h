@@ -32,10 +32,13 @@
 #define DELETED_ENTRY_LEN 34
 
 
+#define ERROR_INVALID_TABLE_LENGTH "[CompactHashTable.h][error]: Cannot produce hash for zero length table"
+
 #define ERROR_COULD_NOT_ALLOCATE_MEMORY_FOR_HASH_TABLE "[CompactHashTable.h][error]: could not allocate memory for hash table"
-#define ERROR_NO_PTR_TO_HASH_TABLE "[CompactHashTable.h][error]: no ptr to hash table"
-#define ERROR_NO_PTR_TO_KEY "[CompactHashTable.h][error]: no ptr to key"
-#define ERROR_INVALID_KEY "[CompactHashTable.h][error]: invalid key"
+#define ERROR_CANNOT_DEALLOCATE_NULL_PTR_TO_HASH_TABLE "[CompactHashTable.h][error]: cannot deallocate null ptr to hash table"
+#define ERROR_NULL_PTR_TO_HASH_TABLE "[CompactHashTable.h][error]: no ptr to hash table"
+#define ERROR_NULL_PTR_TO_KEY "[CompactHashTable.h][error]: no ptr to key"
+#define ERROR_INVALID_KEY_LENGTH "[CompactHashTable.h][error]: invalid key length"
 #define ERROR_UNDEFINED_DATA_TYPE "[CompactHashTable.h][error]: undefined type for stored value"
 #define ERROR_CANNOT_STORE_NULL "[CompactHashTable.h][error]: cannot store NULL"
 #define ERROR_CANT_USE_DELETED_ENTRY_AS_KEY "[CompactHashTable.h][error]: can't use deleted entry as key"
@@ -72,7 +75,7 @@ static inline bool is_deleted_entry_key(char const * key) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 // interface for hash-functions
-typedef uint64_t (HashFunction_t)(char const *, size_t);
+typedef uint64_t (HashFunction_t)(char const *, size_t const);
 
 
 // Polynomial Rolling Hash
@@ -83,7 +86,7 @@ typedef uint64_t (HashFunction_t)(char const *, size_t);
  * @param table_size 
  * @return 
  */
-uint64_t hash_polynomial_64(char const * key, size_t table_size);
+uint64_t hash_polynomial_64(char const * key, size_t const table_size);
 
 
 // Fowler-Noll-Vo hash
@@ -94,7 +97,7 @@ uint64_t hash_polynomial_64(char const * key, size_t table_size);
  * @param table_size 
  * @return 
  */
-uint64_t hash_fnv1a_64(char const *key, size_t table_size);
+uint64_t hash_fnv1a_64(char const *key, size_t const table_size);
 
 
 
@@ -150,7 +153,9 @@ typedef struct CompactHashTable_t {
  *
  * @return                 Null, on error, otherwise, an initialized CompactHashTable
  */
-CompactHashTable_t * compact_hash_table_create(uint32_t size, HashFunction_t * hf);
+CompactHashTable_t * compact_hash_table_create(
+    uint32_t const size,
+    HashFunction_t * hf);
 
 
 /**
@@ -162,6 +167,11 @@ CompactHashTable_t * compact_hash_table_create(uint32_t size, HashFunction_t * h
 bool compact_hash_table_destroy(CompactHashTable_t * ht);
 
 
+/**
+ * @brief Prints data and some contents of the CompactHashTable to stdout
+ * 
+ * @param ht 
+ */
 void compact_hash_table_print(CompactHashTable_t * ht);
 
 
@@ -170,14 +180,13 @@ void compact_hash_table_print(CompactHashTable_t * ht);
 //}
 
 
-
 /**
  * @brief Inserts the supplied value, using the supplied key, into the supplied table
  *
  * @param ht 
  * @param key 
  * @param key_len
- * @param data_type
+ * @param value_type
  * @param value   
  *
  * @returns char const *
@@ -191,17 +200,36 @@ char const * compact_hash_table_insert(
 
 
 /**
- * @brief Looks up an entry in a CompactHashTable_t, and returns NULL, unless the entry is there.
+ * @brief Looks up a value in a CompactHashTable_t, and returns NULL, unless the value is there.
  *
  * @param ht                        the hash table to search
  * @param key                       the key to look for in the hash map
  * @param key_len                   the length of the search key
  *
- * @returns NULL, on error, or the data associated with this key.
+ * @returns NULL on error, or the data associated with this key.
  */
-void* compact_hash_table_lookup(CompactHashTable_t * ht, char const * key, size_t const key_len);
+void* compact_hash_table_lookup(
+    CompactHashTable_t * ht,
+    char const * key,
+    size_t const key_len);
 
 
+/**
+ * @brief Looks up an entry in a CompactHashTable_t, and returns NULL, unless the entry is there.
+ *
+ *  Returning the entry means a user can determine the data_type of the value, because this
+ *  information exists in the entry
+ * 
+ * @param ht 
+ * @param key 
+ * @param key_len 
+ * @return NULL on error, or the data associated with this entry 
+ */
+CompactHashTableEntry_t const * compact_hash_table_lookup_entry(
+    CompactHashTable_t * ht,
+    char const * key,
+    size_t const key_len
+);
 
 
 //
@@ -216,7 +244,9 @@ void* compact_hash_table_lookup(CompactHashTable_t * ht, char const * key, size_
  * @param increase_factor 
  * @return 
  */
-CompactHashTable_t* compact_hash_table_resize(CompactHashTable_t* ht, float increase_factor);
+CompactHashTable_t* compact_hash_table_resize(
+    CompactHashTable_t* ht,
+    float increase_factor);
 
 
 #endif //COMPACT_HASH_TABLE_H

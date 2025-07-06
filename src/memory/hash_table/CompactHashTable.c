@@ -26,13 +26,15 @@ char* compact_hash_table_get_error_message() {
 // Hashing Functions
 // ---------------------------------------------------------------------------------------------------------------------
 
-uint64_t hash_polynomial_64(char const * key, size_t table_size) {
+uint64_t hash_polynomial_64(char const * key, size_t const table_size) {
+    compact_hash_table_global_error_message = NULL;
+    
     if(key == NULL){
-        // error cannot hash null key
+        compact_hash_table_global_error_message = ERROR_NULL_PTR_TO_KEY;
         return UINT64_MAX;
     }
     if (table_size == 0) {
-        // error table size is zero
+        compact_hash_table_global_error_message = ERROR_INVALID_TABLE_LENGTH;
         return UINT64_MAX;
     }
 
@@ -49,8 +51,16 @@ uint64_t hash_polynomial_64(char const * key, size_t table_size) {
 }
 
 
-uint64_t hash_fnv1a_64(char const *key, size_t table_size){
-    if(key == NULL || table_size == 0){
+uint64_t hash_fnv1a_64(char const *key, size_t const table_size){
+    compact_hash_table_global_error_message = NULL;
+
+    if(key == NULL){
+        compact_hash_table_global_error_message = ERROR_NULL_PTR_TO_KEY;
+        return UINT64_MAX;
+    }
+    
+    if (table_size == 0){
+        compact_hash_table_global_error_message = ERROR_INVALID_TABLE_LENGTH;
         return UINT64_MAX;
     }
 
@@ -69,14 +79,14 @@ uint64_t hash_fnv1a_64(char const *key, size_t table_size){
 // ---------------------------------------------------------------------------------------------------------------------
 // CompactHashTable Functions
 // ---------------------------------------------------------------------------------------------------------------------
-CompactHashTable_t* compact_hash_table_create(uint32_t size, HashFunction_t * hf) {
+
+CompactHashTable_t* compact_hash_table_create(uint32_t const size, HashFunction_t * hf) {
     compact_hash_table_global_error_message = NULL;  
     
     size_t const total_allocation = sizeof(CompactHashTable_t) + (sizeof(CompactHashTableEntry_t) * size);
 
     CompactHashTable_t * table = calloc(total_allocation, 1);
     if (table == NULL) {
-        // error, could not allocate memory for hash table
         compact_hash_table_global_error_message  = ERROR_COULD_NOT_ALLOCATE_MEMORY_FOR_HASH_TABLE;
         return NULL;
     }
@@ -105,17 +115,17 @@ CompactHashTable_t* compact_hash_table_create(uint32_t size, HashFunction_t * hf
 
 
 bool compact_hash_table_destroy(CompactHashTable_t* ht) {
-    compact_hash_table_global_error_message   = NULL;
+    compact_hash_table_global_error_message = NULL;
     
     if (ht == NULL){
-        // error, tried to destroy null
+        compact_hash_table_global_error_message = ERROR_CANNOT_DEALLOCATE_NULL_PTR_TO_HASH_TABLE;
         return false;
     }
 
     // iterate the entries in the entries array 
     if(ht->entries != NULL) {
-        int32_t const size = ht->size;
-        for (int32_t i = 0; i < size; i++) {
+        uint32_t const size = ht->size;
+        for (uint32_t i = 0; i < size; i++) {
             if (ht->entries[i].key != NULL) {
                 free(ht->entries[i].key);
                 ht->entries[i].key = NULL;
@@ -203,17 +213,16 @@ char const * compact_hash_table_insert(
     
     if (ht == NULL) {
         // error, no ptr to hash table
-        compact_hash_table_global_error_message   = ERROR_NO_PTR_TO_HASH_TABLE;
+        compact_hash_table_global_error_message   = ERROR_NULL_PTR_TO_HASH_TABLE;
         return NULL;
     }
     if (key == NULL) {
         // error, no ptr to key
-        compact_hash_table_global_error_message = ERROR_NO_PTR_TO_KEY;
+        compact_hash_table_global_error_message = ERROR_NULL_PTR_TO_KEY;
         return NULL;
     } 
     if (key_len == 0) {
-        // error, invalid key
-        compact_hash_table_global_error_message = ERROR_INVALID_KEY;
+        compact_hash_table_global_error_message = ERROR_INVALID_KEY_LENGTH;
         return NULL;
     }
     if (value_type == EPDT__Undefined_t) {
@@ -231,7 +240,6 @@ char const * compact_hash_table_insert(
         compact_hash_table_global_error_message = ERROR_CANT_USE_DELETED_ENTRY_AS_KEY;
         return NULL;
     }
-
     
     // the hashed value of this key
     uint64_t const hash = ht->hash_fn(key, key_len);
@@ -247,7 +255,7 @@ char const * compact_hash_table_insert(
     // if this insertion is in the table, we should update it
     while (entries[index].key != NULL && !is_deleted_entry_key(entries[index].key)){
         if (strncmp(entries[index].key, key, key_len) == 0){
-           entries[index].value = value;
+            entries[index].value = value;
             return entries[index].key; 
         }
 
@@ -276,7 +284,6 @@ char const * compact_hash_table_insert(
         return NULL;
     } 
 
-
     entries[index].key = key_copy;
     entries[index].key_len = key_len;
     entries[index].value_type = value_type;
@@ -288,30 +295,61 @@ char const * compact_hash_table_insert(
 }
 
 void* compact_hash_table_lookup(CompactHashTable_t * ht, char const * key, size_t const key_len){
+    compact_hash_table_global_error_message = NULL;
+
     if (ht == NULL) {
-        // error, null ptr to table
+        compact_hash_table_global_error_message = ERROR_NULL_PTR_TO_HASH_TABLE;
         return NULL;
     }
     if (key == NULL) {
-        // error, null ptr to key
+        compact_hash_table_global_error_message = ERROR_NULL_PTR_TO_KEY;
         return NULL;
     }
     if (key_len == 0) {
-        // error, invalid key length
+        compact_hash_table_global_error_message = ERROR_INVALID_KEY_LENGTH;
+        return NULL;
+    }
+
+    CompactHashTableEntry_t const * entry = compact_hash_table_lookup_entry(ht, key, key_len);
+    if (entry == NULL) {
         return NULL;
     }
     
+    return entry->value;
+}
+
+
+CompactHashTableEntry_t const * compact_hash_table_lookup_entry(CompactHashTable_t * ht, char const * key, size_t const key_len ) {
+    compact_hash_table_global_error_message = NULL;
+
+    if (ht == NULL) {
+        // error, null arg
+        compact_hash_table_global_error_message = ERROR_NULL_PTR_TO_HASH_TABLE;
+        return NULL;
+    }
+
+    if (key == NULL) {
+        // error, null arg
+        compact_hash_table_global_error_message = ERROR_NULL_PTR_TO_KEY;
+        return NULL;
+    }
+
+    if (key_len == 0) {
+        compact_hash_table_global_error_message = ERROR_INVALID_KEY_LENGTH;
+        return NULL;
+    }
+
     size_t index = ht->hash_fn(key, key_len) % ht->size;
     CompactHashTableEntry_t * entries = ht->entries;
     while (entries[index].key != NULL && !is_deleted_entry_key(entries[index].key)) {
         if (strncmp(entries[index].key, key, key_len) == 0){
-            return entries[index].value; 
+            return &entries[index]; 
         }
     } 
-
-    // not found
+    
     return NULL;
 }
+
 
 CompactHashTable_t* compact_hash_table_resize(CompactHashTable_t* ht, float increase_factor) {
     if (ht == NULL) {

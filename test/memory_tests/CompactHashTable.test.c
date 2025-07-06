@@ -271,7 +271,7 @@ START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for
 
     char const * key = compact_hash_table_insert(NULL, "key", 4, 0, NULL);
     ck_assert_ptr_null(key);
-    ck_assert_ptr_eq(compact_hash_table_get_error_message(), ERROR_NO_PTR_TO_HASH_TABLE);
+    ck_assert_ptr_eq(compact_hash_table_get_error_message(), ERROR_NULL_PTR_TO_HASH_TABLE);
 }
 END_TEST
 
@@ -279,7 +279,7 @@ END_TEST
 START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for__null_key) {
     CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     ck_assert_ptr_null(compact_hash_table_insert(ht, NULL, 0, 0, NULL));
-    ck_assert(strcmp(compact_hash_table_get_error_message(), ERROR_NO_PTR_TO_KEY) == 0);
+    ck_assert(strcmp(compact_hash_table_get_error_message(), ERROR_NULL_PTR_TO_KEY) == 0);
     ck_assert(compact_hash_table_destroy(ht));
 }
 END_TEST
@@ -288,7 +288,7 @@ START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for
     CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     char* test_key = "test_key";
     ck_assert_ptr_null(compact_hash_table_insert(ht, test_key, 0, 0, test_key));
-    ck_assert(strcmp(compact_hash_table_get_error_message(), ERROR_INVALID_KEY) == 0);
+    ck_assert(strcmp(compact_hash_table_get_error_message(), ERROR_INVALID_KEY_LENGTH) == 0);
     ck_assert(compact_hash_table_destroy(ht));
 }
 END_TEST
@@ -336,17 +336,22 @@ START_TEST(fn_compact_hash_table_insert__returns_key_of_existing_value__if_value
 END_TEST
 
 
-//START_TEST(fn_compact_hash_table_insert__modifies_existing_value__if_value_is_already_in_table) {
-//    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
-//    char const * test_key = "test_key";
-//    size_t const key_len = strlen(test_key);
-//    char* res1 = compact_hash_table_insert(ht, test_key, key_len, (void*)test_key);
-//    char* res2 = compact_hash_table_insert(ht, test_key, key_len, (void*)test_key);
-//    // this value was already in the table, so the second insert should return the same, copied key
-//    ck_assert_ptr_eq(res1, res2);
-//    ck_assert(compact_hash_table_destroy(ht));
-//}
-//END_TEST
+START_TEST(fn_compact_hash_table_insert__modifies_existing_value__if_value_is_already_in_table) {
+    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    char const * test_key = "test_key";
+    void * test_value = (void*)test_key;
+    size_t const key_len = strlen(test_key);
+    char const * res1 = compact_hash_table_insert(ht, test_key, key_len, EPDT__char_const_ptr_t, test_value);
+    char const * res2 = compact_hash_table_insert(ht, test_key, key_len, EPDT__char_ptr_t, "some other value");
+    // this value was already in the table, so the second insert should return the same, copied key
+    ck_assert_ptr_eq(res1, res2);
+    // this value should have the new value stored in it, so these should no longer match
+    char const * test_value2 = (char const *)compact_hash_table_lookup(ht, test_key, key_len);
+    ck_assert(strncmp(test_value, test_value2, key_len) != 0);
+    ck_assert(compact_hash_table_destroy(ht));
+}
+END_TEST
+
 
 START_TEST(fn_compact_hash_table_insert__returns_null__if_called_when_table_is_100_percent_full) {
     CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
