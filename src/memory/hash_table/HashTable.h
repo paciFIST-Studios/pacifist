@@ -7,7 +7,7 @@
 #include <stddef.h>
 // framework
 // project
-#include "../core/common.h"
+#include "../../core/common.h"
 
 
 /**
@@ -18,6 +18,7 @@ typedef size_t HashTableIndex_t;
 
 #define HASH_TABLE_DEFAULT_CAPACITY 16
 #define HASH_TABLE_WHEN_RESIZING_INCREASE_SIZE_BY_FACTOR 2
+
 
 /**
  * @brief The struct for a single entry in the hash table. 
@@ -41,8 +42,6 @@ typedef struct HashTable_t {
 } HashTable_t;
 
 
-
-
 /**
  * @brief Allocates and returns a HashTable_t* .
  *
@@ -63,12 +62,12 @@ void hash_table_destroy(HashTable_t* table);
 // test it.  If we moved all of the header into a c file, we could
 // still make it static, and still use it, but then there's no header
 /**
- * @brief increases the size of the hash map
+ * @brief  Do not call this fn---it is an internal helper for HashTable.
  * 
  * @param table 
  * @return 
  */
-bool32 hash_table_expand(HashTable_t* table);
+bool32 _hash_table_expand(HashTable_t* table);
 
 
 
@@ -83,6 +82,7 @@ bool32 hash_table_expand(HashTable_t* table);
  */
 void* hash_table_lookup(HashTable_t const * table, char const * key);
 
+
 /**
  * @brief Inserts a value into the hash table, and associates it with the given key.
  *
@@ -93,6 +93,20 @@ void* hash_table_lookup(HashTable_t const * table, char const * key);
  * @return - the address of a copy of the supplied key, or null, if out of memory 
  */
 char const * hash_table_insert(HashTable_t* table, char const * key, void* value);
+
+
+/**
+ * @brief  Do not call this fn---it is an internal helper for HashTable.
+ * 
+ * @param entries - non-null pointer to the HashTable_t's hash table entries array
+ * @param capacity 
+ * @param key 
+ * @param value 
+ * @param pUsed 
+ * @return 
+ */
+char const * _hash_table_insert_new_entry(HashTableEntry_t* entries, size_t capacity, char const * key, void* value, size_t* pUsed);
+
 
 
 /**

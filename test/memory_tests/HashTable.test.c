@@ -2,7 +2,7 @@
 
 // include
 #include "check.h"
-#include "../../src/memory/HashTable.h"
+#include "../../src/memory/hash_table/HashTable.h"
 
 
 // stdlib
@@ -127,10 +127,11 @@ END_TEST
 // fn hash_table_expand ------------------------------------------------------------------------------------------------
 
 START_TEST(fn_hash_table_expand__is_defined) {
-    bool32(*fptr)(HashTable_t* hash_table) = &hash_table_expand;
+    bool32(*fptr)(HashTable_t* hash_table) = &_hash_table_expand;
     ck_assert_ptr_nonnull(fptr);    
 }
 END_TEST
+
 
 
 // fn hash_table_lookup ------------------------------------------------------------------------------------------------
@@ -153,6 +154,10 @@ END_TEST
 START_TEST(fn_hash_table_insert__is_defined) {
     char const * (*fptr)(HashTable_t* hash_table, char const * key, void* value) = &hash_table_insert;
     ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn__hash_table_insert_element__is_defined) {
 }
 END_TEST
 

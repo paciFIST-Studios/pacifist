@@ -96,8 +96,68 @@ void* hash_table_lookup(HashTable_t const * table, char const * key) {
 }
 
 
-char const * hash_table_insert_new_entry(HashTableEntry_t* entries, size_t capacity, char const * key, void* value, size_t* pUsed) {
-    return NULL;
+char const * _hash_table_insert_new_entry(HashTableEntry_t* entries, size_t capacity, char const * key, void* value, size_t* pUsed) {
+    if (entries == NULL) {
+        // error, cannot operate on null array
+        return NULL;
+    }
+    if (capacity == 0) {
+        // error, cannot operate on array with no capacity
+        return NULL;
+    }
+    if (key == NULL) {
+        // error, cannot insert a value without a key
+        return NULL;
+    }
+    if (value == NULL) {
+        // error, cannot insert a null value
+        return NULL;
+    }
+
+    // if pUsed == NULL <-- this is okay, we do this when expanding the hash table
+
+    uint64 const hash = hash_key_64(key);
+    size_t const key_len = strlen(key);
+    size_t index = (size_t)(hash & (uint64)(capacity - 1));
+
+    bool32 has_looped = FALSE;
+    
+    // loop the backing array, until we find a spot
+    while (entries[index].key != NULL) {
+        if (strncmp(key, entries[index].key, key_len) == 0) {
+            // this key already exists, but the user is allowed to update the value
+            entries[index].value = value;
+            return entries[index].key;
+        }
+        // key wasn't in this slot
+        index++;
+        
+        if (index >= capacity) {
+            if (has_looped) {
+                // error, has looped through available entries and all are full
+                return NULL;
+            }
+            
+            // loop around to check again
+            index = 0;
+            has_looped = TRUE;
+        }
+    } // loop naturally breaks on an empty entry
+
+    char const * new_key = NULL;
+    if (pUsed != NULL) {
+        new_key = strndup(key, key_len);
+        if (new_key == NULL) {
+            // error, could not allocate memory for new key
+            return NULL;
+        }
+        (*pUsed)++;
+    }
+
+    entries[index].key = new_key;
+    entries[index].value = value; 
+
+    return new_key;
 }
 
 
@@ -118,16 +178,16 @@ char const * hash_table_insert(HashTable_t * table, char const * key, void* valu
     }
 
     if (table->used >= table->capacity/2) {
-        if (!hash_table_expand(table)) {
+        if (!_hash_table_expand(table)) {
             return NULL;
         }
     } 
 
-    return hash_table_insert_new_entry(table->_entries, table->capacity, key, value, &table->used);
+    return _hash_table_insert_new_entry(table->_entries, table->capacity, key, value, &table->used);
 }
 
 
-bool32 hash_table_expand(HashTable_t* table) {
+bool32 _hash_table_expand(HashTable_t* table) {
 
     size_t const new_capacity = table -> capacity * HASH_TABLE_WHEN_RESIZING_INCREASE_SIZE_BY_FACTOR;
     if (new_capacity < table->capacity) {
@@ -144,7 +204,7 @@ bool32 hash_table_expand(HashTable_t* table) {
     for (size_t i = 0; i < table->capacity; i++) {
         HashTableEntry_t const entry = table->_entries[i];
         if (entry.key != NULL) {
-            hash_table_insert_new_entry(new_entries, new_capacity, entry.key, entry.value, NULL);
+            _hash_table_insert_new_entry(new_entries, new_capacity, entry.key, entry.value, NULL);
         }
     }
 
