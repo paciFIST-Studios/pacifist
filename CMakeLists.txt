@@ -36,6 +36,7 @@ set(CMAKE_LINK_WARNING_AS_ERROR ON)
 
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
 
+
 # Compiler output settings ------------------------------------------------------------------------
 
 # set the directory for exporting the shared libraries

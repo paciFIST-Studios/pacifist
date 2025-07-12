@@ -34,6 +34,7 @@ add_executable(run_unit_tests_engine ${TEST_LIB_SOURCE_FILES})
 target_link_libraries(run_unit_tests_engine PRIVATE 
         ${PROJECT_NAME}_engine_lib
         check
+        zlog
 )
 
 # this adds a some kind of command to CMake, which we can call

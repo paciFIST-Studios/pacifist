@@ -20,6 +20,10 @@
 #       2. include the file as "include", if it's a regular header
 #
 
+# only the src project is being compiled with these warnings
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror")
+# set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -fsanitize=address")
+
 # here, we're setting a local variable, ENGINE_LIB_SOURCE_FILES
 # and we're using it to hold ALL of the files we're compiling.
 # so this is 100% manual.  If something is "header only", it 
@@ -44,13 +48,13 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/QuickHashTable.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/CompactHashTable.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/CompactHashTable.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/memory/LinkedList.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/memory/LinkedList.c
+        memory/list/LinkedList.h
+        memory/list/LinkedList.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/HashTable.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/HashTable.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/memory/MemoryArena.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/memory/RedBlackTree.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/memory/RedBlackTree.c
+        memory/allocator/MemoryArena.h
+        memory/tree/RedBlackTree.h
+        memory/tree/RedBlackTree.c
         # os
         ${CMAKE_CURRENT_SOURCE_DIR}/os/path.h
         ${CMAKE_CURRENT_SOURCE_DIR}/os/os_utility.h
