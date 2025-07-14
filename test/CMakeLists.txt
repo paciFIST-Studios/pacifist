@@ -23,7 +23,9 @@ set(TEST_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/HashTable.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/LinkedList.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/MemoryArena.test.c
-        type_tests/TypedPtr.test.c
+        
+        # type tests
+        ${CMAKE_CURRENT_SOURCE_DIR}/type_tests/TypedPtr.test.c
 
 )
 

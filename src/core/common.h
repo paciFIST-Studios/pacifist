@@ -3,36 +3,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-
-// Asserts -------------------------------------------------------------------------------------------------------------
 #include <stdio.h>
 
-#define BUILD_SETTING_ALLOW_ASSERTS 1
-
-#ifdef BUILD_SETTING_ALLOW_ASSERTS
-inline void do_assertion(char const * fn, char const * file, int line) {
-    fprintf(stderr, "ASSERTION FAILED! fn: %s, file: %s, line: %d", fn, file, line);
-    // force a crash using null deref
-    *(int*)0 = 0;
-}
-#define ASSERT(expression) do { if(!expression){ do_assertion(__func__, __FILE__, __LINE__); } } while(0);
-#else
-#define ASSERT(expression);
-#endif
-
-#ifdef BUILD_SETTING_ALLOW_ASSERTS
-inline void do_assertion_message(char const * message, char const * fn, char const * file, int line) {
-    fprintf(stderr, "ASSERTION FAILED!  %s  fn: %s, file: %s, line: %d", message, fn, file, line);
-    // force a crash using null deref
-    *(int*)0 = 0;
-}
-
-// Asserts that the condition is true.  If it is not, this message is printed to stderr, along with the function, file, and line 
-#define ASSERT_MESSAGE(expression, message) \
-    do { if(!expression){ do_assertion_message(message, __func__, __FILE__, __LINE__); } } while(0);
-#else
-
-#endif
 
 
 // Print Debug ---------------------------------------------------------------------------------------------------------
@@ -113,44 +85,46 @@ typedef size_t MemoryIndex_t;
 
 #define EPSILON 0.00001f
 
-#define R32_APPROX_EQUAL(a, b) (bool32) is_approximately_equal_R32(a, b, EPSILON)
-// https://stackoverflow.com/a/253874
-internal bool32
-is_approximately_equal_R32(real32 a, real32 b, real32 epsilon){
-    return __builtin_fabs(a - b) <= (
-            __builtin_fabs(a) < __builtin_fabs(b)
-                ? __builtin_fabs(b)
-                : __builtin_fabs(a) * epsilon
-    );
-}
+//#define R32_APPROX_EQUAL(a, b) (bool32) is_approximately_equal_R32(a, b, EPSILON)
+//// https://stackoverflow.com/a/253874
+//internal bool32
+//is_approximately_equal_R32(real32 a, real32 b, real32 epsilon){
+//    return __builtin_fabs(a - b) <= (
+//            __builtin_fabs(a) < __builtin_fabs(b)
+//                ? __builtin_fabs(b)
+//                : __builtin_fabs(a) * epsilon
+//    );
+//}
+//
+//#define R32_EQUAL(a, b) (bool32) is_essentially_equal_R32(a, b, EPSILON)
+//// https://stackoverflow.com/a/253874
+//internal bool32
+//is_essentially_equal_R32(real32 a, real32 b, real32 epsilon){
+//    return __builtin_fabs(a - b) <= (
+//            __builtin_fabs(a) > __builtin_fabs(b)
+//                ? __builtin_fabs(b)
+//                : __builtin_fabs(a) * epsilon
+//    );
+//}
+//
+//
+//// little endian
+//// https://stackoverflow.com/a/3974138 
+//internal void
+//print_bits_le(size_t const size, void const * const ptr){
+//uint8 * b = (uint8 *) ptr;
+//uint8 byte;
+//
+//for(size_t i = size-1; i > 0; i--){
+//        for(size_t j = 7; j > 0; j--){
+//            byte = (b[i] >> j) & 1;
+//            printf("%u", byte);
+//        }
+//    }
+//    puts("");
+//}
 
-#define R32_EQUAL(a, b) (bool32) is_essentially_equal_R32(a, b, EPSILON)
-// https://stackoverflow.com/a/253874
-internal bool32
-is_essentially_equal_R32(real32 a, real32 b, real32 epsilon){
-    return __builtin_fabs(a - b) <= (
-            __builtin_fabs(a) > __builtin_fabs(b)
-                ? __builtin_fabs(b)
-                : __builtin_fabs(a) * epsilon
-    );
-}
 
-
-// little endian
-// https://stackoverflow.com/a/3974138 
-internal void
-print_bits_le(size_t const size, void const * const ptr){
-uint8 * b = (uint8 *) ptr;
-uint8 byte;
-
-for(size_t i = size-1; i > 0; i--){
-        for(size_t j = 7; j > 0; j--){
-            byte = (b[i] >> j) & 1;
-            printf("%u", byte);
-        }
-    }
-    puts("");
-}
 
 
 #endif //COMMON_H

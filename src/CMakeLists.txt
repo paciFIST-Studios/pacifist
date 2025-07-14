@@ -21,7 +21,7 @@
 #
 
 # only the src project is being compiled with these warnings
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -pedantic")
 # set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -fsanitize=address")
 
 # here, we're setting a local variable, ENGINE_LIB_SOURCE_FILES
@@ -30,13 +30,18 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror")
 # goes in this list too
 # TODO: Update so we automatically get files, but we need an "allow list" and a "block list", and for something to be included it needs to be on the "allow list" and NOT on the "block list":w
 set(ENGINE_LIB_SOURCE_FILES
+        
+        # _games/snake
+        ${CMAKE_CURRENT_SOURCE_DIR}/_games/snake.h
 
+        
         # algo
         ${CMAKE_CURRENT_SOURCE_DIR}/algo/search.h
         ${CMAKE_CURRENT_SOURCE_DIR}/algo/search.c
         # bit
         ${CMAKE_CURRENT_SOURCE_DIR}/bit/bitfield.h
         # core 
+        ${CMAKE_CURRENT_SOURCE_DIR}/core/assert.h
         ${CMAKE_CURRENT_SOURCE_DIR}/core/common.h
         ${CMAKE_CURRENT_SOURCE_DIR}/core/WindowConfigStruct.h
         # log
@@ -48,13 +53,13 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/QuickHashTable.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/CompactHashTable.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/CompactHashTable.c
-        memory/list/LinkedList.h
-        memory/list/LinkedList.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/list/LinkedList.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/list/LinkedList.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/HashTable.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/HashTable.h
-        memory/allocator/MemoryArena.h
-        memory/tree/RedBlackTree.h
-        memory/tree/RedBlackTree.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/MemoryArena.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/tree/RedBlackTree.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/tree/RedBlackTree.c
         # os
         ${CMAKE_CURRENT_SOURCE_DIR}/os/path.h
         ${CMAKE_CURRENT_SOURCE_DIR}/os/os_utility.h
@@ -67,6 +72,9 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/reflection/metadata_reflection_system.h
         # type
         ${CMAKE_CURRENT_SOURCE_DIR}/type/typed_pointer.h
+        # string
+        ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.h
+        
         
 )
 

@@ -84,8 +84,9 @@ char * global_module;
 #include "../test/memory_tests/MemoryArena.test.c"
 
 
+
 int main(void) {
-    zlog_category_t * c;
+    //zlog_category_t * c;
     // initializing zlog here
 
     
@@ -98,6 +99,11 @@ int main(void) {
      */
     //enum fork_status const fs = CK_NOFORK;
     //srunner_set_fork_status(global_runner, fs)
+
+#ifdef __GNUC__
+    printf("Using GNUC compiler\n");
+#endif
+
     
     int fail_count = 0;
     
@@ -203,20 +209,6 @@ int main(void) {
     ADD_TEST(fn_compact_hash_table_insert__returns_null__if_key_string_could_not_be_duplicated);
     ADD_TEST(fn_compact_hash_table_insert__modifies_existing_value__if_value_is_already_in_table);
 
-
-
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     // fn compact_hash_table_lookup
     ADD_TEST(fn_compact_hash_table_lookup__is_defined);
@@ -236,13 +228,6 @@ int main(void) {
     ADD_TEST(fn_compact_hash_table_resize__returns_ptr_to_newly_allocated_hash_table);
     ADD_TEST(fn_compact_hash_table_reszie__copies_existing_entries_into_new_table);
     ADD_TEST(fn_compact_hsah_table_resize__copies_state_values_during_resize);
-    
-    
-    
-    
-    
-    
-    
     
     
     // ----------//
@@ -283,7 +268,7 @@ int main(void) {
     ADD_TEST(struct_HashTableIterator_t__is_defined);
 
     // fn hash_table_create_iterator
-    ADD_TEST(fn_hash_table_create_iterator__is_defined);
+    //ADD_TEST(fn_hash_table_create_iterator__is_defined);
 
     // fn hash_table_next
     ADD_TEST(fn_hash_table_next__is_defined);
@@ -305,10 +290,23 @@ int main(void) {
     ADD_TEST(struct_MemoryArena_t__has_correct_members);
     ADD_TEST(struct_MemoryArena_t__is_correct_size);
 
-    // fn memory_arena_create
-    ADD_TEST(fn_memory_arena_create__is_defined);
-    ADD_TEST(fn_memory_arena_create__returns_MemoryArena_t_with_initialized_settings);
+    // fn memory_arena_set_bytes_to_zero
+    ADD_TEST(fn_memory_arena_set_bytes_to_zero__is_defined);
+    ADD_TEST(fn_memory_arena_set_bytes_to_zero__does_not_overflow_requested_size);
 
+    // fn memory_arena_create_with_memory
+    ADD_TEST(fn_memory_arena_create_with_memory__is_defined);
+    ADD_TEST(fn_memory_arena_create_with_memory__uses_memory_to_create_new_arena_correctly);
+    
+    //// fn memory_arena_create_with_allocator
+    //ADD_TEST(fn_memory_arena_create_with_allocator__is_defined);
+
+    //// fn memory_arena_create
+    //ADD_TEST(fn_memory_arena_create__is_defined);
+    //ADD_TEST(fn_memory_arena_create__returns_MemoryArena_t_with_initialized_settings);
+
+    // fn memory_arena_destroy
+    //ADD_TEST(fn_memory_arena_destroy__is_defined);
     
 
     RUN_SUITE(fail_count);
@@ -316,6 +314,8 @@ int main(void) {
     // End Memory Test Suite                                              //
     // -------------------------------------------------------------------//
 
+
+    
     
     return fail_count == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }

@@ -4,10 +4,7 @@ cmake_minimum_required(VERSION 3.31)
 project(paciFIST VERSION 0.1 LANGUAGES C)
 
 
-
-
-
-# Generate files used in compilation ----------------------------------------------------------------------------------
+# Generate files used in compilation -----------------------------------------------------------------------------------
 
 # todo: run this script when setting up cmake, to prepare for a build
 #find_package(Python3 REQUIRED)
@@ -24,7 +21,13 @@ project(paciFIST VERSION 0.1 LANGUAGES C)
 #endif ()
 
 
-# Compiler strictness settings --------------------------------------------------------------------
+# Compiler -------------------------------------------------------------------------------------------------------------
+
+#set(CMAKE_C_COMPILER "/usr/bin/clang")
+
+
+
+# Compiler strictness settings -----------------------------------------------------------------------------------------
 
 # we're using C17, which is just a better version of C11,
 # and hoping this will be compatible with the Switch
@@ -52,6 +55,7 @@ add_subdirectory(vendor)
 add_subdirectory(src)
 add_subdirectory(test)
 add_subdirectory(one_off)
+#add_subdirectory(games)
 
 
 # Run tests after build ---------------------------------------------------------------------------
