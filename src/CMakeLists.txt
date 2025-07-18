@@ -24,6 +24,9 @@
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -pedantic")
 # set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -fsanitize=address")
 
+
+
+
 # here, we're setting a local variable, ENGINE_LIB_SOURCE_FILES
 # and we're using it to hold ALL of the files we're compiling.
 # so this is 100% manual.  If something is "header only", it 
@@ -43,6 +46,8 @@ set(ENGINE_LIB_SOURCE_FILES
         # core 
         ${CMAKE_CURRENT_SOURCE_DIR}/core/assert.h
         ${CMAKE_CURRENT_SOURCE_DIR}/core/common.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/core/error.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/core/error.c
         ${CMAKE_CURRENT_SOURCE_DIR}/core/WindowConfigStruct.h
         # log
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log_utility.h
@@ -74,8 +79,8 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/type/typed_pointer.h
         # string
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.h
-        
-        
+
+
 )
 
 set(ENGINE_LIB_INCLUDE_DIRECTORIES

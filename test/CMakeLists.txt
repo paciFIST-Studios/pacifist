@@ -26,6 +26,7 @@ set(TEST_LIB_SOURCE_FILES
         
         # type tests
         ${CMAKE_CURRENT_SOURCE_DIR}/type_tests/TypedPtr.test.c
+        core_tests/error.test.c
 
 )
 
