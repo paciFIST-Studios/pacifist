@@ -33,6 +33,7 @@ set(TEST_LIB_SOURCE_FILES
         
         # type_tests
         ${CMAKE_CURRENT_SOURCE_DIR}/type_tests/TypedPtr.test.c
+        log_tests/log.test.c
 
 )
 

@@ -80,6 +80,8 @@ set(ENGINE_LIB_SOURCE_FILES
         # string
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.h
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.c
+        log/log.h
+        log/log.c
 
 
 )
