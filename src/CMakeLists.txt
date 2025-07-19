@@ -79,6 +79,7 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/type/typed_pointer.h
         # string
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.c
 
 
 )

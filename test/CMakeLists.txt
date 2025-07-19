@@ -14,6 +14,9 @@ set(TEST_LIB_SOURCE_FILES
         # all of the directories under the test directory, should have "tests" at the end
         # yes, it is redundant information, but we don't want any confusion when comparing
         # /src/memory to /test/memory --- especially if we're using this path generator
+      
+        # core tests
+        ${CMAKE_CURRENT_SOURCE_DIR}/core_tests/error.test.c
         
         # memory_tests
         ${CMAKE_CURRENT_SOURCE_DIR}/algo_tests/search.test.c
@@ -23,10 +26,13 @@ set(TEST_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/HashTable.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/LinkedList.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/MemoryArena.test.c
+
+        # string_tests
+        ${CMAKE_CURRENT_SOURCE_DIR}/string_tests/PString.test.c
         
-        # type tests
+        
+        # type_tests
         ${CMAKE_CURRENT_SOURCE_DIR}/type_tests/TypedPtr.test.c
-        core_tests/error.test.c
 
 )
 
