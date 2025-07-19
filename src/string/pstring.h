@@ -25,10 +25,13 @@ typedef struct PString_t {
 
 
 
+int32_t pstring_contains_char_sub(PString_t const a, char const * substring, size_t const length);
+
 
 // returns 1 is A contains B
 // returns 0 otherwise
-int32_t pstring_contains_substring(PString_t const a, PString_t const b);
+int32_t pstring_contains_pstr_sub(PString_t const a, PString_t const b);
+
 
 
 

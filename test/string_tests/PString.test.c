@@ -26,35 +26,35 @@ START_TEST(struct_PString_t__has_expected_size) {
 
 // fn pstring_contains_substring ---------------------------------------------------------------------------------------
 
-START_TEST(fn_pstring_contains_substring__is_defined) {
-    int32_t(*fptr)(PString_t const, PString_t const) = & pstring_contains_substring;
+START_TEST(fn_pstring_contains_pstr_sub__is_defined) {
+    int32_t(*fptr)(PString_t const, PString_t const) = & pstring_contains_pstr_sub;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
-START_TEST(fn_pstring_contains_substring__returns_false_if_substring_is_longer_that_first_string) {
+START_TEST(fn_pstring_contains_pstr_sub__returns_false_if_substring_is_longer_that_first_string) {
     PString_t pstr1 = { .string = "a", .length = 1 };
     PString_t pstr2 = { .string = "ab", .length = 2 };
-    ck_assert_int_eq(pstring_contains_substring(pstr1, pstr2), 0);
+    ck_assert_int_eq(pstring_contains_pstr_sub(pstr1, pstr2), 0);
 }
 END_TEST
 
-START_TEST(fn_pstring_contains_substring__can_find_a_substring) {
+START_TEST(fn_pstring_contains_pstr_sub__can_find_a_substring) {
     PString_t a = { .string = "ab", .length = 2 };
     PString_t b = { .string =  "a", .length = 1 };
     
     //pstring_contains_substring(a, b);  
-    ck_assert_int_eq(pstring_contains_substring(a, b), 1);  
+    ck_assert_int_eq(pstring_contains_pstr_sub(a, b), 1);  
 }
 END_TEST
 
-START_TEST(fn_pstring_contains_substring__stress_testing) {
+START_TEST(fn_pstring_contains_pstr_sub__stress_testing) {
     char * test_string_a = "gold old ld d";
     char * test_substring_a = "gold";
     PString_t ta = { .string = test_string_a, .length = strlen(test_string_a) };
     PString_t tsa = { .string = test_substring_a, .length = strlen(test_substring_a) };
 
-    ck_assert_int_eq(1, pstring_contains_substring(ta, tsa));
+    ck_assert_int_eq(1, pstring_contains_pstr_sub(ta, tsa));
     
     char * test_string = "There are strange things done in the midnight sun by the men who moil for gold";
     char * test_substring1 = "range";
@@ -68,19 +68,24 @@ START_TEST(fn_pstring_contains_substring__stress_testing) {
     PString_t e = { .string = test_substring4, .length = strlen(test_substring4) };
 
     // matches substring which is part of a word
-    pstring_contains_substring(a, b);
-    ck_assert_int_eq(1, pstring_contains_substring(a, b));
+    ck_assert_int_eq(1, pstring_contains_pstr_sub(a, b));
     // matches substring which includes whitespace
-    ck_assert_int_eq(1, pstring_contains_substring(a, c));
+    ck_assert_int_eq(1,  pstring_contains_pstr_sub(a, c));
     // matches substring which is a word
-    ck_assert_int_eq(1, pstring_contains_substring(a, d));
+    ck_assert_int_eq(1,  pstring_contains_pstr_sub(a, d));
     // does not match substring which doesn't appear,
     // even if part of the substring does appear
-    ck_assert_int_eq(0, pstring_contains_substring(a, e));
+    ck_assert_int_eq(0,  pstring_contains_pstr_sub(a, e));
 }
 END_TEST
 
 
+// fn pstring_contains_char_sub ----------------------------------------------------------------------------------------
 
+START_TEST(fn_pstring_constains_char_sub__is_defined) {
+    int32_t(*fptr)(PString_t const, char const *, size_t const) = &pstring_contains_char_sub;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
 
 
