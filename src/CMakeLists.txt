@@ -36,7 +36,6 @@ set(ENGINE_LIB_SOURCE_FILES
         
         # _games/snake
         ${CMAKE_CURRENT_SOURCE_DIR}/_games/snake.h
-
         
         # algo
         ${CMAKE_CURRENT_SOURCE_DIR}/algo/search.h
@@ -46,14 +45,19 @@ set(ENGINE_LIB_SOURCE_FILES
         # core 
         ${CMAKE_CURRENT_SOURCE_DIR}/core/assert.h
         ${CMAKE_CURRENT_SOURCE_DIR}/core/common.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/core/define.h
         ${CMAKE_CURRENT_SOURCE_DIR}/core/error.h
         ${CMAKE_CURRENT_SOURCE_DIR}/core/error.c
         ${CMAKE_CURRENT_SOURCE_DIR}/core/WindowConfigStruct.h
-        # log
-        ${CMAKE_CURRENT_SOURCE_DIR}/log/log_utility.h
+        # d,e,f,g,h
         # io
         ${CMAKE_CURRENT_SOURCE_DIR}/io/read.c
         ${CMAKE_CURRENT_SOURCE_DIR}/io/read.h
+        # j,k
+        # log
+        ${CMAKE_CURRENT_SOURCE_DIR}/log/log_utility.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/log/log.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/log/log.c
         # memory
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/QuickHashTable.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/CompactHashTable.h
@@ -65,6 +69,7 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/MemoryArena.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/tree/RedBlackTree.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/tree/RedBlackTree.c
+        # n
         # os
         ${CMAKE_CURRENT_SOURCE_DIR}/os/path.h
         ${CMAKE_CURRENT_SOURCE_DIR}/os/os_utility.h
@@ -72,18 +77,20 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/parsers/ConfigFileParser.h
         # project_types.h
         ${CMAKE_CURRENT_SOURCE_DIR}/project_data_types.h
+        # q
         # reflection
         ${CMAKE_CURRENT_SOURCE_DIR}/reflection/metadata_reflection_system.c
         ${CMAKE_CURRENT_SOURCE_DIR}/reflection/metadata_reflection_system.h
-        # type
-        ${CMAKE_CURRENT_SOURCE_DIR}/type/typed_pointer.h
         # string
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.h
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.c
-        log/log.h
-        log/log.c
-
-
+        # type
+        ${CMAKE_CURRENT_SOURCE_DIR}/type/typed_pointer.h
+        os/os_utility.c
+        date/datetime.h
+        date/datetime.c
+        log/log_category.h
+        # u,v,w,x,y,z 
 )
 
 set(ENGINE_LIB_INCLUDE_DIRECTORIES

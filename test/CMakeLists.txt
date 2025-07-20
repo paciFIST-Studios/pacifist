@@ -18,7 +18,10 @@ set(TEST_LIB_SOURCE_FILES
         # core tests
         ${CMAKE_CURRENT_SOURCE_DIR}/core_tests/error.test.c
         
-        # memory_tests
+        # log tests
+        ${CMAKE_CURRENT_SOURCE_DIR}/log_tests/log.test.c
+        
+        # memory tests
         ${CMAKE_CURRENT_SOURCE_DIR}/algo_tests/search.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/bit/bitfield.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/RedBlackTree.test.c
@@ -27,13 +30,14 @@ set(TEST_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/LinkedList.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/MemoryArena.test.c
 
-        # string_tests
+        # string tests
         ${CMAKE_CURRENT_SOURCE_DIR}/string_tests/PString.test.c
         
         
         # type_tests
         ${CMAKE_CURRENT_SOURCE_DIR}/type_tests/TypedPtr.test.c
-        log_tests/log.test.c
+        os_tests/os_utility.test.c
+        datetime_test/datetime.test.c
 
 )
 
