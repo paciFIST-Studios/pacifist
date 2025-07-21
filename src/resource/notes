@@ -1,0 +1,30 @@
+
+
+The resource manager has a few jobs:
+
+1. Read in a cfg file, in order to identify all of the assets being used
+    a. this cfg file may specify binary assets or something
+
+2. Load in the assets identified by the cfg, at a time specified by the cfg
+    a. this can be immediately, on-request
+    
+3. Unload the assets identified by the cfg
+    a. on request, when test_fn returns true, on timer
+
+4. When an asset is being serialized from elsewhere, the ResourcceManager
+    should be able to take the address of that asset, look it up, and return
+    a struct which includes:
+        * asset file name
+        * asset file path
+        * asset relative path
+
+5. When loading a serialized file from elsewhere, someone might call in 
+    to the ResourceManager with an asset name, and ask the resource manager
+    to return that loaded asset
+    
+6. Resource manager should define some kind of struct which will:
+    a. identify the asset to which it pertains
+    b. support general metadata for that asset
+    c. identify a print fn for that asset type
+    d. identify various debug fns for that asset type
+

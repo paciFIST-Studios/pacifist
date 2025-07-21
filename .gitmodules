@@ -31,3 +31,6 @@
 [submodule "vendor/cimgui"]
 	path = vendor/cimgui
 	url = https://github.com/cimgui/cimgui.git
+[submodule "vendor/zlog"]
+	path = vendor/zlog
+	url = https://github.com/HardySimpson/zlog.git
