@@ -53,4 +53,5 @@ dkms.conf
 
 # ignore the build folder
 build
-
+vendor
+research
