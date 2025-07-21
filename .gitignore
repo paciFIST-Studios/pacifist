@@ -55,5 +55,5 @@ dkms.conf
 /build/
 /research/
 /vendor/
-
+/cmake-build-debug/
 *.pdf
