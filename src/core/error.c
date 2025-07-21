@@ -18,6 +18,7 @@
 
 static int32_t s_errors_are_suppressed = 0;
 
+
 static char s_error_buffer[ERROR_BUFFER_SIZE];
 
 
@@ -58,19 +59,19 @@ void pf_clear_error() {
 
 
 
-void pf_set_error_suppressed() {
+void dnc__pf_set_error_suppressed() {
 #ifdef ERROR_SUPPRESSION_ALLOWED
     s_errors_are_suppressed = TRUE;
 #endif
 }
 
-void pf_set_error_not_suppressed() {
+void dnc__pf_set_error_not_suppressed() {
 #ifdef ERROR_SUPPRESSION_ALLOWED
     s_errors_are_suppressed = FALSE;
 #endif
 }
 
-int32_t pf_get_is_error_suppressed() {
+int32_t dnc__pf_get_is_error_suppressed() {
 #ifdef ERROR_SUPPRESSION_ALLOWED
     return s_errors_are_suppressed;
 #else

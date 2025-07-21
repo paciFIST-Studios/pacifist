@@ -56,9 +56,9 @@ END_TEST;
 
 START_TEST(fn_get_error__returns_nullptr__if_errors_are_suppressed) {
     pf_set_error("a", 1);
-    pf_set_error_suppressed();
+    dnc__pf_set_error_suppressed();
     ck_assert_ptr_null(pf_get_error());
-    pf_set_error_not_suppressed();
+    dnc__pf_set_error_not_suppressed();
 }
 END_TEST
 
@@ -99,17 +99,17 @@ START_TEST(fn_set_error__copies_at_most__error_buffer_size_characters){
     }
     
     free(test_error_message);
-    pf_set_error_not_suppressed();
+    dnc__pf_set_error_not_suppressed();
 }
 END_TEST
 
 
 START_TEST(fn_set_error__does_not_automatically_unspresses_errors) {
-    pf_set_error_suppressed();
-    ck_assert_int_eq(1, pf_get_is_error_suppressed());
+    dnc__pf_set_error_suppressed();
+    ck_assert_int_eq(1, dnc__pf_get_is_error_suppressed());
     pf_set_error("a", 1);
-    ck_assert_int_eq(1, pf_get_is_error_suppressed());
-    pf_set_error_not_suppressed();
+    ck_assert_int_eq(1, dnc__pf_get_is_error_suppressed());
+    dnc__pf_set_error_not_suppressed();
 }
 END_TEST
 
@@ -131,7 +131,7 @@ START_TEST(fn_clear_error__fills_buffer_with_zeroes) {
     }
     test_buffer[test_length] = '\0';
 
-    pf_set_error_not_suppressed();
+    dnc__pf_set_error_not_suppressed();
     pf_set_error(test_buffer, test_length);
 
     char* error = pf_get_error();
@@ -147,60 +147,60 @@ START_TEST(fn_clear_error__fills_buffer_with_zeroes) {
         ck_assert(error[i] == 0);
     }
     free(test_buffer);
-    pf_set_error_not_suppressed();
+    dnc__pf_set_error_not_suppressed();
 }
 END_TEST
 
 // fn pf_set_error_suppressed ---------------------------------------------------------------------
 START_TEST(fn_pf_set_error_suppressed__is_defined) {
-    void(*fptr)() = &pf_set_error_suppressed;
+    void(*fptr)() = &dnc__pf_set_error_suppressed;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
 START_TEST(fn_pf_set_error_suppressed__turns_suppression_on) {
-    pf_set_error_not_suppressed();
-    ck_assert_int_eq(0, pf_get_is_error_suppressed());
-    pf_set_error_suppressed();
-    ck_assert_int_eq(1, pf_get_is_error_suppressed());
-    pf_set_error_not_suppressed();
+    dnc__pf_set_error_not_suppressed();
+    ck_assert_int_eq(0, dnc__pf_get_is_error_suppressed());
+    dnc__pf_set_error_suppressed();
+    ck_assert_int_eq(1, dnc__pf_get_is_error_suppressed());
+    dnc__pf_set_error_not_suppressed();
 }
 END_TEST
 
 
 // fn pf_set_error_not_suppressed -----------------------------------------------------------------
 START_TEST(fn_pf_set_error_not_suppressed__is_defined) {
-    void(*fptr)() = &pf_set_error_not_suppressed;
+    void(*fptr)() = &dnc__pf_set_error_not_suppressed;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
 START_TEST(fn_pf_set_error_not_suppressed__turns_suppression_off) {
-    pf_set_error_suppressed();
-    ck_assert_int_eq(1, pf_get_is_error_suppressed());
-    pf_set_error_not_suppressed();
-    ck_assert_int_eq(0, pf_get_is_error_suppressed());
-    pf_set_error_not_suppressed();
+    dnc__pf_set_error_suppressed();
+    ck_assert_int_eq(1, dnc__pf_get_is_error_suppressed());
+    dnc__pf_set_error_not_suppressed();
+    ck_assert_int_eq(0, dnc__pf_get_is_error_suppressed());
+    dnc__pf_set_error_not_suppressed();
 }
 END_TEST
 
 // fn pf_get_is_error_suppressed ------------------------------------------------------------------
 START_TEST(fn_pf_get_is_error_suppressed__is_defined) {
-    int32_t(*fptr)() = &pf_get_is_error_suppressed;
+    int32_t(*fptr)() = &dnc__pf_get_is_error_suppressed;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
 START_TEST(fn_pg_get_is_error_suppressed__returns_current_state_of_suppression) {
-    pf_set_error_suppressed();
-    ck_assert_int_eq(1, pf_get_is_error_suppressed());
-    pf_set_error_not_suppressed();
-    ck_assert_int_eq(0, pf_get_is_error_suppressed());
-    pf_set_error_suppressed();
-    ck_assert_int_eq(1, pf_get_is_error_suppressed());
-    pf_set_error_not_suppressed();
-    ck_assert_int_eq(0, pf_get_is_error_suppressed());
-    pf_set_error_not_suppressed();
+    dnc__pf_set_error_suppressed();
+    ck_assert_int_eq(1, dnc__pf_get_is_error_suppressed());
+    dnc__pf_set_error_not_suppressed();
+    ck_assert_int_eq(0, dnc__pf_get_is_error_suppressed());
+    dnc__pf_set_error_suppressed();
+    ck_assert_int_eq(1, dnc__pf_get_is_error_suppressed());
+    dnc__pf_set_error_not_suppressed();
+    ck_assert_int_eq(0, dnc__pf_get_is_error_suppressed());
+    dnc__pf_set_error_not_suppressed();
 }
 END_TEST
 
