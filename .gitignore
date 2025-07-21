@@ -52,6 +52,6 @@ Mkfile.old
 dkms.conf
 
 # ignore the build folder
-build
-vendor
-research
+build/*
+vendor/*
+research/*
