@@ -223,8 +223,9 @@ size_t hash_table_count(HashTable_t const * table) {
 
 
 
-HashTableIterator_t hash_table_create_iterator(HashTable_t * table) {
-}
+//HashTableIterator_t hash_table_create_iterator(HashTable_t * table) {
+//    return HashTableIterator_t{0};
+//}
 
 bool32 hash_table_next(HashTableIterator_t * iterator) {
     return FALSE;

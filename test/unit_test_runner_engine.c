@@ -4,7 +4,6 @@
 #define UNIT_TEST_RUNNER_H
 
 #include <check.h>
-#include <zlog.h>
 
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
@@ -47,7 +46,8 @@ char * global_module;
 } while(0);                                             \
 
 
-/** --------------------------------------------------------------------------------------------------------------------
+
+/** ------------------------------------------------------------------------------------------------
  *  Ellie's Note:
  *
  *      There are some concessions we have to make in order to simplify
@@ -65,7 +65,7 @@ char * global_module;
  *
  *  By using these macros, you agree to the above stipulations
  * 
- *----------------------------------------------------------------------------------------------------------------------
+ *--------------------------------------------------------------------------------------------------
  */
 
 // Test Includes: Manually include your code here.  (keep it in alphabetical order)
@@ -76,6 +76,15 @@ char * global_module;
 // Bit
 #include "../test/bit/bitfield.test.c"
 
+// Core
+#include "../test/core_tests/error.test.c"
+
+// DateTime
+#include "../test/datetime_test/datetime.test.c"
+
+// Log
+#include "../test/log_tests/log.test.c"
+
 // Memory
 #include "../test/memory_tests/RedBlackTree.test.c"
 #include "../test/memory_tests/CompactHashTable.test.c"
@@ -83,13 +92,14 @@ char * global_module;
 #include "../test/memory_tests/LinkedList.test.c"
 #include "../test/memory_tests/MemoryArena.test.c"
 
+// os
+#include "../test/os_tests/os_utility.test.c"
+
+// string
+#include "../test/string_tests/PString.test.c"
 
 
 int main(void) {
-    //zlog_category_t * c;
-    // initializing zlog here
-
-    
     /*  Setting NO_FORK here allows us to ensure that check does not spin up child processes to handle
      *  test execution.  One the one hand, this means we're now running the tests serially (I guess),
      *  and it's slower.  But on the other hand, we can set break points in the tests, and debug them, and
@@ -101,7 +111,7 @@ int main(void) {
     //srunner_set_fork_status(global_runner, fs)
 
 #ifdef __GNUC__
-    printf("Using GNUC compiler\n");
+    printf("Using GNUC compiler\n\n");
 #endif
 
     
@@ -138,6 +148,80 @@ int main(void) {
     // End Bit Test Suite                                                 //
     // -------------------------------------------------------------------//
 
+    
+    // -------------------------------------------------------------------//
+    // Core Test Suite                                                     //
+    // -------------------------------------------------------------------//
+    BUILD_SUITE("Core");
+
+    //--------------//
+    // Core         //
+    //--------------//
+
+    // build_and_set_error_message
+    ADD_TEST(macro_build_and_set_error_message__is_defined);
+    
+    // get_error_buffer_size
+    ADD_TEST(fn_get_error_buffer_size__is_defined);
+    ADD_TEST(fn_get_error_buffer_size__has_expected_value);
+    // get_error
+    ADD_TEST(fn_get_error__is_defined);
+    ADD_TEST(fn_get_error__returns_ptr_to_error_buffer);
+    ADD_TEST(fn_get_error__returns_nullptr__if_errors_are_suppressed);
+    
+    // set_error
+    ADD_TEST(fn_set_error__is_defined);
+    ADD_TEST(fn_set_error__copies_at_most__error_buffer_size_characters);
+    ADD_TEST(fn_set_error__does_not_automatically_unspresses_errors);
+    // clear_error
+    ADD_TEST(fn_clear_error__is_defined);
+    ADD_TEST(fn_clear_error__fills_buffer_with_zeroes); 
+    // set_error_suppressed
+    ADD_TEST(fn_pf_set_error_suppressed__is_defined);
+    ADD_TEST(fn_pf_set_error_suppressed__turns_suppression_on); 
+    // set_error_not_suppressed
+    ADD_TEST(fn_pf_set_error_not_suppressed__is_defined);
+    ADD_TEST(fn_pf_set_error_not_suppressed__turns_suppression_off); 
+    // get_is_error_suppressed
+    ADD_TEST(fn_pf_get_is_error_suppressed__is_defined);
+    ADD_TEST(fn_pg_get_is_error_suppressed__returns_current_state_of_suppression);
+    
+    RUN_SUITE(fail_count);
+    // -------------------------------------------------------------------//
+    // End Core Test Suite                                                //
+    // -------------------------------------------------------------------//
+
+
+    // -------------------------------------------------------------------//
+    // DateTime Test Suite                                                //
+    // -------------------------------------------------------------------//
+    BUILD_SUITE("DateTime");
+
+    // fn get_datetime_string
+    ADD_TEST(fn_get_datetime_string__is_defined);
+    ADD_TEST(fn_get_datetime_string__requires_buffer_len_greater_or_equal_to_22);
+    ADD_TEST(fn_get_datetime_string__can_return_valid_string);
+
+    
+    RUN_SUITE(fail_count);
+    // -------------------------------------------------------------------//
+    // End DateTime Test Suite                                            //
+    // -------------------------------------------------------------------//
+
+    // -------------------------------------------------------------------//
+    // Log Test Suite                                                     //
+    // -------------------------------------------------------------------//
+    BUILD_SUITE("Log");
+
+
+    
+    RUN_SUITE(fail_count);
+    // -------------------------------------------------------------------//
+    // End Log Test Suite                                                 //
+    // -------------------------------------------------------------------//
+    
+
+    
     
     // -------------------------------------------------------------------//
     // Memory Test Suite                                                  //
@@ -314,6 +398,73 @@ int main(void) {
     // End Memory Test Suite                                              //
     // -------------------------------------------------------------------//
 
+
+
+    // -------------------------------------------------------------------//
+    // String Test Suite                                                  //
+    // -------------------------------------------------------------------//
+    BUILD_SUITE("OS");
+
+    //ADD_TEST(fn_file_size__is_defined);
+    //ADD_TEST(fn_file_size__returns_minus_one__for_null_path);
+    //ADD_TEST(fn_file_size__returns_minus_one__for_zero_path_length);
+    //ADD_TEST(fn_file_size__returns_minus_one__if_file_does_not_exist);
+    //ADD_TEST(fn_file_size__writes_correct_error__for_null_path);
+    //ADD_TEST(fn_file_size__writes_correct_error__for_zero_path_length);
+    //ADD_TEST(fn_file_size__writes_correct_error__if_file_does_not_exist);
+    //
+    //ADD_TEST(fn_is_file__is_defined);
+    //ADD_TEST(fn_is_file__returns_minus_one__for_null_path);
+    //ADD_TEST(fn_is_file__returns_minus_one__for_zero_path_length);
+    //ADD_TEST(fn_is_file__returns_zero__if_file_does_not_exist);
+    //ADD_TEST(fn_is_file__returns_one__if_file_does_exist);
+    //ADD_TEST(fn_is_file__writes_correct_error__for_null_path);
+    //ADD_TEST(fn_is_file__writes_correct_error__for_zero_path_length);
+    //
+    //ADD_TEST(fn_is_directory__is_defined);
+    //ADD_TEST(fn_is_directory__returns_minus_one__for_null_path);
+    //ADD_TEST(fn_if_directory__returns_minus_one__for_zero_path_length);
+    //ADD_TEST(fn_is_directory__returns_zero__if_path_is_not_a_directory);
+    //ADD_TEST(fn_is_directory__returns_one__if_path_is_a_directory);
+    //ADD_TEST(fn_is_directory__writes_correct_error__for_null_path);
+    //ADD_TEST(fn_is_directory__writes_correct_error__for_zero_path_length);
+    
+    RUN_SUITE(fail_count); 
+    // -------------------------------------------------------------------//
+    // End String Test Suite                                              //
+    // -------------------------------------------------------------------//
+
+    
+
+    // -------------------------------------------------------------------//
+    // String Test Suite                                                  //
+    // -------------------------------------------------------------------//
+    BUILD_SUITE("String");
+
+    //-----------//
+    // PString_t //
+    //-----------//
+    
+    ADD_TEST(struct_PString_t__is_defined);
+    ADD_TEST(struct_PString_t__has_expected_size);
+
+    // fn pstring_contains_char_sub    
+    ADD_TEST(fn_pstring_constains_char_sub__is_defined);
+
+    // fn pstring_contains_pstr_sub
+    // this fn actually calls into the char_sub version, so we're saying it's "testing both"
+    ADD_TEST(fn_pstring_contains_pstr_sub__is_defined);
+    ADD_TEST(fn_pstring_contains_pstr_sub__returns_false_if_substring_is_longer_that_first_string);
+    ADD_TEST(fn_pstring_contains_pstr_sub__can_find_a_substring); 
+    ADD_TEST(fn_pstring_contains_pstr_sub__stress_testing);
+    
+    RUN_SUITE(fail_count);
+    // -------------------------------------------------------------------//
+    // End String Test Suite                                              //
+    // -------------------------------------------------------------------//
+
+
+    
 
     
     

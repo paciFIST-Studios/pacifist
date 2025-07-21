@@ -82,8 +82,9 @@ uint64_t hash_fnv1a_64(char const *key, size_t const table_size){
 
 CompactHashTable_t* compact_hash_table_create(uint32_t const size, HashFunction_t * hf) {
     compact_hash_table_global_error_message = NULL;  
-    
-    size_t const total_allocation = sizeof(CompactHashTable_t) + (sizeof(CompactHashTableEntry_t) * size);
+    size_t const hash_table_size = sizeof(CompactHashTable_t);
+    size_t const hash_table_entry_size = sizeof(CompactHashTableEntry_t);
+    size_t const total_allocation = hash_table_size + (hash_table_entry_size * size);
 
     CompactHashTable_t * table = calloc(total_allocation, 1);
     if (table == NULL) {
@@ -96,7 +97,7 @@ CompactHashTable_t* compact_hash_table_create(uint32_t const size, HashFunction_
     table->hash_fn = hf;
 
     // the entries start in the next byte after the table itself
-    table->entries = (CompactHashTableEntry_t*)((void*)table + sizeof(CompactHashTable_t));
+    table->entries = (CompactHashTableEntry_t*)(table + 1);
     
     // initialize all of these to their "zero" settings
     for (int32_t i = 0; i < size; i++) {
@@ -127,7 +128,11 @@ bool compact_hash_table_destroy(CompactHashTable_t* ht) {
         uint32_t const size = ht->size;
         for (uint32_t i = 0; i < size; i++) {
             if (ht->entries[i].key != NULL) {
-                free(ht->entries[i].key);
+                // these keys are copied using strncpy, so they're
+                // heap allocated, and will need to be freed individually
+                if (ht->entries[i].key != NULL) {
+                    free(ht->entries[i].key);
+                }
                 ht->entries[i].key = NULL;
                 ht->entries[i].key_len = 0;
                 ht->entries[i].value = NULL;
@@ -181,7 +186,7 @@ void compact_hash_table_print(CompactHashTable_t* ht) {
     printf("[CompactHashTable_t] -- START\n");
     
     if (ht != NULL) {
-        printf("\taddress: %p\n\tused:    %d\n\tmax:     %d\n\n", ht, ht->used, ht->size);
+        printf("\taddress: %p\n\tused:    %d\n\tmax:     %d\n\n", (void*)ht, ht->used, ht->size);
         
         if (ht->entries != NULL) {
             for (int32_t i = 0; i < ht->used; i++) {
@@ -206,14 +211,14 @@ char const * compact_hash_table_insert(
     CompactHashTable_t* ht,
     char const * key,
     size_t const key_len,
-    EProjectDataTypes_t value_type,
+    EProjectDataTypes_t const value_type,
     void * value)
 {
-    compact_hash_table_global_error_message   = NULL;
+    compact_hash_table_global_error_message = NULL;
     
     if (ht == NULL) {
         // error, no ptr to hash table
-        compact_hash_table_global_error_message   = ERROR_NULL_PTR_TO_HASH_TABLE;
+        compact_hash_table_global_error_message = ERROR_NULL_PTR_TO_HASH_TABLE;
         return NULL;
     }
     if (key == NULL) {
@@ -339,8 +344,8 @@ CompactHashTableEntry_t const * compact_hash_table_lookup_entry(CompactHashTable
         return NULL;
     }
 
-    size_t index = ht->hash_fn(key, key_len) % ht->size;
-    CompactHashTableEntry_t * entries = ht->entries;
+    size_t const index = ht->hash_fn(key, key_len) % ht->size;
+    CompactHashTableEntry_t const * entries = ht->entries;
     while (entries[index].key != NULL && !is_deleted_entry_key(entries[index].key)) {
         if (strncmp(entries[index].key, key, key_len) == 0){
             return &entries[index]; 
@@ -382,7 +387,7 @@ CompactHashTable_t* compact_hash_table_resize(CompactHashTable_t* ht, float incr
 
     // iterate all the existing entries
     for (int32_t i = 0; i < old_table_size; i++) {
-        CompactHashTableEntry_t* entry = &ht->entries[i];
+        CompactHashTableEntry_t const * entry = &ht->entries[i];
         // skip empty entries, but also skip deleted entries, b/c those are only needed to re-find
         // the roll-over position of something that was inserted with a collision, but then removed.
         // we'll re-create equivalent conditions by inserting the keys and values again, simply

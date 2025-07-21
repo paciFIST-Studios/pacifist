@@ -14,7 +14,7 @@
 // Defines -------------------------------------------------------------------------------------------------------------
 
 START_TEST(define_DELETED_ENTRY__is_defined) {
-    char* deleted_entry = DELETED_ENTRY;
+    char const * deleted_entry = DELETED_ENTRY;
     ck_assert_ptr_nonnull(deleted_entry);
     ck_assert_int_eq(strcmp(deleted_entry, "DELETED_ENTRY_THIS_KEY_IS_INVALID"), 0);
 }
@@ -88,13 +88,13 @@ END_TEST
 // struct CompactHashTableEntry_t --------------------------------------------------------------------------------------
 
 START_TEST(struct_CompactHashTableEntry_t__is_defined) {
-    CompactHashTableEntry_t entry = {0};
+    CompactHashTableEntry_t const entry = {0};
     ck_assert_ptr_nonnull(&entry);
 }
 END_TEST
 
 START_TEST(struct_CompactHashTableEntry_t__is_expected_size) {
-    CompactHashTableEntry_t entry = {0};
+    CompactHashTableEntry_t const entry = {0};
     ck_assert_int_eq(sizeof(entry), 32);
 }
 END_TEST
@@ -111,7 +111,7 @@ START_TEST(struct_CompactHashTable_t__is_defined) {
 END_TEST
 
 START_TEST(struct_CompactHashTable_t__is_expected_size) {
-    CompactHashTable_t table = {0};
+    CompactHashTable_t const table = {0};
     ck_assert_int_eq(sizeof(table), 32);
 }
 END_TEST
@@ -520,8 +520,8 @@ START_TEST(fn_compact_hsah_table_resize__copies_state_values_during_resize) {
     ck_assert_int_eq(ht->size, 1);
     ck_assert_int_eq(ht->used, 0);
     
-    bool allow_auto_resize = true;
-    float auto_resize_percent = 0.9f;
+    //bool allow_auto_resize = true;
+    //float auto_resize_percent = 0.9f;
     StringCopyFunction_t* string_copy_fn = ht->string_copy_fn;
     HashFunction_t* hash_fn = ht->hash_fn;
 

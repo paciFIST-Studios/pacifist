@@ -13,14 +13,6 @@
 
 
 
-/**
- * @brief Returns date time in the form: 120250719T131700(-07), and requires 22 char 
- *
- * @param out_buffer 
- * @param out_buffer_length 
- * @return 
- */
-void get_date_time_string(char * out_buffer, size_t const out_buffer_length);
 
 
 // the engine supplied callback which SDL uses to write all of the SDL_log commands
@@ -28,6 +20,11 @@ void paciFIST_log(void* userdata, int category, SDL_LogPriority priority, char c
 
 
 
+int32_t initialize_log_file(char const * path, size_t const path_length);
+
+
+
+int32_t close_log_file(char const * path, size_t const path_length);
 
 
 #endif //LOG_H

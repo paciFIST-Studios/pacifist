@@ -1,7 +1,7 @@
 // paciFIST studios. 2025. MIT License
 
 // header
-#include "../LinkedList.h"
+#include "../list/LinkedList.h"
 // stdlib
 #include <stdlib.h>
 // framework

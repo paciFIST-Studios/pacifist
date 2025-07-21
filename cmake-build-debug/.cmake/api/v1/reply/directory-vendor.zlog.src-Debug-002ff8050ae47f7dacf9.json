@@ -1,0 +1,100 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"vendor/zlog/src/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 46,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 54,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "zlog",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"vendor/zlog/lib/libzlog.so.1.2.18",
+				"vendor/zlog/lib/libzlog.so.1"
+			],
+			"targetId" : "zlog::@c76ca8ef9266808d5ccf",
+			"targetIndex" : 43,
+			"targetInstallNamelink" : "skip",
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "zlog",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"vendor/zlog/lib/libzlog.so"
+			],
+			"targetId" : "zlog::@c76ca8ef9266808d5ccf",
+			"targetIndex" : 43,
+			"targetInstallNamelink" : "only",
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "zlog",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"vendor/zlog/lib/libzlog.a"
+			],
+			"targetId" : "zlog_s::@c76ca8ef9266808d5ccf",
+			"targetIndex" : 45,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "zlog",
+			"destination" : "bin",
+			"paths" : 
+			[
+				"vendor/zlog/bin/zlog-chk-conf"
+			],
+			"targetId" : "zlog-chk-conf::@c76ca8ef9266808d5ccf",
+			"targetIndex" : 44,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "zlog",
+			"destination" : "include",
+			"paths" : 
+			[
+				"vendor/zlog/src/zlog.h"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "vendor/zlog/src",
+		"source" : "vendor/zlog/src"
+	}
+}

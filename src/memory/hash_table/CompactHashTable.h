@@ -61,7 +61,7 @@ typedef char* (StringCopyFunction_t)(const char * src, size_t len);
 // Helper Functions
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline bool is_deleted_entry_key(char const * key) {
+static bool is_deleted_entry_key(char const * key) {
     if  (key == NULL) {
         return false;
     }

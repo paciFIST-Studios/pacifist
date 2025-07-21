@@ -1,0 +1,6 @@
+# CMake generated Testfile for 
+# Source directory: /home/ellie/git/paciFIST/vendor/cimgui
+# Build directory: /home/ellie/git/paciFIST/cmake-build-debug/vendor/cimgui
+# 
+# This file includes the relevant testing commands required for 
+# testing this directory and lists subdirectories to be tested as well.

@@ -1,0 +1,882 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						19,
+						20,
+						21
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.31"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						41
+					]
+				},
+				{
+					"build" : "vendor",
+					"childIndexes" : 
+					[
+						2,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-vendor-Debug-650fd368ad88650ee272.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.31"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "vendor"
+				},
+				{
+					"build" : "vendor/check",
+					"childIndexes" : 
+					[
+						3,
+						7,
+						8,
+						9
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-vendor.check-Debug-ab827760965d0956a554.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.13"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "vendor/check",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						20,
+						21,
+						22,
+						23,
+						24,
+						25,
+						26,
+						27
+					]
+				},
+				{
+					"build" : "vendor/check/doc",
+					"childIndexes" : 
+					[
+						4
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-vendor.check.doc-Debug-a94a8a7295f3403244ef.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.13"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 1,
+					"source" : "vendor/check/doc"
+				},
+				{
+					"build" : "vendor/check/doc/man",
+					"childIndexes" : 
+					[
+						5,
+						6
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-vendor.check.doc.man-Debug-33098393bb82ee98bda6.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.13"
+					},
+					"parentIndex" : 3,
+					"projectIndex" : 1,
+					"source" : "vendor/check/doc/man"
+				},
+				{
+					"build" : "vendor/check/doc/man/man3",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-vendor.check.doc.man.man3-Debug-3648521041c03c68ccc1.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.13"
+					},
+					"parentIndex" : 4,
+					"projectIndex" : 1,
+					"source" : "vendor/check/doc/man/man3"
+				},
+				{
+					"build" : "vendor/check/doc/man/man7",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-vendor.check.doc.man.man7-Debug-6b762c73c86bc966c27c.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.13"
+					},
+					"parentIndex" : 4,
+					"projectIndex" : 1,
+					"source" : "vendor/check/doc/man/man7"
+				},
+				{
+					"build" : "vendor/check/lib",
+					"jsonFile" : "directory-vendor.check.lib-Debug-9b1e00558752af1a0946.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.13"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 1,
+					"source" : "vendor/check/lib",
+					"targetIndexes" : 
+					[
+						37
+					]
+				},
+				{
+					"build" : "vendor/check/src",
+					"jsonFile" : "directory-vendor.check.src-Debug-f89d5543331a02351cfa.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.13"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 1,
+					"source" : "vendor/check/src",
+					"targetIndexes" : 
+					[
+						34,
+						35
+					]
+				},
+				{
+					"build" : "vendor/check/checkmk",
+					"jsonFile" : "directory-vendor.check.checkmk-Debug-1af6d7ba77a5a667f6fa.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.13"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 1,
+					"source" : "vendor/check/checkmk"
+				},
+				{
+					"build" : "vendor/cimgui",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-vendor.cimgui-Debug-f9133566f44a6be11ec2.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.15"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 2,
+					"source" : "vendor/cimgui",
+					"targetIndexes" : 
+					[
+						36
+					]
+				},
+				{
+					"build" : "vendor/SDL",
+					"jsonFile" : "directory-vendor.SDL-Debug-e47c68a38cf7e31f86d9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 3,
+					"source" : "vendor/SDL",
+					"targetIndexes" : 
+					[
+						28,
+						31,
+						33
+					]
+				},
+				{
+					"build" : "vendor/SDL_image",
+					"jsonFile" : "directory-vendor.SDL_image-Debug-efce94baae54fdfa9f87.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 4,
+					"source" : "vendor/SDL_image",
+					"targetIndexes" : 
+					[
+						29
+					]
+				},
+				{
+					"build" : "vendor/SDL_mixer",
+					"jsonFile" : "directory-vendor.SDL_mixer-Debug-336d5ce6de5476ba75ed.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 5,
+					"source" : "vendor/SDL_mixer",
+					"targetIndexes" : 
+					[
+						30
+					]
+				},
+				{
+					"build" : "vendor/SDL_ttf",
+					"jsonFile" : "directory-vendor.SDL_ttf-Debug-11a4fbf5d195269a848d.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 6,
+					"source" : "vendor/SDL_ttf",
+					"targetIndexes" : 
+					[
+						32
+					]
+				},
+				{
+					"build" : "vendor/zlog",
+					"childIndexes" : 
+					[
+						16,
+						17
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-vendor.zlog-Debug-4edc0267b63da035178a.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 7,
+					"source" : "vendor/zlog"
+				},
+				{
+					"build" : "vendor/zlog/src",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-vendor.zlog.src-Debug-002ff8050ae47f7dacf9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"parentIndex" : 15,
+					"projectIndex" : 7,
+					"source" : "vendor/zlog/src",
+					"targetIndexes" : 
+					[
+						43,
+						44,
+						45
+					]
+				},
+				{
+					"build" : "vendor/zlog/cpack",
+					"childIndexes" : 
+					[
+						18
+					],
+					"jsonFile" : "directory-vendor.zlog.cpack-Debug-0d975d8a544fc077aaff.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"parentIndex" : 15,
+					"projectIndex" : 7,
+					"source" : "vendor/zlog/cpack"
+				},
+				{
+					"build" : "vendor/zlog/cpack/zlog",
+					"jsonFile" : "directory-vendor.zlog.cpack.zlog-Debug-9091514485c5675899e9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"parentIndex" : 17,
+					"projectIndex" : 7,
+					"source" : "vendor/zlog/cpack/zlog"
+				},
+				{
+					"build" : "src",
+					"jsonFile" : "directory-src-Debug-b6cf2213fc5053b67c22.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.31"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "src",
+					"targetIndexes" : 
+					[
+						38,
+						39,
+						40
+					]
+				},
+				{
+					"build" : "test",
+					"jsonFile" : "directory-test-Debug-451c0598f41488bb20b9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.31"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "test",
+					"targetIndexes" : 
+					[
+						42
+					]
+				},
+				{
+					"build" : "one_off",
+					"jsonFile" : "directory-one_off-Debug-a58754b9c5d2a4b65e65.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.31"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "one_off"
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7
+					],
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						19,
+						20,
+						21
+					],
+					"name" : "paciFIST",
+					"targetIndexes" : 
+					[
+						38,
+						39,
+						40,
+						41,
+						42
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9
+					],
+					"name" : "Check",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						20,
+						21,
+						22,
+						23,
+						24,
+						25,
+						26,
+						27,
+						34,
+						35,
+						37
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						10
+					],
+					"name" : "cimgui",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						36
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						11
+					],
+					"name" : "SDL3",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						28,
+						31,
+						33
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						12
+					],
+					"name" : "SDL3_image",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						29
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						13
+					],
+					"name" : "SDL3_mixer",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						30
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						14
+					],
+					"name" : "SDL3_ttf",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						32
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						15,
+						16,
+						17,
+						18
+					],
+					"name" : "zlog",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						43,
+						44,
+						45
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 2,
+					"id" : "Continuous::@0555fe80bab46067d197",
+					"jsonFile" : "target-Continuous-Debug-cfd629c33898f12ecb89.json",
+					"name" : "Continuous",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ContinuousBuild::@0555fe80bab46067d197",
+					"jsonFile" : "target-ContinuousBuild-Debug-744d9cef35abb802428b.json",
+					"name" : "ContinuousBuild",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ContinuousConfigure::@0555fe80bab46067d197",
+					"jsonFile" : "target-ContinuousConfigure-Debug-15fad539cc802a6e0edc.json",
+					"name" : "ContinuousConfigure",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ContinuousCoverage::@0555fe80bab46067d197",
+					"jsonFile" : "target-ContinuousCoverage-Debug-df967aff42caa3e0947e.json",
+					"name" : "ContinuousCoverage",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ContinuousMemCheck::@0555fe80bab46067d197",
+					"jsonFile" : "target-ContinuousMemCheck-Debug-4e43bb09b716b7b3cd3e.json",
+					"name" : "ContinuousMemCheck",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ContinuousStart::@0555fe80bab46067d197",
+					"jsonFile" : "target-ContinuousStart-Debug-c7055e320215265f1dc1.json",
+					"name" : "ContinuousStart",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ContinuousSubmit::@0555fe80bab46067d197",
+					"jsonFile" : "target-ContinuousSubmit-Debug-8dd9d62b59e34628e8a4.json",
+					"name" : "ContinuousSubmit",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ContinuousTest::@0555fe80bab46067d197",
+					"jsonFile" : "target-ContinuousTest-Debug-972539f6a4440d65531f.json",
+					"name" : "ContinuousTest",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ContinuousUpdate::@0555fe80bab46067d197",
+					"jsonFile" : "target-ContinuousUpdate-Debug-48c7d0056ae6e2d819a1.json",
+					"name" : "ContinuousUpdate",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "Experimental::@0555fe80bab46067d197",
+					"jsonFile" : "target-Experimental-Debug-144969102e7f393bafe6.json",
+					"name" : "Experimental",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ExperimentalBuild::@0555fe80bab46067d197",
+					"jsonFile" : "target-ExperimentalBuild-Debug-f5f65359bda740404428.json",
+					"name" : "ExperimentalBuild",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ExperimentalConfigure::@0555fe80bab46067d197",
+					"jsonFile" : "target-ExperimentalConfigure-Debug-d68249f9c5a2488191b6.json",
+					"name" : "ExperimentalConfigure",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ExperimentalCoverage::@0555fe80bab46067d197",
+					"jsonFile" : "target-ExperimentalCoverage-Debug-5bd6e51d50bd7bdf2a03.json",
+					"name" : "ExperimentalCoverage",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ExperimentalMemCheck::@0555fe80bab46067d197",
+					"jsonFile" : "target-ExperimentalMemCheck-Debug-10cdf60572677ad94cb3.json",
+					"name" : "ExperimentalMemCheck",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ExperimentalStart::@0555fe80bab46067d197",
+					"jsonFile" : "target-ExperimentalStart-Debug-fcc1fa09113a6357e54d.json",
+					"name" : "ExperimentalStart",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ExperimentalSubmit::@0555fe80bab46067d197",
+					"jsonFile" : "target-ExperimentalSubmit-Debug-b9d7062ae1dfbe627b4b.json",
+					"name" : "ExperimentalSubmit",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ExperimentalTest::@0555fe80bab46067d197",
+					"jsonFile" : "target-ExperimentalTest-Debug-04fcd5d8ee6b7a249e99.json",
+					"name" : "ExperimentalTest",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ExperimentalUpdate::@0555fe80bab46067d197",
+					"jsonFile" : "target-ExperimentalUpdate-Debug-4b6a6e64156d2ef587ba.json",
+					"name" : "ExperimentalUpdate",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "Nightly::@0555fe80bab46067d197",
+					"jsonFile" : "target-Nightly-Debug-1d3ca1b86af078145d6e.json",
+					"name" : "Nightly",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "NightlyBuild::@0555fe80bab46067d197",
+					"jsonFile" : "target-NightlyBuild-Debug-76898c07209f763f4c07.json",
+					"name" : "NightlyBuild",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "NightlyConfigure::@0555fe80bab46067d197",
+					"jsonFile" : "target-NightlyConfigure-Debug-6985b3ecfcf9384e673c.json",
+					"name" : "NightlyConfigure",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "NightlyCoverage::@0555fe80bab46067d197",
+					"jsonFile" : "target-NightlyCoverage-Debug-3cdb195ecba37f19d827.json",
+					"name" : "NightlyCoverage",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "NightlyMemCheck::@0555fe80bab46067d197",
+					"jsonFile" : "target-NightlyMemCheck-Debug-f8f071979af70860567b.json",
+					"name" : "NightlyMemCheck",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "NightlyMemoryCheck::@0555fe80bab46067d197",
+					"jsonFile" : "target-NightlyMemoryCheck-Debug-335b54a1bbcee3789e8b.json",
+					"name" : "NightlyMemoryCheck",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "NightlyStart::@0555fe80bab46067d197",
+					"jsonFile" : "target-NightlyStart-Debug-beb597bbbae87b4cae06.json",
+					"name" : "NightlyStart",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "NightlySubmit::@0555fe80bab46067d197",
+					"jsonFile" : "target-NightlySubmit-Debug-b307dcbc97d02dad1822.json",
+					"name" : "NightlySubmit",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "NightlyTest::@0555fe80bab46067d197",
+					"jsonFile" : "target-NightlyTest-Debug-eb2e56f89ededfc18818.json",
+					"name" : "NightlyTest",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "NightlyUpdate::@0555fe80bab46067d197",
+					"jsonFile" : "target-NightlyUpdate-Debug-7f4c7b449d0aa572d0c9.json",
+					"name" : "NightlyUpdate",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 11,
+					"id" : "SDL3-shared::@8139a08349bd60abf0db",
+					"jsonFile" : "target-SDL3-shared-Debug-860e6d8449adb0144112.json",
+					"name" : "SDL3-shared",
+					"projectIndex" : 3
+				},
+				{
+					"directoryIndex" : 12,
+					"id" : "SDL3_image-shared::@814bd7a07b6f968bb755",
+					"jsonFile" : "target-SDL3_image-shared-Debug-160c7ddcdd7190ab2031.json",
+					"name" : "SDL3_image-shared",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 13,
+					"id" : "SDL3_mixer-shared::@0e4cd5d56a3c815c8e94",
+					"jsonFile" : "target-SDL3_mixer-shared-Debug-a27922aa227868b21c02.json",
+					"name" : "SDL3_mixer-shared",
+					"projectIndex" : 5
+				},
+				{
+					"directoryIndex" : 11,
+					"id" : "SDL3_test::@8139a08349bd60abf0db",
+					"jsonFile" : "target-SDL3_test-Debug-535b5de93a5ea3c38186.json",
+					"name" : "SDL3_test",
+					"projectIndex" : 3
+				},
+				{
+					"directoryIndex" : 14,
+					"id" : "SDL3_ttf-shared::@7f1d25eaeffadc53ddb2",
+					"jsonFile" : "target-SDL3_ttf-shared-Debug-3ea3706a171f8a738146.json",
+					"name" : "SDL3_ttf-shared",
+					"projectIndex" : 6
+				},
+				{
+					"directoryIndex" : 11,
+					"id" : "SDL_uclibc::@8139a08349bd60abf0db",
+					"jsonFile" : "target-SDL_uclibc-Debug-eadd7ea1561e246c71ef.json",
+					"name" : "SDL_uclibc",
+					"projectIndex" : 3
+				},
+				{
+					"directoryIndex" : 8,
+					"id" : "check::@897e9802b3477661834b",
+					"jsonFile" : "target-check-Debug-e519cd8d2b0de91d80c9.json",
+					"name" : "check",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 8,
+					"id" : "checkShared::@897e9802b3477661834b",
+					"jsonFile" : "target-checkShared-Debug-98988e9534b7a36ddbb6.json",
+					"name" : "checkShared",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "cimgui::@3c95f967c44c5b92396d",
+					"jsonFile" : "target-cimgui-Debug-8d6d88e7317d8e18bd47.json",
+					"name" : "cimgui",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 7,
+					"id" : "compat::@529b0d88e588f183a572",
+					"jsonFile" : "target-compat-Debug-98aa73faae02d675e5ad.json",
+					"name" : "compat",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 19,
+					"id" : "doc::@145eef247bfb46b6828c",
+					"jsonFile" : "target-doc-Debug-b849bc81a30462534c35.json",
+					"name" : "doc",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 19,
+					"id" : "paciFIST_engine::@145eef247bfb46b6828c",
+					"jsonFile" : "target-paciFIST_engine-Debug-6a0a6dc8adc2d188ffc7.json",
+					"name" : "paciFIST_engine",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 19,
+					"id" : "paciFIST_engine_lib::@145eef247bfb46b6828c",
+					"jsonFile" : "target-paciFIST_engine_lib-Debug-dad5d8581a9aac90d5c1.json",
+					"name" : "paciFIST_engine_lib",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "run_all_unit_tests::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-run_all_unit_tests-Debug-16617e6b3bd1a9e4d45a.json",
+					"name" : "run_all_unit_tests",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 20,
+					"id" : "run_unit_tests_engine::@36f028580bb02cc8272a",
+					"jsonFile" : "target-run_unit_tests_engine-Debug-1bb40c2fa3a288d49665.json",
+					"name" : "run_unit_tests_engine",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 16,
+					"id" : "zlog::@c76ca8ef9266808d5ccf",
+					"jsonFile" : "target-zlog-Debug-883bc1bce13bb8bc4ced.json",
+					"name" : "zlog",
+					"projectIndex" : 7
+				},
+				{
+					"directoryIndex" : 16,
+					"id" : "zlog-chk-conf::@c76ca8ef9266808d5ccf",
+					"jsonFile" : "target-zlog-chk-conf-Debug-a4f665220ed118d1dc85.json",
+					"name" : "zlog-chk-conf",
+					"projectIndex" : 7
+				},
+				{
+					"directoryIndex" : 16,
+					"id" : "zlog_s::@c76ca8ef9266808d5ccf",
+					"jsonFile" : "target-zlog_s-Debug-6f333d3f75fd309cf08d.json",
+					"name" : "zlog_s",
+					"projectIndex" : 7
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/ellie/git/paciFIST/cmake-build-debug",
+		"source" : "/home/ellie/git/paciFIST"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

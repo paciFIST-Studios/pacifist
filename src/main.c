@@ -9,7 +9,9 @@
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_main.h"
 // engine
-#include "core/common.h"
+#include "core/define.h"
+#include "core/error.h"
+#include "log/log.h"
 #include "memory/allocator/MemoryArena.h"
 // game
 #include "_games/snake.h"
@@ -91,7 +93,8 @@ void deallocate_application_memory(void* memory, size_t const size) {
 
 SDL_AppResult SDL_AppInit(void ** appstate, int argc, char* argv[]) {
    if (SDL_Init(SDL_INIT_VIDEO) == FALSE) {
-      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize SDL!", SDL_GetError(), NULL);
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize SDL!",
+         SDL_GetError(), NULL);
       return SDL_APP_FAILURE;
    }   
 
@@ -102,9 +105,12 @@ SDL_AppResult SDL_AppInit(void ** appstate, int argc, char* argv[]) {
       return SDL_APP_FAILURE;
    }
 
-   // all of our memory is allocated now.  in order to manage it, put in a memory arena aligned to byte 0
-   s_program_lifetime_memory_arena = memory_arena_create_with_memory(application_memory, s_application_memory_size);
-   // first allocation from within the memory arena is the game state, which includes a pointer to the arena itself,
+   // all of our memory is allocated now.  in order to manage it, put in a
+   // memory arena aligned to byte 0
+   s_program_lifetime_memory_arena = memory_arena_create_with_memory(
+      application_memory, s_application_memory_size);
+   // first allocation from within the memory arena is the game state,
+   // which includes a pointer to the arena itself,
    // so more things can be allocated from the arena later.
    SnakeGameState_t * snake_game_state = PUSH_STRUCT(s_program_lifetime_memory_arena, SnakeGameState_t);
    snake_game_state->program_lifetime_memory_arena = s_program_lifetime_memory_arena;
@@ -112,6 +118,11 @@ SDL_AppResult SDL_AppInit(void ** appstate, int argc, char* argv[]) {
    // since we have a pointer to the arena living inside the game state, just set the game state as the app state
    *appstate = snake_game_state;
 
+
+
+
+
+   
    return SDL_APP_CONTINUE; 
 }
 
