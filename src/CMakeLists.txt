@@ -51,8 +51,6 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/core/WindowConfigStruct.h
         # d,e,f,g,h
         # io
-        ${CMAKE_CURRENT_SOURCE_DIR}/io/read.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/io/read.h
         # j,k
         # log
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log_utility.h
