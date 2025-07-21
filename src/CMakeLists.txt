@@ -49,13 +49,17 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/core/error.h
         ${CMAKE_CURRENT_SOURCE_DIR}/core/error.c
         ${CMAKE_CURRENT_SOURCE_DIR}/core/WindowConfigStruct.h
-        # d,e,f,g,h
+        # date
+        ${CMAKE_CURRENT_SOURCE_DIR}/date/datetime.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/date/datetime.c
+        #e,f,g,h
         # io
         # j,k
         # log
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log_utility.h
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log.h
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/log/log_category.h
         # memory
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/QuickHashTable.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/CompactHashTable.h
@@ -71,6 +75,7 @@ set(ENGINE_LIB_SOURCE_FILES
         # os
         ${CMAKE_CURRENT_SOURCE_DIR}/os/path.h
         ${CMAKE_CURRENT_SOURCE_DIR}/os/os_utility.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/os/os_utility.c
         # parsers
         ${CMAKE_CURRENT_SOURCE_DIR}/parsers/ConfigFileParser.h
         # project_types.h
@@ -84,10 +89,6 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.c
         # type
         ${CMAKE_CURRENT_SOURCE_DIR}/type/typed_pointer.h
-        os/os_utility.c
-        date/datetime.h
-        date/datetime.c
-        log/log_category.h
         # u,v,w,x,y,z 
 )
 
