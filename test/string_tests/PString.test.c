@@ -6,9 +6,10 @@
 // stdlib
 // framework
 // engine
+#include "../../src/core/define.h"
+#include "../../src/core/error.h"
 
-
-// struct PString_t --------------------------------------------------------------------------------------------------
+// struct PString_t ------------------------------------------------------------------------------------------
 
 START_TEST(struct_PString_t__is_defined) {
     PString_t pstr = { .string = NULL, .length = 0 };
@@ -24,7 +25,7 @@ START_TEST(struct_PString_t__has_expected_size) {
 }
 
 
-// fn pstring_contains_substring ---------------------------------------------------------------------------------------
+// fn pstring_contains_substring -----------------------------------------------------------------------------
 
 START_TEST(fn_pstring_contains_pstr_sub__is_defined) {
     int32_t(*fptr)(PString_t const, PString_t const) = & pstring_contains_pstr_sub;
@@ -80,12 +81,103 @@ START_TEST(fn_pstring_contains_pstr_sub__stress_testing) {
 END_TEST
 
 
-// fn pstring_contains_char_sub ----------------------------------------------------------------------------------------
+// fn pstring_contains_char_sub ------------------------------------------------------------------------------
 
 START_TEST(fn_pstring_constains_char_sub__is_defined) {
     int32_t(*fptr)(PString_t const, char const *, size_t const) = &pstring_contains_char_sub;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
+
+
+// fn pstring_slice ------------------------------------------------------------------------------------------
+
+START_TEST(fn_pstring_slice__is_defined) {
+    PString_t(*fptr)(PString_t const, int32_t const, int32_t const) = &pstring_slice;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pstirng_slice__returns_null_result__of_correct_form) {
+    PString_t pstr = { .string = NULL, .length = 0 };
+    PString_t result = pstring_slice(pstr, 0, 1);
+    ck_assert_ptr_nonnull(&result);
+    ck_assert_int_eq(result.length, 0);
+    ck_assert_ptr_null(result.string);
+}
+END_TEST
+
+START_TEST(fn_pstring_slice__returns_null_result__for_pstr_arg_with_null_string) {
+    PString_t pstr = { .string = NULL, .length = 1 };
+    PString_t result = pstring_slice(pstr, 0, 1);
+    ck_assert_ptr_null(result.string);
+    ck_assert_int_eq(result.length, 0);
+}
+END_TEST
+
+START_TEST(fn_pstring_slice__returns_null_result__for_pstr_arg_with_zero_length) {
+    PString_t pstr = { .string = "test", .length = 0 };
+    PString_t result = pstring_slice(pstr, 0, 1);
+    ck_assert_ptr_null(result.string);
+    ck_assert_int_eq(result.length, 0);
+}
+END_TEST
+
+START_TEST(fn_pstring_slice__returns_null_result__for_request_of_zero_length_slice) {
+    PString_t pstr = { .string = "words", .length = 5 };
+    PString_t result = pstring_slice(pstr, 2, 2);
+    ck_assert_ptr_null(result.string);
+    ck_assert_int_eq(result.length, 0);
+}
+
+START_TEST(fn_pstring_slice__returns_null_result__for_out_of_bounds_begin_idx) {
+    PString_t pstr = { .string = "a", .length = 1 };
+    PString_t result = pstring_slice(pstr, 2, 1);
+    ck_assert_ptr_null(result.string);
+    ck_assert_int_eq(result.length, 0);
+}
+
+START_TEST(fn_pstring_slice__returns_null_result__for_out_of_bounds_end_idx) {
+    PString_t pstr = { .string = "a", .length = 1 };
+    PString_t result = pstring_slice(pstr, 0, 2);
+    ck_assert_ptr_null(result.string);
+    ck_assert_int_eq(result.length, 0);
+}
+END_TEST
+
+
+START_TEST(fn_pstring_slice__returns_non_owning_pstring__for_valid_slice) {
+    char const test_string[] = "This is a test, it is only a test";
+    size_t const test_length = pf_strlen(test_string);
+    PString_t const pstr = { .string = (char*)test_string, test_length };
+
+    int32_t const begin = 10;
+    int32_t const end = 14;
+    PString_t result = pstring_slice(pstr, begin, end);
+    ck_assert_ptr_nonnull(result.string);
+    ck_assert_int_eq(result.length, end - begin);
+
+    ck_assert_int_eq(TRUE, pstring_contains_char_sub(result, "test", 4));
+}
+END_TEST
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
