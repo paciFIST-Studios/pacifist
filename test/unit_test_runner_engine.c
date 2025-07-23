@@ -467,6 +467,10 @@ int main(void) {
     ADD_TEST(fn_pstring_slice__returns_null_result__for_out_of_bounds_begin_idx);
     ADD_TEST(fn_pstring_slice__returns_null_result__for_out_of_bounds_end_idx);
     ADD_TEST(fn_pstring_slice__returns_non_owning_pstring__for_valid_slice);
+    ADD_TEST(fn_pstring_slice__returns_slice__when_using_negative_indicies);
+    ADD_TEST(fn_pstring_slice__returns_slice__when_using_positive_then_negative_indicies);
+    ADD_TEST(fn_pstirng_slice__feels_okay_in_casual_usage);
+
     
     RUN_SUITE(fail_count);
     // -------------------------------------------------------------------//

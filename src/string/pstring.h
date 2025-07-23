@@ -9,11 +9,14 @@
 // framework
 // engine
 
+#define PSTR_LAST 0
+
 
 typedef struct PString_t {
     char * string;
     size_t length;
 } PString_t;
+
 
 
 // thought:  basically make a string arena, except make it a free list allocator,

@@ -4,6 +4,7 @@
 #include <check.h>
 #include "../../src/string/pstring.h"
 // stdlib
+#include <stdlib.h>
 // framework
 // engine
 #include "../../src/core/define.h"
@@ -162,9 +163,51 @@ START_TEST(fn_pstring_slice__returns_non_owning_pstring__for_valid_slice) {
 END_TEST
 
 
+START_TEST(fn_pstring_slice__returns_slice__when_using_negative_indicies) {
+    char const test_string[] = "This is a string.  Oh there's an html tag in it <b>bold</b>";
+    size_t const test_length = pf_strlen(test_string);
+    PString_t const pstr = { .string = (char*)test_string, test_length };
 
+    int32_t const begin = -12;
+    int32_t const end = PSTR_LAST;
+    size_t const len = abs(end - begin);
+    PString_t result = pstring_slice(pstr, begin, end);
+    ck_assert_ptr_nonnull(result.string);
+    ck_assert_int_eq(result.length, len);
+}
+END_TEST
 
+START_TEST(fn_pstring_slice__returns_slice__when_using_positive_then_negative_indicies) {
+    char const test_string[] = "GameplayTag=JustALilGuy";
+    size_t const test_length = pf_strlen(test_string);
+    PString_t const pstr = { .string = (char*)test_string, test_length };
 
+    int32_t const begin = 12;
+    int32_t const end = PSTR_LAST;
+    size_t const len = test_length - begin;
+    PString_t result = pstring_slice(pstr, begin, end);
+    ck_assert_ptr_nonnull(result.string);
+    ck_assert_int_eq(result.length, len);
+}
+END_TEST
+
+START_TEST(fn_pstirng_slice__feels_okay_in_casual_usage) {
+    char const test_string[] = "player.skill.fireball.level.1";
+    size_t const test_length = pf_strlen(test_string);
+    PString_t const pstr = { .string = (char*)test_string, test_length };
+
+    PString_t result = pstring_slice(pstr, 14, PSTR_LAST);
+
+    char * fireball = malloc(9);
+    for (size_t i = 0; i < 9; i++) { fireball[i] = 0; }
+    
+    strncpy(fireball, result.string, 9);
+
+    int32_t bContainsSubstring = pstring_contains_char_sub(result, fireball, 9);
+    ck_assert_int_eq(bContainsSubstring, TRUE);
+    
+    free(fireball);
+}
 
 
 

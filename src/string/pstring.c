@@ -95,8 +95,11 @@ PString_t pstring_slice(PString_t const pstr, int32_t const begin, int32_t const
         return result;
     }
 
+    // WARNING: Zero is a positive number in the "begin" parameter,
+    //          but it's a negative number in the "end" parameter,
+    //          and in the end parameter, it's used to mean "last idx"
     int32_t bBeginIsPositive = begin >= 0;
-    int32_t bEndIsPositive = end >= 0;
+    int32_t bEndIsPositive = end > 0;
 
     char* pBegin = NULL;
     char* pEnd = NULL;
@@ -109,12 +112,13 @@ PString_t pstring_slice(PString_t const pstr, int32_t const begin, int32_t const
     }
 
     if (bEndIsPositive) {
-        pEnd = (void*)(pstr.string + end);
-    } else {
-        size_t const offset = pstr.length + end;
-        pEnd = (void*)(pstr.string + offset);
-    }
-
+         pEnd = (void*)(pstr.string + end);
+     } else {
+         size_t const offset = pstr.length + end;
+         pEnd = (void*)(pstr.string + offset);
+     }
+    
+        
     if (pBegin == NULL || pEnd == NULL) {
         // error, somehow requested slice includes null
         return result;
