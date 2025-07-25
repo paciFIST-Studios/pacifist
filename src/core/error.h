@@ -41,13 +41,9 @@ static inline size_t pf_strlen(char const * string) {
  * @param Category PFLogCategory_t
  * @param Message 
  */
-#define PF_LOG_VERBOSE(Category, Message) do {                          \
-    BUILD_AND_SET_ERROR_MESSAGE(Message);                               \
-    if(dnc__pf_get_is_error_suppressed()) { break; }                    \
-    char const * error = pf_get_error();                                \
-    size_t const error_length = pf_strlen(error);                       \
-    SDL_LogVerbose((SDL_LogCategory)Category, error, error_length );    \
-} while (0);                                                            \
+#define PF_LOG_VERBOSE(Category, Message) do {              \
+    pf_log_verbose(Category, Message, __FILE__, __LINE__);  \
+} while (0);                                                \
 
 /**
  *  @brief this macro builds and logs a WARNING message to SDL_Log, using the give category and message
@@ -55,13 +51,9 @@ static inline size_t pf_strlen(char const * string) {
  * @param Category PFLogCategory_t
  * @param Message 
  */
-#define PF_LOG_WARNING(Category, Message) do {                          \
-    BUILD_AND_SET_ERROR_MESSAGE(Message);                               \
-    if(dnc__pf_get_is_error_suppressed()) { break; }                    \
-    char const * error = pf_get_error();                                \
-    size_t const error_length = pf_strlen(error);                       \
-    SDL_LogWarning((SDL_LogCategory)Category, error, error_length );      \
-} while (0);                                                            \
+#define PF_LOG_WARNING(Category, Message) do {              \
+    pf_log_warning(Category, Message, __FILE__, __LINE__);  \
+} while (0);                                                \
 
 
 
@@ -71,13 +63,9 @@ static inline size_t pf_strlen(char const * string) {
  * @param Category PFLogCategory_t
  * @param Message 
  */
-#define PF_LOG_ERROR(Category, Message) do {                            \
-    BUILD_AND_SET_ERROR_MESSAGE(Message);                               \
-    if(dnc__pf_get_is_error_suppressed()) { break; }                    \
-    char const * error = pf_get_error();                                \
-    size_t const error_length = pf_strlen(error);                       \
-    SDL_LogError((SDL_LogCategory)Category, error, error_length );      \
-} while (0);                                                            \
+#define PF_LOG_ERROR(Category, Message) do {               \
+    pf_log_error(Category, Message, __FILE__, __LINE__);   \
+} while (0);                                               \
 
 /**
  *  @brief this macro builds and logs a CRITICAL message to SDL_Log, using the give category and message
@@ -85,13 +73,9 @@ static inline size_t pf_strlen(char const * string) {
  * @param Category PFLogCategory_t
  * @param Message 
  */
-#define PF_LOG_CRITICAL(Category, Message) do {                         \
-    BUILD_AND_SET_ERROR_MESSAGE(Message);                               \
-    if(dnc__pf_get_is_error_suppressed()) { break; }                    \
-    char const * error = pf_get_error();                                \
-    size_t const error_length = pf_strlen(error);                       \
-    SDL_LogCritical((SDL_LogCategory)Category, error, error_length );   \
-} while (0);                                                            \
+#define PF_LOG_CRITICAL(Category, Message) do {            \
+    pf_log_error(Category, Message, __FILE__, __LINE__);   \
+} while (0);                                               \
 
 
 
@@ -100,28 +84,110 @@ static inline size_t pf_strlen(char const * string) {
  * 
  * @param message 
  */
-#define BUILD_AND_SET_ERROR_MESSAGE(message) do {               \
-    size_t const size = pf_get_error_buffer_size();             \
-    char error_message[size];                                   \
-    for(size_t i = 0; i < size; i++){ error_message[i] = 0; }   \
-    char dt[22];                                                \
-    get_datetime_string(dt, 22);                                \
-    sprintf(error_message, "%s:  ERROR %s  --  file: %s[%d]",   \
-         dt, message, __FILE__, __LINE__);                      \
-    pf_set_error(error_message, strlen(error_message));         \
-} while(0);                                                     \
 
 
-#define PF_SUPPRESS_ERRORS do {                                 \
-    dnc__pf_set_error_suppressed();                             \
-}while(0);                                                      \
+#define PF_SUPPRESS_ERRORS do {                           \
+    dnc__pf_set_error_suppressed();                       \
+}while(0);                                                \
 
 
-#define PF_UNSUPPRESS_ERRORS do {                               \
-    dnc__pf_set_error_not_suppressed();                         \
-} while(0);                                                     \
+#define PF_UNSUPPRESS_ERRORS do {                         \
+    dnc__pf_set_error_not_suppressed();                   \
+} while(0);                                               \
+
+
+
+/**
+ *
+ *  NOTES:
+ *      Okay, so this is clearly two tasks, therefore, let me explain why it's in one fn.
+ *
+ *      1. error.c owns the singleton static error buffer.  Placing an error in this buffer,
+ *          simply means copying each character over
+ *
+ *      2. building the message happens exactly the same way to every message which is logged.
+ *          prefixed by date, followed by verbosity type, followed by message, followed by
+ *          caller's file, followed by calling line number
+ *
+ *      3. in order to transport this data from one fn to the next, we'll need an additional
+ *          buffer, of size ERROR_BUFFER_SIZE, which is 4096 bytes.  Right now, we're building
+ *          it on the stack, but also cleaning it up at the end of the function.
+ *
+ *          in order to return this to the caller, we would have to allocate memory, or do
+ *          yet more stack allocations of this size, and yet more copies of this size
+ *
+ *      4. combing these two tasks, occurs in part as an optimization--we don't want to
+ *          introduce a stack overflow.  But primarily, this is done to prevent heap
+ *          allocation.  Our game engine is only meant to have a single allocation at
+ *          program start, and thereafter, allocate from that memory, using pf_allocators
+ *          of some kind.  Not only is this work unfinished at the time of this writing,
+ *          but also we want to avoid a future maintainer's temptation to allocate memory
+ *          for the error messages, as a way of reducing the code surface area which
+ *          directly interacts with memory from the OS
+ *
+ *      5. it's not perfect, and we could either query the size of the buffer needed,
+ *          or simply always make a buffer of ERROR_BUFFER_SIZE.  However, I (Ellie Barrett, 1202507231051)
+ *          believe this is the best compromise of logical rigor, and practical necessity.
+ *          I agree to suffer the consequences of this decision in the future.  Future
+ *          maintainers can be assured, this is explicitly my decision/fault.  Sorry,
+ *          if it's a hassle for you.
+ *
+ *
+ * @param message 
+ * @param file 
+ * @param line 
+ */
+void pf_build_and_set_error_message(char const * message, char const * file, int32_t const line);
+
 
 // Error -----------------------------------------------------------------------------------------------------
+
+// these logging fns can be used directly, but there are some simple macro wrappers,
+// which supply the file name and line number for you
+
+
+/**
+ * @brief Logs a message with a Verbose modifier (won't print out unless user is using verbose logging)
+ *
+ * @param category
+ * @param message
+ * @param file
+ * @param line
+ */
+void pf_log_verbose(PFLogCategory_t const category, char const * message, char const * file, int32_t const line);
+
+
+/**
+ * @brief Logs a message with a Warning modifier
+ * 
+ * @param category
+ * @param message
+ * @param file
+ * @param line
+ */
+void pf_log_warning(PFLogCategory_t const category, char const * message, char const * file, int32_t const line);
+
+
+/**
+ * @brief Logs a message with an Error modifier
+ * 
+ * @param category
+ * @param message
+ * @param file
+ * @param line
+ */
+void pf_log_error(PFLogCategory_t const category, char const * message, char const * file, int32_t const line);
+
+
+/**
+ * @brief Logs a message with a Critical modifier
+ * 
+ * @param category
+ * @param message
+ * @param file
+ * @param line
+ */
+void pf_log_critical(PFLogCategory_t const category, char const * message, char const * file, int32_t const line);
 
 
 // gets the current allocation size of the error buffer
@@ -156,7 +222,7 @@ void dnc__pf_set_error_not_suppressed();
 /**
  * @brief DO NOT CALL - this fn is used internally by the PF_SUPPRESS_ERRORS marco, use that instead 
  */
-int32_t dnc__pf_get_is_error_suppressed();
+int32_t pf_get_is_error_suppressed();
 
 /**
  * @brief DO NOT CALL - this fn is used internally by the PF_SUPPRESS_ERRORS marco, use that instead 

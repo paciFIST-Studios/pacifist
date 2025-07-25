@@ -16,6 +16,7 @@
 #define ERROR_BUFFER_SIZE 4096
 
 
+
 static int32_t s_errors_are_suppressed = 0;
 
 
@@ -41,6 +42,8 @@ void pf_set_error(char const * message, size_t const message_len) {
         return;
     }
 
+    pf_clear_error();
+    
     for (size_t i = 0; i < message_len; i++) {
         if(i >= ERROR_BUFFER_SIZE){
             return;
@@ -71,11 +74,59 @@ void dnc__pf_set_error_not_suppressed() {
 #endif
 }
 
-int32_t dnc__pf_get_is_error_suppressed() {
+int32_t pf_get_is_error_suppressed() {
 #ifdef ERROR_SUPPRESSION_ALLOWED
     return s_errors_are_suppressed;
 #else
     return FALSE;
 #endif
 }
+
+void pf_build_and_set_error_message(char const * message, char const * file, int32_t const line) {
+    char error_message[ERROR_BUFFER_SIZE];
+    for(size_t i = 0; i < ERROR_BUFFER_SIZE; i++){ error_message[i] = 0; }
+    char dt[22];
+    get_datetime_string(dt, 22);
+    sprintf(error_message, "%s:  ERROR %s  --  file: %s[%d]", dt, message, file, line);
+    pf_set_error(error_message, strlen(error_message));
+}
+
+
+
+void pf_log_verbose(PFLogCategory_t const category, char const * message, char const * file, int32_t const line) {
+    pf_build_and_set_error_message(message, file, line);
+    if (!pf_get_is_error_suppressed()) {
+        char const * error = pf_get_error();
+        size_t const error_length = pf_strlen(error);
+        SDL_LogVerbose((SDL_LogCategory)category, error, error_length);
+    }
+}
+
+void pf_log_warning(PFLogCategory_t const category, char const * message, char const * file, int32_t const line) {
+    pf_build_and_set_error_message(message, file, line);
+    if (!pf_get_is_error_suppressed()) {
+        char const * error = pf_get_error();
+        size_t const error_length = pf_strlen(error);
+        SDL_LogWarn((SDL_LogCategory)category, error, error_length);
+    }
+}
+
+void pf_log_error(PFLogCategory_t const category, char const * message, char const * file, int32_t const line) {
+    pf_build_and_set_error_message(message, file, line);
+    if (!pf_get_is_error_suppressed()) {
+        char const * error = pf_get_error();
+        size_t const error_length = pf_strlen(error);
+        SDL_LogError((SDL_LogCategory)category, error, error_length);
+    }
+}
+
+void pf_log_critical(PFLogCategory_t const category, char const * message, char const * file, int32_t const line) {
+    pf_build_and_set_error_message(message, file, line);
+    if (!pf_get_is_error_suppressed()) {
+        char const * error = pf_get_error();
+        size_t const error_length = pf_strlen(error);
+        SDL_LogCritical((SDL_LogCategory)category, error, error_length);
+    }
+}
+
 

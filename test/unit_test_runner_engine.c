@@ -159,7 +159,7 @@ int main(void) {
     //--------------//
 
     // build_and_set_error_message
-    ADD_TEST(macro_build_and_set_error_message__is_defined);
+    //ADD_TEST(macro_build_and_set_error_message__is_defined);
     
     // get_error_buffer_size
     ADD_TEST(fn_get_error_buffer_size__is_defined);
@@ -454,7 +454,8 @@ int main(void) {
     // fn pstring_contains_pstr_sub
     // this fn actually calls into the char_sub version, so we're saying it's "testing both"
     ADD_TEST(fn_pstring_contains_pstr_sub__is_defined);
-    ADD_TEST(fn_pstring_contains_pstr_sub__returns_false_if_substring_is_longer_that_first_string);
+    ADD_TEST(fn_pstring_contains_pstr_sub__returns_false__if_substring_is_longer_that_first_string);
+    ADD_TEST(fn_pstring_contains_pstr_sub__logs_correct_error__if_substring_is_longer_than_first_string);
     ADD_TEST(fn_pstring_contains_pstr_sub__can_find_a_substring); 
     ADD_TEST(fn_pstring_contains_pstr_sub__stress_testing);
 

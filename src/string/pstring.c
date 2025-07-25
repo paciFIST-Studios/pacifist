@@ -8,12 +8,14 @@
 // framework
 // engine
 #include "../core/common.h"
+#include "../core/error.h"
 // game
 
 
 
 int32_t pstring_contains_char_sub(PString_t const a, char const * substring, size_t const length){
     if (length > a.length) {
+        PF_LOG_ERROR(PF_STRING, "Searching for substring whose length is longer than the base string!");
         return FALSE;
     }    
 
@@ -74,24 +76,24 @@ PString_t pstring_slice(PString_t const pstr, int32_t const begin, int32_t const
     PString_t result = { .string = NULL, .length = 0 };
 
     if (pstr.string == NULL) {
-        // error, invalid ptr to string
+        //PF_LOG_ERROR(PF_STRING, "Null pointer passed to base string!");
         return result;
     }
     if (pstr.length == 0) {
-        // error, invalid string length
+        //PF_LOG_ERROR(PF_STRING, "Invalid string length!");
         return result;
     }
     if (begin == end) {
-        // error, slice is zero length
+        //PF_LOG_ERROR(PF_STRING, "Cannot create a zero-length slice!");
         return result;
     }
 
     if (abs(begin) > pstr.length) {
-        // error, begin wants out of bounds access
+        //PF_LOG_ERROR(PF_STRING, "Begin parameter wants out of bounds access to string!");
         return result;
     }
     if (abs(end) > pstr.length) {
-        // error, end wants out of bounds access
+        //PF_LOG_ERROR(PF_STRING, "End parameter wants out of bounds access to string!");
         return result;
     }
 
@@ -120,7 +122,7 @@ PString_t pstring_slice(PString_t const pstr, int32_t const begin, int32_t const
     
         
     if (pBegin == NULL || pEnd == NULL) {
-        // error, somehow requested slice includes null
+        //PF_LOG_ERROR(PF_STRING, "Somehow, attempted work on null ptr for pBegin=%p, pEnd=%p", pBegin, pEnd);
         return result;
     }
 
@@ -137,7 +139,7 @@ PString_t pstring_slice(PString_t const pstr, int32_t const begin, int32_t const
     size_t const length = pLast - pFirst;
 
     if (length == 0) {
-        // error, somehow requested slice length is zero
+        //PF_LOG_ERROR(PF_STRING, "Somehow, attempted work on zero-length slice!");
         return result;
     }
     

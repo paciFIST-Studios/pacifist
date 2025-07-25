@@ -10,8 +10,9 @@
 
 typedef enum PFLogCategory_t {
     PF_APPLICATION = SDL_LOG_CATEGORY_CUSTOM,
-    PF_OS,
     PF_ERROR_ERROR, /* an error in the error system itself */
+    PF_STRING,
+    PF_OS,
 } PFLogCategory_t;
 
 

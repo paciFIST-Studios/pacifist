@@ -34,12 +34,33 @@ START_TEST(fn_pstring_contains_pstr_sub__is_defined) {
 }
 END_TEST
 
-START_TEST(fn_pstring_contains_pstr_sub__returns_false_if_substring_is_longer_that_first_string) {
+START_TEST(fn_pstring_contains_pstr_sub__returns_false__if_substring_is_longer_that_first_string) {
     PString_t pstr1 = { .string = "a", .length = 1 };
     PString_t pstr2 = { .string = "ab", .length = 2 };
-    ck_assert_int_eq(pstring_contains_pstr_sub(pstr1, pstr2), 0);
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(FALSE, pstring_contains_pstr_sub(pstr1, pstr2));
+    PF_UNSUPPRESS_ERRORS
 }
 END_TEST
+
+START_TEST(fn_pstring_contains_pstr_sub__logs_correct_error__if_substring_is_longer_than_first_string) {
+    PString_t pstr1 = { .string = "a", .length = 1 }; 
+    PString_t pstr2 = { .string = "ab", .length = 2 };
+    pf_clear_error();
+    
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(FALSE, pstring_contains_pstr_sub(pstr1, pstr2));
+    PF_UNSUPPRESS_ERRORS
+
+    char const expected_error[] = "Searching for substring whose length is longer than the base string!";
+    size_t const expected_length = pf_strlen(expected_error);
+    char * found_error = pf_get_error();
+
+    PString_t pstr_found_error = { .string = found_error, .length = pf_strlen(found_error) };
+    ck_assert_int_eq(TRUE, pstring_contains_char_sub(pstr_found_error, expected_error, expected_length));
+}
+END_TEST
+
 
 START_TEST(fn_pstring_contains_pstr_sub__can_find_a_substring) {
     PString_t a = { .string = "ab", .length = 2 };
