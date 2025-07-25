@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <time.h>
+
+#include "../core/error.h"
 // framework
 // engine
 
@@ -15,12 +17,12 @@ void get_datetime_string(char * out_buffer, size_t const out_buffer_length) {
     int32_t const required_buffer_len = 22;
 
     if (out_buffer == NULL) {
-        // error, requires valid ptr to buffer
+        PF_LOG_ERROR(PF_OS, "Requires valid ptr to buffer!");
         return;
     }
     
     if(out_buffer_length < required_buffer_len) {
-        // error, requires valid buffer length
+        PF_LOG_ERROR(PF_OS, "Output buffer too small!");
         return;
     }
 
@@ -28,15 +30,14 @@ void get_datetime_string(char * out_buffer, size_t const out_buffer_length) {
         out_buffer[i] = 0;
     }
 
-    time_t t = time(NULL);
-    struct tm *tm = localtime(&t);
+    time_t const t = time(NULL);
+    struct tm const * tm = localtime(&t);
 
     if (tm == NULL) {
-        // error, could not get local time
+        PF_LOG_ERROR(PF_OS, "Could not get local time!");
         return;
     }
 
-    
     int32_t const year   = tm->tm_year + 1900;
     int32_t const month  = tm->tm_mon + 1;
     int32_t const day    = tm->tm_mday;
