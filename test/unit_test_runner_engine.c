@@ -463,14 +463,20 @@ int main(void) {
     ADD_TEST(fn_pstring_slice__is_defined);
     ADD_TEST(fn_pstirng_slice__returns_null_result__of_correct_form);
     ADD_TEST(fn_pstring_slice__returns_null_result__for_pstr_arg_with_null_string);
+    ADD_TEST(fn_pstring_slice__sets_correct_error_message__for_pstring_arg_with_null_string);
     ADD_TEST(fn_pstring_slice__returns_null_result__for_pstr_arg_with_zero_length);
+    ADD_TEST(fn_pstring_slive__sets_correct_error_message__for_pstr_arg_with_zero_length);
     ADD_TEST(fn_pstring_slice__returns_null_result__for_request_of_zero_length_slice);
+    ADD_TEST(fn_pstring_slice__sets_correct_error_message__for_request_of_zero_length_slice);
     ADD_TEST(fn_pstring_slice__returns_null_result__for_out_of_bounds_begin_idx);
+    ADD_TEST(fn_pstring_slice__sets_correct_error_message__for_out_of_bounds_begin_idx);
     ADD_TEST(fn_pstring_slice__returns_null_result__for_out_of_bounds_end_idx);
+    ADD_TEST(fn_pstring_slice__sets_correct_error_message__for_out_of_bounds_end_idx);
+    //ADD_TEST(fn_pstring_slice__sets_correct_error_message__for_hack_slice_which_creates_null_begin_ptr);
     ADD_TEST(fn_pstring_slice__returns_non_owning_pstring__for_valid_slice);
     ADD_TEST(fn_pstring_slice__returns_slice__when_using_negative_indicies);
     ADD_TEST(fn_pstring_slice__returns_slice__when_using_positive_then_negative_indicies);
-    ADD_TEST(fn_pstirng_slice__feels_okay_in_casual_usage);
+    ADD_TEST(fn_pstring_slice__feels_okay_in_casual_usage);
 
     
     RUN_SUITE(fail_count);

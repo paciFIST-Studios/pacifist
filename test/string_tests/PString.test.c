@@ -122,7 +122,9 @@ END_TEST
 
 START_TEST(fn_pstirng_slice__returns_null_result__of_correct_form) {
     PString_t pstr = { .string = NULL, .length = 0 };
+    PF_SUPPRESS_ERRORS
     PString_t result = pstring_slice(pstr, 0, 1);
+    PF_UNSUPPRESS_ERRORS
     ck_assert_ptr_nonnull(&result);
     ck_assert_int_eq(result.length, 0);
     ck_assert_ptr_null(result.string);
@@ -131,42 +133,135 @@ END_TEST
 
 START_TEST(fn_pstring_slice__returns_null_result__for_pstr_arg_with_null_string) {
     PString_t pstr = { .string = NULL, .length = 1 };
+    PF_SUPPRESS_ERRORS
     PString_t result = pstring_slice(pstr, 0, 1);
+    PF_UNSUPPRESS_ERRORS
     ck_assert_ptr_null(result.string);
     ck_assert_int_eq(result.length, 0);
+}
+END_TEST
+
+START_TEST(fn_pstring_slice__sets_correct_error_message__for_pstring_arg_with_null_string) {
+    PString_t const pstr = { .string = NULL, .length = 1 };
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    PString_t result = pstring_slice(pstr, 0, 1);
+    PF_UNSUPPRESS_ERRORS
+
+    char const * error_message = pf_get_error();
+    size_t const error_length = pf_strlen(error_message);
+    PString_t const error = { .string = (char*)error_message, .length = error_length };
+
+    char const expected_error[] = "Null pointer passed to base string!";
+    size_t const expected_length = pf_strlen(expected_error);
+    ck_assert_int_eq(TRUE,  pstring_contains_char_sub(error, expected_error, expected_length)); 
 }
 END_TEST
 
 START_TEST(fn_pstring_slice__returns_null_result__for_pstr_arg_with_zero_length) {
     PString_t pstr = { .string = "test", .length = 0 };
+    PF_SUPPRESS_ERRORS
     PString_t result = pstring_slice(pstr, 0, 1);
+    PF_UNSUPPRESS_ERRORS
     ck_assert_ptr_null(result.string);
     ck_assert_int_eq(result.length, 0);
+}
+END_TEST
+
+START_TEST(fn_pstring_slive__sets_correct_error_message__for_pstr_arg_with_zero_length) {
+    PString_t pstr = { .string = "test", .length = 0 };
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    PString_t result = pstring_slice(pstr, 0, 1);
+    PF_UNSUPPRESS_ERRORS
+
+    char const * error_message = pf_get_error();
+    size_t const error_length = pf_strlen(error_message);
+    PString_t const error = { .string = (char*)error_message, .length = error_length };
+
+    char const expected_error[] = "Invalid string length!";
+    size_t const expected_length = pf_strlen(expected_error);
+    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected_error, expected_length));
 }
 END_TEST
 
 START_TEST(fn_pstring_slice__returns_null_result__for_request_of_zero_length_slice) {
     PString_t pstr = { .string = "words", .length = 5 };
+    PF_SUPPRESS_ERRORS
     PString_t result = pstring_slice(pstr, 2, 2);
+    PF_UNSUPPRESS_ERRORS
     ck_assert_ptr_null(result.string);
     ck_assert_int_eq(result.length, 0);
 }
+
+START_TEST(fn_pstring_slice__sets_correct_error_message__for_request_of_zero_length_slice) {
+    PString_t pstr = { .string = "words", .length = 5 };
+    PF_SUPPRESS_ERRORS
+    PString_t result = pstring_slice(pstr, 2, 2);
+    PF_UNSUPPRESS_ERRORS
+
+    char const * error_message = pf_get_error();
+    size_t const error_length = pf_strlen(error_message);
+    PString_t const error = { .string = (char*)error_message, .length = error_length };
+
+    char const expected_error[] = "Cannot create a zero-length slice!";
+    size_t const expected_length = pf_strlen(expected_error);
+    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected_error, expected_length));
+}
+END_TEST
 
 START_TEST(fn_pstring_slice__returns_null_result__for_out_of_bounds_begin_idx) {
     PString_t pstr = { .string = "a", .length = 1 };
+    PF_SUPPRESS_ERRORS
     PString_t result = pstring_slice(pstr, 2, 1);
+    PF_UNSUPPRESS_ERRORS
     ck_assert_ptr_null(result.string);
     ck_assert_int_eq(result.length, 0);
 }
 
+START_TEST(fn_pstring_slice__sets_correct_error_message__for_out_of_bounds_begin_idx) {
+    PString_t pstr = { .string = "a", .length = 1 };
+    PF_SUPPRESS_ERRORS
+    PString_t result = pstring_slice(pstr, 2, 1);
+    PF_UNSUPPRESS_ERRORS
+
+    char const * error_message = pf_get_error();
+    size_t const error_length = pf_strlen(error_message);
+    PString_t const error = { .string = (char*)error_message, .length = error_length };
+
+    char const expected_error[] = "Begin parameter wants out of bounds access to string!";
+    size_t const expected_length = pf_strlen(expected_error);
+    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected_error, expected_length));
+}
+END_TEST
+
 START_TEST(fn_pstring_slice__returns_null_result__for_out_of_bounds_end_idx) {
     PString_t pstr = { .string = "a", .length = 1 };
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
     PString_t result = pstring_slice(pstr, 0, 2);
+    PF_UNSUPPRESS_ERRORS
     ck_assert_ptr_null(result.string);
     ck_assert_int_eq(result.length, 0);
 }
 END_TEST
 
+START_TEST(fn_pstring_slice__sets_correct_error_message__for_out_of_bounds_end_idx) {
+    PString_t const pstr = { .string = "a", .length = 1 };
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    PString_t result = pstring_slice(pstr, 0, 2);
+    PF_UNSUPPRESS_ERRORS
+
+    char const * error_message = pf_get_error();
+    size_t const error_length = pf_strlen(error_message);
+    PString_t const error = { .string = (char*)error_message, .length = error_length };
+
+    char const expected_error[] = "End parameter wants out of bounds access to string!";
+    size_t const expected_length = pf_strlen(expected_error);
+    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected_error, expected_length));
+}
+END_TEST
 
 START_TEST(fn_pstring_slice__returns_non_owning_pstring__for_valid_slice) {
     char const test_string[] = "This is a test, it is only a test";
@@ -182,7 +277,6 @@ START_TEST(fn_pstring_slice__returns_non_owning_pstring__for_valid_slice) {
     ck_assert_int_eq(TRUE, pstring_contains_char_sub(result, "test", 4));
 }
 END_TEST
-
 
 START_TEST(fn_pstring_slice__returns_slice__when_using_negative_indicies) {
     char const test_string[] = "This is a string.  Oh there's an html tag in it <b>bold</b>";
@@ -212,7 +306,7 @@ START_TEST(fn_pstring_slice__returns_slice__when_using_positive_then_negative_in
 }
 END_TEST
 
-START_TEST(fn_pstirng_slice__feels_okay_in_casual_usage) {
+START_TEST(fn_pstring_slice__feels_okay_in_casual_usage) {
     char const test_string[] = "player.skill.fireball.level.1";
     size_t const test_length = pf_strlen(test_string);
     PString_t const pstr = { .string = (char*)test_string, test_length };
@@ -229,7 +323,6 @@ START_TEST(fn_pstirng_slice__feels_okay_in_casual_usage) {
     
     free(fireball);
 }
-
 
 
 
