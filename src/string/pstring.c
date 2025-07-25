@@ -23,12 +23,12 @@ int32_t pstring_contains_char_sub(PString_t const a, char const * substring, siz
 
     int32_t const a_last_index = (int32_t)(a.length - 1);
     int32_t const b_last_index = (int32_t)(length - 1);
-    
+
     // loop backwards through the base string
     int32_t i = 0;
     for (i = a_last_index; i >= 0; i--) {
         failed_match_j_index = 0;
-        
+
         // loop backwards through the comparator string
         for (int32_t j = b_last_index; j >= 0; j--) {
 
@@ -52,7 +52,7 @@ int32_t pstring_contains_char_sub(PString_t const a, char const * substring, siz
                 return TRUE;
             }
         }
-        
+
         // skip over these indices, so we don't re-check them
         int32_t const indices_to_skip = (b_last_index - failed_match_j_index);
         // if we need to skip 1 index, still don't, b/c the outer loop goes
@@ -100,8 +100,8 @@ PString_t pstring_slice(PString_t const pstr, int32_t const begin, int32_t const
     // WARNING: Zero is a positive number in the "begin" parameter,
     //          but it's a negative number in the "end" parameter,
     //          and in the end parameter, it's used to mean "last idx"
-    int32_t bBeginIsPositive = begin >= 0;
-    int32_t bEndIsPositive = end > 0;
+    int32_t const bBeginIsPositive = begin >= 0;
+    int32_t const bEndIsPositive = end > 0;
 
     char* pBegin = NULL;
     char* pEnd = NULL;
@@ -144,10 +144,10 @@ PString_t pstring_slice(PString_t const pstr, int32_t const begin, int32_t const
         PF_LOG_ERROR(PF_STRING, "Somehow, attempted work on zero-length slice!");
         return result;
     }
-    
+
     result.string = pFirst;
     result.length = length;
-    
+
     return result;
 }
 
