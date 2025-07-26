@@ -70,6 +70,9 @@ static char const GLOBAL_TYPE_STRING__META_DATA_REFLECTION_TEST_STRUCT2_T[] = "M
 static char const GLOBAL_TYPE_STRING__META_DATA_REGISTRY_CONST_PTR_T[] = "MetaDataRegistry_const_ptr_t";
 static char const GLOBAL_TYPE_STRING__META_DATA_REGISTRY_PTR_T[] = "MetaDataRegistry_ptr_t";
 static char const GLOBAL_TYPE_STRING__META_DATA_REGISTRY_T[] = "MetaDataRegistry_t";
+static char const GLOBAL_TYPE_STRING__PFENGINE_STATE_CONST_PTR_T[] = "PFEngineState_const_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFENGINE_STATE_PTR_T[] = "PFEngineState_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFENGINE_STATE_T[] = "PFEngineState_t";
 static char const GLOBAL_TYPE_STRING__PFLOG_CATEGORY_CONST_PTR_T[] = "PFLogCategory_const_ptr_t";
 static char const GLOBAL_TYPE_STRING__PFLOG_CATEGORY_PTR_T[] = "PFLogCategory_ptr_t";
 static char const GLOBAL_TYPE_STRING__PFLOG_CATEGORY_T[] = "PFLogCategory_t";
@@ -85,12 +88,12 @@ static char const GLOBAL_TYPE_STRING__RED_BLACK_TREE_T[] = "RedBlackTree_t";
 static char const GLOBAL_TYPE_STRING__SNAKE_GAME_STATE_CONST_PTR_T[] = "SnakeGameState_const_ptr_t";
 static char const GLOBAL_TYPE_STRING__SNAKE_GAME_STATE_PTR_T[] = "SnakeGameState_ptr_t";
 static char const GLOBAL_TYPE_STRING__SNAKE_GAME_STATE_T[] = "SnakeGameState_t";
-static char const GLOBAL_TYPE_STRING__STRING_ALLOCATOR_SINGLETON_CONST_PTR_T[] = "StringAllocatorSingleton_const_ptr_t";
-static char const GLOBAL_TYPE_STRING__STRING_ALLOCATOR_SINGLETON_PTR_T[] = "StringAllocatorSingleton_ptr_t";
-static char const GLOBAL_TYPE_STRING__STRING_ALLOCATOR_SINGLETON_T[] = "StringAllocatorSingleton_t";
 static char const GLOBAL_TYPE_STRING__STRING_COPY_FUNCTION_CONST_PTR_T[] = "StringCopyFunction_const_ptr_t";
 static char const GLOBAL_TYPE_STRING__STRING_COPY_FUNCTION_PTR_T[] = "StringCopyFunction_ptr_t";
 static char const GLOBAL_TYPE_STRING__STRING_COPY_FUNCTION_T[] = "StringCopyFunction_t";
+static char const GLOBAL_TYPE_STRING__STRING_INTERNMENT_SINGLETON_CONST_PTR_T[] = "StringInternmentSingleton_const_ptr_t";
+static char const GLOBAL_TYPE_STRING__STRING_INTERNMENT_SINGLETON_PTR_T[] = "StringInternmentSingleton_ptr_t";
+static char const GLOBAL_TYPE_STRING__STRING_INTERNMENT_SINGLETON_T[] = "StringInternmentSingleton_t";
 static char const GLOBAL_TYPE_STRING__TYPED_PTR_CONST_PTR_T[] = "TypedPtr_const_ptr_t";
 static char const GLOBAL_TYPE_STRING__TYPED_PTR_PTR_T[] = "TypedPtr_ptr_t";
 static char const GLOBAL_TYPE_STRING__TYPED_PTR_T[] = "TypedPtr_t";
@@ -187,6 +190,9 @@ typedef enum EProjectDataTypes_t {	EPDT__Undefined_t,
 	EPDT__MetaDataRegistry_const_ptr_t,
 	EPDT__MetaDataRegistry_ptr_t,
 	EPDT__MetaDataRegistry_t,
+	EPDT__PFEngineState_const_ptr_t,
+	EPDT__PFEngineState_ptr_t,
+	EPDT__PFEngineState_t,
 	EPDT__PFLogCategory_const_ptr_t,
 	EPDT__PFLogCategory_ptr_t,
 	EPDT__PFLogCategory_t,
@@ -202,12 +208,12 @@ typedef enum EProjectDataTypes_t {	EPDT__Undefined_t,
 	EPDT__SnakeGameState_const_ptr_t,
 	EPDT__SnakeGameState_ptr_t,
 	EPDT__SnakeGameState_t,
-	EPDT__StringAllocatorSingleton_const_ptr_t,
-	EPDT__StringAllocatorSingleton_ptr_t,
-	EPDT__StringAllocatorSingleton_t,
 	EPDT__StringCopyFunction_const_ptr_t,
 	EPDT__StringCopyFunction_ptr_t,
 	EPDT__StringCopyFunction_t,
+	EPDT__StringInternmentSingleton_const_ptr_t,
+	EPDT__StringInternmentSingleton_ptr_t,
+	EPDT__StringInternmentSingleton_t,
 	EPDT__TypedPtr_const_ptr_t,
 	EPDT__TypedPtr_ptr_t,
 	EPDT__TypedPtr_t,
