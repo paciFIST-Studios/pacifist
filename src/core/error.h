@@ -14,15 +14,10 @@
 // game
 
 
+static const int32_t PF_NO_ERROR = 0;
 
 
-// Logging Macros ------------------------------------------------------------------------------------------------------
-
-// stdlib
-// framework
-// engine
-#include "../core/error.h"
-#include "../log/log_category.h"
+// utility fns -----------------------------------------------------------------------------------------------
 
 // iirc, this is the strlen implementation
 static inline size_t pf_strlen(char const * string) {
@@ -34,6 +29,8 @@ static inline size_t pf_strlen(char const * string) {
 }
 
 
+
+// Logging Macros --------------------------------------------------------------------------------------------
 
 /**
  *  @brief this macro builds and logs a VERBOSE message to SDL_Log, using the give category and message
@@ -87,12 +84,12 @@ static inline size_t pf_strlen(char const * string) {
 
 
 #define PF_SUPPRESS_ERRORS do {                           \
-    dnc__pf_set_error_suppressed();                       \
+    pf_set_error_suppressed();                            \
 }while(0);                                                \
 
 
 #define PF_UNSUPPRESS_ERRORS do {                         \
-    dnc__pf_set_error_not_suppressed();                   \
+    pf_set_error_not_suppressed();                        \
 } while(0);                                               \
 
 
@@ -140,7 +137,7 @@ static inline size_t pf_strlen(char const * string) {
 void pf_build_and_set_error_message(char const * message, char const * file, int32_t const line);
 
 
-// Error -----------------------------------------------------------------------------------------------------
+// Logging fns -----------------------------------------------------------------------------------------------
 
 // these logging fns can be used directly, but there are some simple macro wrappers,
 // which supply the file name and line number for you
@@ -189,6 +186,7 @@ void pf_log_error(PFLogCategory_t const category, char const * message, char con
  */
 void pf_log_critical(PFLogCategory_t const category, char const * message, char const * file, int32_t const line);
 
+// Error state fns -------------------------------------------------------------------------------------------
 
 // gets the current allocation size of the error buffer
 size_t pf_get_error_buffer_size();
@@ -211,27 +209,17 @@ void pf_clear_error();
 /**
  * @brief DO NOT CALL - this fn is used internally by the PF_SUPPRESS_ERRORS marco, use that instead 
  */
-void dnc__pf_set_error_suppressed();
+void pf_set_error_suppressed();
 
 /**
  * @brief DO NOT CALL - this fn is used internally by the PF_SUPPRESS_ERRORS marco, use that instead 
  */
-void dnc__pf_set_error_not_suppressed();
+void pf_set_error_not_suppressed();
 
 // if errors are suppressed, calling get_error will return nullptr
 /**
  * @brief DO NOT CALL - this fn is used internally by the PF_SUPPRESS_ERRORS marco, use that instead 
  */
 int32_t pf_get_is_error_suppressed();
-
-/**
- * @brief DO NOT CALL - this fn is used internally by the PF_SUPPRESS_ERRORS marco, use that instead 
- */
-int32_t dnc__pf_is_error_suppression_balanced();
-
-/**
- * @brief DO NOT CALL - this fn is used internally by the PF_SUPPRESS_ERRORS marco, use that instead 
- */
-char* dnc__pf_get_error_suppression_unbalanced_message();
 
 #endif //ERROR_H

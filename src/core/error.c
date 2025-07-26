@@ -62,13 +62,13 @@ void pf_clear_error() {
 
 
 
-void dnc__pf_set_error_suppressed() {
+void pf_set_error_suppressed() {
 #ifdef ERROR_SUPPRESSION_ALLOWED
     s_errors_are_suppressed = TRUE;
 #endif
 }
 
-void dnc__pf_set_error_not_suppressed() {
+void pf_set_error_not_suppressed() {
 #ifdef ERROR_SUPPRESSION_ALLOWED
     s_errors_are_suppressed = FALSE;
 #endif
