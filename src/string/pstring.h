@@ -19,12 +19,6 @@ typedef struct PString_t {
 
 
 
-// thought:  basically make a string arena, except make it a free list allocator,
-//           so strings can either be interned for the duration of the program,
-//           or they can be allocated in a free-list, for short-term usage
-//typedef struct StringAllocatorSingleton_t {
-//    
-//} StringAllocatorSingleton_t;
 
 
 
