@@ -82,6 +82,9 @@ char * global_module;
 // DateTime
 #include "../test/datetime_test/datetime.test.c"
 
+// Engine
+#include "../test/engine_tests/PFEngineState.test.c"
+
 // Log
 #include "../test/log_tests/log.test.c"
 
@@ -208,6 +211,39 @@ int main(void) {
     // End DateTime Test Suite                                            //
     // -------------------------------------------------------------------//
 
+
+    // -------------------------------------------------------------------//
+    // Engine Test Suite                                            //
+    // -------------------------------------------------------------------//
+    BUILD_SUITE("Engine");
+
+
+    // struct PFEngineState_t
+    ADD_TEST(fn_struct_PFEngineState_t__is_defined);
+    ADD_TEST(fn_struct_PFEngineState_t__has_expected_size);
+    ADD_TEST(fn_struct_PFEngineState_t__has_expected_members);
+
+    // fn pf_engine_state_initialize
+    ADD_TEST(fn_pf_engine_state_initialize__is_defined);
+    ADD_TEST(fn_pf_engine_state_initialize__correctly_initializes_engine_state);
+    
+    // fn pf_engine_state_destroy
+    ADD_TEST(fn_pf_engine_state_destroy__is_defined);
+    
+    // fn pf_engine_state_save
+    ADD_TEST(fn_pf_engine_state_save__is_defined);
+
+    // fn pf_engine_state_load
+    ADD_TEST(fn_pf_engine_state_load__is_defined);
+
+    RUN_SUITE(fail_count);
+    // -------------------------------------------------------------------//
+    // End Engine Test Suite                                            //
+    // -------------------------------------------------------------------//
+
+
+
+    
     // -------------------------------------------------------------------//
     // Log Test Suite                                                     //
     // -------------------------------------------------------------------//
