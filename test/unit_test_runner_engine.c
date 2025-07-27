@@ -543,6 +543,36 @@ int main(void) {
 
     // fn pf_string_internment_emplace_cstring
     ADD_TEST(fn_pf_string_internment_emplace_cstring__is_defined);
+
+    // first param
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for_null_ptr_to_PFStringInternmentSingleton_t);
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for_null_ptr_to_PFStirngInternmentSingleton_t);
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for_null_ptr_to_memory_base_in_PFStringInternmentSingleton_t);
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for_null_ptr_to_memory_base_in_PFStringInternmentSingleton_t);
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for_invalid_owned_memory_size_in_PFStringInternmentSingleton_t);
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for_invalid_owned_memory_size_in_PFStringInternmentSingleton_t);
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for_used_memory_size_greather_than_owned_memory_size_PFStringInternmentSingleton_t);
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for_used_memory_sie_greater_than_owned_memory_size_in_PFStringInternmentSingleton_t);
+
+    // second param
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for_null_ptr_to_cstring);
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for_null_ptr_to_cstring);
+
+    // third param
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for_invalid_length);
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for_invalid_length);
+
+    // fn internal
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for_out_of_memory_error);
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for_out_of_memory_error);
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for_out_of_tracking_indices);
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for_out_of_tracking_indices);
+
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_pstr__for_valid_args);
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__copies_string_to_memory__for_valid_args);
+    ADD_TEST(fn_pf_string_internment_emplace_cstr__sets_memory_used_correctly_after_copy);
+
+
     
     // fn pf_string_internment_emplace_pstring
     //ADD_TEST(fn_pf_string_internment_emplace_pstring__is_defined);

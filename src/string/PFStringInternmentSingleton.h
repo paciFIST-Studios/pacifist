@@ -40,9 +40,49 @@ typedef struct PFStringInternmentSingleton_t {
     PString_t strings[PFSI_MAX_STRINGS];
 } PFStringInternmentSingleton_t;
 
-int32_t pf_string_internment_initialize(PFStringInternmentSingleton_t * string_internment, void * memory_base, size_t const memory_size);
-int32_t pf_string_internment_emplace_cstring(char const * cstring, size_t const length);
-int32_t pf_string_internment_emplace_pstring(PString_t const pstring);
+int32_t pf_string_internment_initialize(
+    PFStringInternmentSingleton_t * string_internment,
+    void * memory_base,
+    size_t const memory_size);
+
+
+/**
+ * 
+ * 
+ * NOTE: when copying string over, string_internment will use 1 byte
+ *          to add a nul-terminator for the interned string
+ * 
+ * NOTE: on error, fn returns a PString_t with a null string,
+ *          and the error code placed in PString_t.length.
+ *          The error is also logged
+ * 
+ * @param string_internment 
+ * @param cstring 
+ * @param length 
+ * @return 
+ */
+PString_t pf_string_internment_emplace_cstr(
+    PFStringInternmentSingleton_t * string_internment,
+    char * cstring,
+    size_t const length);
+
+/**
+ * 
+ * 
+ * NOTE: when copying string over, string_internment will use 1 byte
+ *          to add a nul-terminator for the interned string
+ * 
+ * NOTE: on error, fn returns a PString_t with a null string,
+ *          and the error code placed in PString_t.length.
+ *          The error is also logged
+ * 
+ * @param string_internment 
+ * @param pstring 
+ * @return 
+ */
+PString_t pf_string_internment_emplace_pstr(
+    PFStringInternmentSingleton_t * string_internment,
+    PString_t const pstring);
 
 
 #endif //STRING_INTERNMENT_SINGLETON_H
