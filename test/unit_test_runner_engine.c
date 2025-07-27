@@ -203,8 +203,12 @@ int main(void) {
     // fn get_datetime_string
     ADD_TEST(fn_get_datetime_string__is_defined);
     ADD_TEST(fn_get_datetime_string__requires_buffer_len_greater_or_equal_to_22);
+    ADD_TEST(fn_get_datetime_string__returns_correct_error_code__for_null_out_buffer);
+    ADD_TEST(fn_get_date_time_string__sets_correct_error_message__for_null_out_buffer);
+    ADD_TEST(fn_get_date_time_string__returns_correct_error_code__for_invalid_out_buffer_length);
+    ADD_TEST(fn_get_date_time_string__sets_correct_error_message__for_invalid_out_buffer_length);
     ADD_TEST(fn_get_datetime_string__can_return_valid_string);
-
+    ADD_TEST(fn_get_datetime_string__returns_correct_error_code__for_successful_use);
     
     RUN_SUITE(fail_count);
     // -------------------------------------------------------------------//

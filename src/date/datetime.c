@@ -11,19 +11,19 @@
 #include "../core/error.h"
 // framework
 // engine
+#include "../core/error.h"
 
-
-void get_datetime_string(char * out_buffer, size_t const out_buffer_length) {
+int32_t get_datetime_string(char * out_buffer, size_t const out_buffer_length) {
     int32_t const required_buffer_len = 22;
 
     if (out_buffer == NULL) {
-        PF_LOG_ERROR(PF_OS, "Requires valid ptr to buffer!");
-        return;
+        PF_LOG_ERROR(PF_OS, "Requires valid ptr to out buffer");
+        return PFEC_ERROR_NULL_PTR;
     }
     
     if(out_buffer_length < required_buffer_len) {
-        PF_LOG_ERROR(PF_OS, "Output buffer too small!");
-        return;
+        PF_LOG_ERROR(PF_OS, "Output buffer too small");
+        return PFEC_ERROR_INVALID_LENGTH;
     }
 
     for (size_t i = 0; i < required_buffer_len; i++) {
@@ -35,7 +35,7 @@ void get_datetime_string(char * out_buffer, size_t const out_buffer_length) {
 
     if (tm == NULL) {
         PF_LOG_ERROR(PF_OS, "Could not get local time!");
-        return;
+        return PFEC_COULD_NOT_GET_TIME;
     }
 
     int32_t const year   = tm->tm_year + 1900;
@@ -48,6 +48,8 @@ void get_datetime_string(char * out_buffer, size_t const out_buffer_length) {
 
     sprintf(out_buffer, "1%d%02d%02dT%02d%02d%02d(%03d)",
         year, month, day, hour, minute, second, zone);
+
+    return PFEC_NO_ERROR;
 }
 
 

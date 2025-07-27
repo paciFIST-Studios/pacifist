@@ -4,6 +4,7 @@
 #define DATETIME_H
 
 // stdlib
+#include <stdint.h>
 #include <stddef.h>
 // framework
 // engine
@@ -16,7 +17,7 @@
  * @param out_buffer_length 
  * @return 
  */
-void get_datetime_string(char * out_buffer, size_t const out_buffer_length);
+int32_t get_datetime_string(char * out_buffer, size_t const out_buffer_length);
 
 
 #endif //DATETIME_H
