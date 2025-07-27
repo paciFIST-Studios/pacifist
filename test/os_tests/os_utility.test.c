@@ -42,7 +42,7 @@ START_TEST(fn_file_size__returns_correct_error_code__if_file_does_not_exist) {
     sprintf(path, "%s.get_wrekd", __FILE__);
 
     PF_SUPPRESS_ERRORS
-    ck_assert(file_size(path, pf_strlen(path)) == PFEC_FILE_DOES_NOT_EXIST);
+    ck_assert(file_size(path, pf_strlen(path)) == PFEC_ERROR_FILE_DOES_NOT_EXIST);
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
