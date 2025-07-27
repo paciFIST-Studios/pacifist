@@ -71,7 +71,7 @@ START_TEST(fn_pf_string_internment_initialize__sets_correct_error_message__for_n
     char const expected[] = "Null ptr to PFStringInternmentSingleton";
     size_t const expected_length = strlen(expected);
 
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected, expected_length));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
 }
 END_TEST
 
@@ -100,7 +100,7 @@ START_TEST(pf_string_internment_initialize__sets_correct_error_message__for_null
     char const expected[] = "Null ptr to PFStringInternmentSingleton memory base";
     size_t const expected_length = pf_strlen(expected);
 
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected, expected_length));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
 }
 END_TEST
 
@@ -134,7 +134,7 @@ START_TEST(pf_string_internment_initialize__sets_correct_error_message__for_inva
     char const expected[] = "Invalid memory size for PFStringInternmentSingleton";
     size_t const expected_length = strlen(expected);
 
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected, expected_length));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
 
     free(memory);
 }
@@ -196,7 +196,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     char const expected[] = "Null ptr to PFStringInternmentSingleton";
     size_t const expected_length = pf_strlen(expected);
 
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected, expected_length));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
 }
 END_TEST
 
@@ -225,7 +225,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     char const expected[] = "Null ptr to PFStringInternmentSingleton usable memory base";
     size_t const expected_length = pf_strlen(expected);
 
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected, expected_length));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
 }
 END_TEST
 
@@ -262,7 +262,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     char const expected[] = "PFStringInternmentSingleton invalid owned memory size";
     size_t const expected_length = pf_strlen(expected);
 
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected, expected_length));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
 }
 END_TEST
 
@@ -301,7 +301,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     char const expected[] = "PFStringInternmentSingleton is using memory it doesn't own";
     size_t const expected_length = pf_strlen(expected);
 
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected, expected_length));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
 }
 END_TEST
 
@@ -337,7 +337,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     char const expected[] = "Null ptr to cstring";
     size_t const expected_length = pf_strlen(expected);
 
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected, expected_length));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
 }
 END_TEST
 
@@ -378,7 +378,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     char const expected[] = "Invalid string length";
     size_t const expected_length = pf_strlen(expected);
 
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected, expected_length));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
 }
 END_TEST
 
@@ -424,7 +424,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     char const expected[] = "Ran out of memory for PFStringInternmentSingleton";
     size_t const expected_length = pf_strlen(expected);
 
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected, expected_length));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
 }
 END_TEST
 
@@ -468,7 +468,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     char const expected[] = "Ran out of tracking indices for PFStringInternmentSingleton";
     size_t const expected_length = pf_strlen(expected);
 
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected, expected_length));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
 }
 END_TEST
 
@@ -487,7 +487,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_pstr__for_valid
     PF_UNSUPPRESS_ERRORS
     ck_assert_ptr_nonnull(ret.string);
     ck_assert_int_eq(ret.length, test_length);
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(ret, test_string, test_length));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(ret, test_string, test_length));
 }
 END_TEST
 
@@ -505,7 +505,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__copies_string_to_memory__for_va
     PF_UNSUPPRESS_ERRORS
     ck_assert_ptr_nonnull(ret.string);
     ck_assert_int_eq(ret.length, test_length);
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(mem, test_string, test_length));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(mem, test_string, test_length));
 }
 END_TEST
 
@@ -528,9 +528,9 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_memory_used_correctly_afte
     ck_assert_ptr_nonnull(ret1.string);
     ck_assert_int_eq(ret1.length, test_length1);
     // return value has correct information?
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(ret1, test_string1, test_length1));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(ret1, test_string1, test_length1));
     // information was copied to provided memory?
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(mem, test_string1, test_length1));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(mem, test_string1, test_length1));
 
     char test_string2[] = "another test string";
     size_t const test_length2 = pf_strlen(test_string2);
@@ -539,9 +539,9 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_memory_used_correctly_afte
     ck_assert_ptr_nonnull(ret2.string);
     ck_assert_int_eq(ret2.length, test_length2);
     // return value has correct information?
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(ret2, test_string2, test_length2));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(ret2, test_string2, test_length2));
     // information was copied to provided memory?
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(mem, test_string2, test_length2));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(mem, test_string2, test_length2));
 
     // expected amount of memory is used?
     size_t const expected_memory_used = test_length1 + 1 + test_length2 + 1;

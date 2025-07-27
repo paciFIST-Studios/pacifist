@@ -22,7 +22,7 @@ typedef struct PString_t {
 
 
 
-void pstring_set_allocator(void* allocator);
+void pf_pstring_set_allocator(void* allocator);
 
 
 
@@ -36,7 +36,7 @@ void pstring_set_allocator(void* allocator);
  *      1: A contains substring
  *      0: A does not contain substring
  */
-int32_t pstring_contains_char_sub(PString_t const a, char const * substring, size_t const length);
+int32_t pf_pstring_contains_char_sub(PString_t const a, char const * substring, size_t const length);
 
 
 /**
@@ -48,7 +48,7 @@ int32_t pstring_contains_char_sub(PString_t const a, char const * substring, siz
  *      1: A contains B
  *      0: A does not contain B
  */
-int32_t pstring_contains_pstr_sub(PString_t const a, PString_t const b);
+int32_t pf_pstring_contains_pstr_sub(PString_t const a, PString_t const b);
 
 
 /**
@@ -59,7 +59,7 @@ int32_t pstring_contains_pstr_sub(PString_t const a, PString_t const b);
  * @param end
  * @return 
  */
-PString_t pstring_slice(PString_t const pstr, int32_t const begin, int32_t const end);
+PString_t pf_pstring_slice(PString_t const pstr, int32_t const begin, int32_t const end);
 
 
 /**
@@ -71,14 +71,14 @@ PString_t pstring_slice(PString_t const pstr, int32_t const begin, int32_t const
  * @param count 
  * @return 
  */
-PString_t pstring_copy_allocate(PString_t const pstr, int32_t const i, int32_t const j, int32_t const count);
+PString_t pf_pstring_copy_allocate(PString_t const pstr, int32_t const i, int32_t const j, int32_t const count);
 
 /**
  * @brief reverses the supplied string, in the memory it already occupies
  *
  * @param pstr 
  */
-void pstring_reverse_in_place(PString_t * pstr);
+void pf_pstring_reverse_in_place(PString_t * pstr);
 
 
 /**
@@ -88,7 +88,7 @@ void pstring_reverse_in_place(PString_t * pstr);
  * @param b 
  * @return 
  */
-int32_t pstring_compare(PString_t const a, PString_t const b);
+int32_t pf_pstring_compare(PString_t const a, PString_t const b);
 
 /**
  * @brief tokenizes the supplied PString_t, based on the delimiter.  Allocates space for PString_t to hold tokens, but does not copy or change memory:w
@@ -100,10 +100,10 @@ int32_t pstring_compare(PString_t const a, PString_t const b);
  * @param out_array 
  * @param out_array_length 
  */
-void pstring_tokenize_allocate(PString_t const pstr, char const * delimiter, size_t const length, PString_t* out_array, size_t out_array_length);
+void pf_pstring_tokenize_allocate(PString_t const pstr, char const * delimiter, size_t const length, PString_t* out_array, size_t out_array_length);
 
 
-void pstring_findall_allocate(PString_t const a, char  const * substring, size_t const length, int32_t* out_array, size_t out_array_length);
+void pf_pstring_findall_allocate(PString_t const a, char  const * substring, size_t const length, int32_t* out_array, size_t out_array_length);
 
 /**
  * @brief returns a pstring, containing the first patching substring found in pstr:w
@@ -114,7 +114,7 @@ void pstring_findall_allocate(PString_t const a, char  const * substring, size_t
  * @param length 
  * @return 
  */
-PString_t pstring_find_first(PString_t const pstr, char const * substring, size_t const length);
+PString_t pf_pstring_find_first(PString_t const pstr, char const * substring, size_t const length);
 
 /**
  * @brief returns a pstring, containing the last matching substring found in pstr
@@ -124,7 +124,7 @@ PString_t pstring_find_first(PString_t const pstr, char const * substring, size_
  * @param length 
  * @return 
  */
-PString_t pstring_find_last(PString_t const pstr, char const * substring, size_t const length);
+PString_t pf_pstring_find_last(PString_t const pstr, char const * substring, size_t const length);
 
 
 

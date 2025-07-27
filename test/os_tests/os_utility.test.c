@@ -64,7 +64,7 @@ START_TEST(fn_file_size__writes_correct_error__for_null_path) {
     size_t const expected_length = pf_strlen(expected);
 
     // did we get the expected result?
-    ck_assert_int_eq(1, pstring_contains_char_sub(msg, expected, expected_length));
+    ck_assert_int_eq(1, pf_pstring_contains_char_sub(msg, expected, expected_length));
 }
 END_TEST
 
@@ -86,7 +86,7 @@ START_TEST(fn_file_size__writes_correct_error__for_zero_path_length) {
     size_t const expected_length = pf_strlen(expected);
 
     // did we get the expected result?
-    ck_assert_int_eq(1, pstring_contains_char_sub(msg, expected, expected_length));
+    ck_assert_int_eq(1, pf_pstring_contains_char_sub(msg, expected, expected_length));
 }
 END_TEST
 
@@ -110,7 +110,7 @@ START_TEST(fn_file_size__writes_correct_error__if_file_does_not_exist) {
     size_t const expected_length = pf_strlen(expected);
 
     // did we get the expected result?
-    ck_assert_int_eq(1, pstring_contains_char_sub(msg, expected, expected_length));
+    ck_assert_int_eq(1, pf_pstring_contains_char_sub(msg, expected, expected_length));
 }
 END_TEST
 
@@ -175,7 +175,7 @@ START_TEST(fn_is_file__writes_correct_error__for_null_path) {
     size_t const expected_length = pf_strlen(expected);
 
     // did we get the expected result?
-    ck_assert_int_eq(1, pstring_contains_char_sub(msg, expected, expected_length));
+    ck_assert_int_eq(1, pf_pstring_contains_char_sub(msg, expected, expected_length));
 }
 END_TEST
 
@@ -196,7 +196,7 @@ START_TEST(fn_is_file__writes_correct_error__for_zero_path_length) {
     size_t const expected_length = pf_strlen(expected);
 
     // did we get the expected result?
-    ck_assert_int_eq(1, pstring_contains_char_sub(msg, expected, expected_length));
+    ck_assert_int_eq(1, pf_pstring_contains_char_sub(msg, expected, expected_length));
 }
 END_TEST
 
@@ -268,7 +268,7 @@ START_TEST(fn_is_directory__writes_correct_error__for_null_path) {
     size_t const expected_length = pf_strlen(expected);
 
     // did we get the expected result?
-    ck_assert_int_eq(1, pstring_contains_char_sub(msg, expected, expected_length));
+    ck_assert_int_eq(1, pf_pstring_contains_char_sub(msg, expected, expected_length));
 }
 END_TEST
 
@@ -289,7 +289,7 @@ START_TEST(fn_is_directory__writes_correct_error__for_zero_path_length) {
     size_t const expected_length = pf_strlen(expected);
 
     // did we get the expected result?
-    ck_assert_int_eq(1, pstring_contains_char_sub(msg, expected, expected_length));
+    ck_assert_int_eq(1, pf_pstring_contains_char_sub(msg, expected, expected_length));
     
 }
 END_TEST

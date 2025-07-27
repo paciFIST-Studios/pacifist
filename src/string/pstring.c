@@ -13,7 +13,7 @@
 
 
 
-int32_t pstring_contains_char_sub(PString_t const a, char const * substring, size_t const length){
+int32_t pf_pstring_contains_char_sub(PString_t const a, char const * substring, size_t const length){
     if (length > a.length) {
         PF_LOG_ERROR(PF_STRING, "Searching for substring whose length is longer than the base string!");
         return FALSE;
@@ -67,12 +67,12 @@ int32_t pstring_contains_char_sub(PString_t const a, char const * substring, siz
 
 
 
-int32_t pstring_contains_pstr_sub(PString_t const a, PString_t const b) {
-    return pstring_contains_char_sub(a, b.string, b.length);
+int32_t pf_pstring_contains_pstr_sub(PString_t const a, PString_t const b) {
+    return pf_pstring_contains_char_sub(a, b.string, b.length);
 }
 
 
-PString_t pstring_slice(PString_t const pstr, int32_t const begin, int32_t const end) {
+PString_t pf_pstring_slice(PString_t const pstr, int32_t const begin, int32_t const end) {
     PString_t result = { .string = NULL, .length = 0 };
 
     if (pstr.string == NULL) {

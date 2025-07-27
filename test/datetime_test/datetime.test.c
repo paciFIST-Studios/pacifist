@@ -57,7 +57,7 @@ START_TEST(fn_get_date_time_string__sets_correct_error_message__for_null_out_buf
 
     char const expected[] = "Requires valid ptr to out buffer";
     size_t const expected_length = pf_strlen(expected);
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected, expected_length));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
 }
 END_TEST
 
@@ -85,7 +85,7 @@ START_TEST(fn_get_date_time_string__sets_correct_error_message__for_invalid_out_
     char const expected[] = "Output buffer too small";
     size_t const expected_length = pf_strlen(expected);
 
-    ck_assert_int_eq(TRUE, pstring_contains_char_sub(error, expected, expected_length));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
 }
 END_TEST
 
