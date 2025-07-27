@@ -6,12 +6,12 @@
 // stdlib
 // framework
 // engine
-#include "../string/StringInternmentSingleton.h"
+#include "../string/PFStringInternmentSingleton.h"
 #include "../core/error.h"
 
 
 typedef struct PFEngineState_t {
-    StringInternmentSingleton_t m_string_internment;
+    PFStringInternmentSingleton_t m_string_internment;
 
 } PFEngineState_t;
 

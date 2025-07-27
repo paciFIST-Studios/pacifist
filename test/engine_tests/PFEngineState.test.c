@@ -16,7 +16,7 @@ START_TEST(fn_struct_PFEngineState_t__is_defined) {
 }
 
 START_TEST(fn_struct_PFEngineState_t__has_expected_size) {
-    ck_assert_int_eq(sizeof(PFEngineState_t), 48);
+    ck_assert_int_eq(sizeof(PFEngineState_t), 2048);
 }
 END_TEST
 
@@ -38,7 +38,7 @@ END_TEST
 START_TEST(fn_pf_engine_state_initialize__correctly_initializes_engine_state) {
     PFEngineState_t engine_state = {0};
     int32_t const result = pf_engine_state_initialize(&engine_state);
-    ck_assert_int_eq(result, PF_NO_ERROR);
+    ck_assert_int_eq(result, PFEC_NO_ERROR);
 }
 END_TEST
 
