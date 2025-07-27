@@ -52,7 +52,10 @@ set(ENGINE_LIB_SOURCE_FILES
         # date
         ${CMAKE_CURRENT_SOURCE_DIR}/date/datetime.h
         ${CMAKE_CURRENT_SOURCE_DIR}/date/datetime.c
-        #e,f,g,h
+        # engine
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine/PFEngineState.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine/PFEngineState.c
+        # f,g,h
         # io
         # j,k
         # log
@@ -66,9 +69,10 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/CompactHashTable.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/list/LinkedList.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/list/LinkedList.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/HashTable.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/HashTable.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/HashTable.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/MemoryArena.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/PFAllocator.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/tree/RedBlackTree.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/tree/RedBlackTree.c
         # n
@@ -85,6 +89,8 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/reflection/metadata_reflection_system.c
         ${CMAKE_CURRENT_SOURCE_DIR}/reflection/metadata_reflection_system.h
         # string
+        ${CMAKE_CURRENT_SOURCE_DIR}/string/PFStringInternmentSingleton.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/string/PFStringInternmentSingleton.c
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.h
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.c
         # type

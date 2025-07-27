@@ -1,7 +1,7 @@
 # paciFIST studios. 2025. MIT License
 
 # NOTE: Check is compiled into an executable, so we actually need it as an include,
-# rathr than as just a library
+# rather than as just a library
 include_directories(${CMAKE_SOURCE_DIR}/vendor/check/include)
 
 
@@ -10,17 +10,23 @@ set(TEST_LIB_SOURCE_FILES
         # In order to register a test with check, you have to add that in
         # the unit_test_runner_engine.c file.
         ${CMAKE_CURRENT_SOURCE_DIR}/unit_test_runner_engine.c
-       
+
         # all of the directories under the test directory, should have "tests" at the end
         # yes, it is redundant information, but we don't want any confusion when comparing
         # /src/memory to /test/memory --- especially if we're using this path generator
-      
+
         # core tests
         ${CMAKE_CURRENT_SOURCE_DIR}/core_tests/error.test.c
-        
+
+        # datetime tests
+        ${CMAKE_CURRENT_SOURCE_DIR}/datetime_test/datetime.test.c
+
+        # engine tests
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine_tests/PFEngineState.test.c
+
         # log tests
         ${CMAKE_CURRENT_SOURCE_DIR}/log_tests/log.test.c
-        
+
         # memory tests
         ${CMAKE_CURRENT_SOURCE_DIR}/algo_tests/search.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/bit/bitfield.test.c
@@ -30,15 +36,15 @@ set(TEST_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/LinkedList.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/MemoryArena.test.c
 
+        # os tests
+        ${CMAKE_CURRENT_SOURCE_DIR}/os_tests/os_utility.test.c
+
         # string tests
         ${CMAKE_CURRENT_SOURCE_DIR}/string_tests/PString.test.c
-        
-        
+        ${CMAKE_CURRENT_SOURCE_DIR}/string_tests/PFStringInternmentSingleton.test.c
+
         # type_tests
         ${CMAKE_CURRENT_SOURCE_DIR}/type_tests/TypedPtr.test.c
-        os_tests/os_utility.test.c
-        datetime_test/datetime.test.c
-
 )
 
 # the run_unit_tests_engine is an executable that you could just run from the
