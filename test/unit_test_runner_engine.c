@@ -442,24 +442,24 @@ int main(void) {
     BUILD_SUITE("OS");
 
     ADD_TEST(fn_file_size__is_defined);
-    ADD_TEST(fn_file_size__returns_minus_one__for_null_path);
-    ADD_TEST(fn_file_size__returns_minus_one__for_zero_path_length);
-    ADD_TEST(fn_file_size__returns_minus_one__if_file_does_not_exist);
+    ADD_TEST(fn_file_size__returns_correct_error_code__for_null_path);
+    ADD_TEST(fn_file_size__returns_correct_error_code__for_zero_path_length);
+    ADD_TEST(fn_file_size__returns_correct_error_code__if_file_does_not_exist);
     ADD_TEST(fn_file_size__writes_correct_error__for_null_path);
     ADD_TEST(fn_file_size__writes_correct_error__for_zero_path_length);
     ADD_TEST(fn_file_size__writes_correct_error__if_file_does_not_exist);
     
     ADD_TEST(fn_is_file__is_defined);
-    ADD_TEST(fn_is_file__returns_minus_one__for_null_path);
-    ADD_TEST(fn_is_file__returns_minus_one__for_zero_path_length);
+    ADD_TEST(fn_is_file__returns_correct_error_code__for_null_path);
+    ADD_TEST(fn_is_file__returns_correct_error_code__for_zero_path_length);
     ADD_TEST(fn_is_file__returns_zero__if_file_does_not_exist);
     ADD_TEST(fn_is_file__returns_one__if_file_does_exist);
     ADD_TEST(fn_is_file__writes_correct_error__for_null_path);
     ADD_TEST(fn_is_file__writes_correct_error__for_zero_path_length);
     
     ADD_TEST(fn_is_directory__is_defined);
-    ADD_TEST(fn_is_directory__returns_minus_one__for_null_path);
-    ADD_TEST(fn_if_directory__returns_minus_one__for_zero_path_length);
+    ADD_TEST(fn_is_directory__returns_correct_error_code__for_null_path);
+    ADD_TEST(fn_if_directory__returns_correct_error_code__for_zero_path_length);
     ADD_TEST(fn_is_directory__returns_zero__if_path_is_not_a_directory);
     ADD_TEST(fn_is_directory__returns_one__if_path_is_a_directory);
     ADD_TEST(fn_is_directory__writes_correct_error__for_null_path);

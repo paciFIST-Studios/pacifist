@@ -21,15 +21,15 @@
 int64_t file_size(char const * file_path, size_t const file_path_length) {
     if (file_path == NULL) {
         PF_LOG_ERROR(PF_OS, "Invalid ptr to file path");
-        return -1;
+        return PFEC_ERROR_NULL_PTR;
     }
     if (file_path_length == 0) {
         PF_LOG_ERROR(PF_OS, "Invalid file path length");
-        return -1;
+        return  PFEC_ERROR_INVALID_LENGTH;
     }
     if (!is_file(file_path, pf_strlen(file_path))) {
         PF_LOG_ERROR(PF_OS, "File does not exist");
-        return -1;
+        return PFEC_FILE_DOES_NOT_EXIST;
     }
     
     struct stat buffer;
@@ -41,11 +41,11 @@ int64_t file_size(char const * file_path, size_t const file_path_length) {
 int32_t is_file(const char * file_path, size_t const file_path_length) {
     if (file_path == NULL) {
         PF_LOG_ERROR(PF_OS, "Invalid ptr to file path");
-        return -1;
+        return PFEC_ERROR_NULL_PTR;
     }
     if (file_path_length == 0) {
         PF_LOG_ERROR(PF_OS, "Invalid file path length");
-        return -1;
+        return PFEC_ERROR_INVALID_LENGTH;
     } 
 
     struct stat buffer;
@@ -56,11 +56,11 @@ int32_t is_file(const char * file_path, size_t const file_path_length) {
 int32_t is_directory(const char * file_path, size_t const file_path_length) {
     if (file_path == NULL) {
         PF_LOG_ERROR(PF_OS, "Invalid ptr to file path");
-        return -1;
+        return PFEC_ERROR_NULL_PTR;
     }
     if (file_path_length == 0) {
         PF_LOG_ERROR(PF_OS, "Invalid file path length");
-        return -1;
+        return PFEC_ERROR_INVALID_LENGTH;
     } 
 
     struct stat buffer;

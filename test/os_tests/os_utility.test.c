@@ -22,27 +22,27 @@ START_TEST(fn_file_size__is_defined) {
 }
 END_TEST
 
-START_TEST(fn_file_size__returns_minus_one__for_null_path) {
+START_TEST(fn_file_size__returns_correct_error_code__for_null_path) {
     PF_SUPPRESS_ERRORS
-    ck_assert(file_size(NULL, 0) == -1);
+    ck_assert(file_size(NULL, 0) == PFEC_ERROR_NULL_PTR);
     PF_UNSUPPRESS_ERRORS
 }
 
-START_TEST(fn_file_size__returns_minus_one__for_zero_path_length) {
+START_TEST(fn_file_size__returns_correct_error_code__for_zero_path_length) {
     char * path = "";
     PF_SUPPRESS_ERRORS
-    ck_assert(file_size(path, 0) == -1);
+    ck_assert(file_size(path, 0) == PFEC_ERROR_INVALID_LENGTH);
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
 
-START_TEST(fn_file_size__returns_minus_one__if_file_does_not_exist) {
+START_TEST(fn_file_size__returns_correct_error_code__if_file_does_not_exist) {
     char path[200];
     for (size_t i = 0; i < 200; i++) { path[i] = 0; }
     sprintf(path, "%s.get_wrekd", __FILE__);
 
     PF_SUPPRESS_ERRORS
-    ck_assert(file_size(path, pf_strlen(path)) == -1);
+    ck_assert(file_size(path, pf_strlen(path)) == PFEC_FILE_DOES_NOT_EXIST);
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
@@ -123,17 +123,17 @@ START_TEST(fn_is_file__is_defined) {
 }
 END_TEST
 
-START_TEST(fn_is_file__returns_minus_one__for_null_path) {
+START_TEST(fn_is_file__returns_correct_error_code__for_null_path) {
     PF_SUPPRESS_ERRORS
-    ck_assert_int_eq(-1, is_file(NULL, 0));
+    ck_assert_int_eq(is_file(NULL, 0), PFEC_ERROR_NULL_PTR);
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
 
-START_TEST(fn_is_file__returns_minus_one__for_zero_path_length) {
+START_TEST(fn_is_file__returns_correct_error_code__for_zero_path_length) {
     char * path = "";
     PF_SUPPRESS_ERRORS
-    ck_assert_int_eq(-1, is_file(path, 0));
+    ck_assert_int_eq(is_file(path, 0), PFEC_ERROR_INVALID_LENGTH);
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
@@ -209,17 +209,17 @@ START_TEST(fn_is_directory__is_defined) {
 }
 END_TEST
 
-START_TEST(fn_is_directory__returns_minus_one__for_null_path) {
+START_TEST(fn_is_directory__returns_correct_error_code__for_null_path) {
     PF_SUPPRESS_ERRORS
-    ck_assert_int_eq(-1, is_directory(NULL, 0));
+    ck_assert_int_eq(is_directory(NULL, 0), PFEC_ERROR_NULL_PTR);
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
 
-START_TEST(fn_if_directory__returns_minus_one__for_zero_path_length) {
+START_TEST(fn_if_directory__returns_correct_error_code__for_zero_path_length) {
     char * path = "";
     PF_SUPPRESS_ERRORS
-    ck_assert_int_eq(-1, is_directory(path, 0));
+    ck_assert_int_eq(is_directory(path, 0), PFEC_ERROR_INVALID_LENGTH);
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST

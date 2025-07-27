@@ -15,9 +15,9 @@
 
 // PF Error Codes
 static const int32_t PFEC_NO_ERROR = 0;
-static const int32_t PFEC_ERROR_NULL_PTR = 1;
-static const int32_t PFEC_ERROR_INVALID_LENGTH = 2;
-
+static const int32_t PFEC_ERROR_NULL_PTR = 10;
+static const int32_t PFEC_ERROR_INVALID_LENGTH = 20;
+static const int32_t PFEC_FILE_DOES_NOT_EXIST = 30;
 
 
 
