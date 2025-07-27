@@ -13,8 +13,12 @@
 #include "../log/log_category.h"
 // game
 
+// PF Error Codes
+static const int32_t PFEC_NO_ERROR = 0;
+static const int32_t PFEC_ERROR_NULL_PTR = 1;
+static const int32_t PFEC_ERROR_INVALID_LENGTH = 2;
 
-static const int32_t PF_NO_ERROR = 0;
+
 
 
 // utility fns -----------------------------------------------------------------------------------------------

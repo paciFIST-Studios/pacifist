@@ -100,7 +100,7 @@ char * global_module;
 
 // string
 #include "../test/string_tests/PString.test.c"
-
+#include "../test/string_tests/PFStringInternmentSingleton.test.c"
 
 int main(void) {
     /*  Setting NO_FORK here allows us to ensure that check does not spin up child processes to handle
@@ -513,6 +513,35 @@ int main(void) {
     ADD_TEST(fn_pstring_slice__returns_slice__when_using_negative_indicies);
     ADD_TEST(fn_pstring_slice__returns_slice__when_using_positive_then_negative_indicies);
     ADD_TEST(fn_pstring_slice__feels_okay_in_casual_usage);
+
+
+    //-------------------------------//
+    // PFStringInternmentSingleton_t //
+    //-------------------------------//
+
+    // constants
+    ADD_TEST(constant_PFSI_MAX_STRINGS__is_expected_value);
+
+    // struct PFStringInternmentSingleton_t
+    ADD_TEST(struct_PFStringInternmentSingleton_t__is_defined);
+    ADD_TEST(struct_PFStringInternmentSingleton_t__has_correct_size);
+    ADD_TEST(struct_PFStringInternmentSingleton_t__has_expected_members);
+
+    // fn pf_string_internment_initialize
+    ADD_TEST(fn_pf_string_internment_initialize__is_defined);
+    ADD_TEST(fn_pf_string_internment_initialize__returns_correct_error_code__for_null_string_internment_param);
+    ADD_TEST(fn_pf_string_internment_initialize__sets_correct_error_message__for_null_string_internment_param);
+    ADD_TEST(pf_string_internment_initialize__returns_correct_error_code__for_null_memory_base_param);
+    ADD_TEST(pf_string_internment_initialize__sets_correct_error_message__for_null_memory_base_param);
+    ADD_TEST(pf_string_internment_initialize__returns_correct_error_code__for_invalid_memory_size);
+    ADD_TEST(pf_string_internment_initialize__sets_correct_error_message__for_invalid_memory_size);
+    ADD_TEST(pf_string_internment_initialize__correctly_initializes_string_internment__for_expected_arguments);
+
+    // fn pf_string_internment_emplace_cstring
+    ADD_TEST(fn_pf_string_internment_emplace_cstring__is_defined);
+    
+    // fn pf_string_internment_emplace_pstring
+    //ADD_TEST(fn_pf_string_internment_emplace_pstring__is_defined);
 
     
     RUN_SUITE(fail_count);
