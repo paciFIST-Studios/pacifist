@@ -16,7 +16,7 @@ START_TEST(fn_struct_PFEngineState_t__is_defined) {
 }
 
 START_TEST(fn_struct_PFEngineState_t__has_expected_size) {
-    ck_assert_int_eq(sizeof(PFEngineState_t), 2048);
+    ck_assert_int_eq(sizeof(PFEngineState_t), 4096);
 }
 END_TEST
 

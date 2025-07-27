@@ -15,7 +15,7 @@
 // Constants -------------------------------------------------------------------------------------------------
 
 START_TEST(constant_PFSI_MAX_STRINGS__is_expected_value) {
-    ck_assert_int_eq(PFSI_MAX_STRINGS, 126);
+    ck_assert_int_eq(PFSI_MAX_STRINGS, 254);
 }
 END_TEST
 
@@ -30,7 +30,7 @@ START_TEST(struct_PFStringInternmentSingleton_t__is_defined) {
 END_TEST
 
 START_TEST(struct_PFStringInternmentSingleton_t__has_correct_size) {
-    ck_assert_int_eq(sizeof(PFStringInternmentSingleton_t), 2048);
+    ck_assert_int_eq(sizeof(PFStringInternmentSingleton_t), 4096);
 }
 
 START_TEST(struct_PFStringInternmentSingleton_t__has_expected_members) {

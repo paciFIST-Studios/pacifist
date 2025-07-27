@@ -29,8 +29,10 @@
  *
  */
 
-#define PFSI_MAX_STRINGS 126
 
+#define PFSI_MAX_STRINGS 254
+
+// 120250727 - struct is 4096 bytes right now
 typedef struct PFStringInternmentSingleton_t {
     void * usable_memory_base;
     size_t owned_memory_size;

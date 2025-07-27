@@ -11,7 +11,7 @@
 
 #define PSTR_LAST 0
 
-
+// 120250727 - struct is 16 bytes right now
 typedef struct PString_t {
     char * string;
     size_t length;
