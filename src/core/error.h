@@ -17,9 +17,10 @@
 static const int32_t PFEC_NO_ERROR = 0;
 static const int32_t PFEC_ERROR_NULL_PTR = 10;
 static const int32_t PFEC_ERROR_INVALID_LENGTH = 20;
-static const int32_t PFEC_FILE_DOES_NOT_EXIST = 30;
-static const int32_t PFEC_COULD_NOT_GET_TIME = 40;
-
+static const int32_t PFEC_ERROR_FILE_DOES_NOT_EXIST = 30;
+static const int32_t PFEC_ERROR_COULD_NOT_GET_TIME = 40;
+static const int32_t PFEC_ERROR_OUT_OF_MEMORY = 50;
+static const int32_t PFEC_ERROR_OUT_OF_BOUNDS_MEMORY_USE = 60;
 
 // utility fns -----------------------------------------------------------------------------------------------
 

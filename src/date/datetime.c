@@ -35,7 +35,7 @@ int32_t get_datetime_string(char * out_buffer, size_t const out_buffer_length) {
 
     if (tm == NULL) {
         PF_LOG_ERROR(PF_OS, "Could not get local time!");
-        return PFEC_COULD_NOT_GET_TIME;
+        return PFEC_ERROR_COULD_NOT_GET_TIME;
     }
 
     int32_t const year   = tm->tm_year + 1900;

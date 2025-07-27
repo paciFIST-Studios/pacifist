@@ -29,7 +29,7 @@ int64_t file_size(char const * file_path, size_t const file_path_length) {
     }
     if (!is_file(file_path, pf_strlen(file_path))) {
         PF_LOG_ERROR(PF_OS, "File does not exist");
-        return PFEC_FILE_DOES_NOT_EXIST;
+        return PFEC_ERROR_FILE_DOES_NOT_EXIST;
     }
     
     struct stat buffer;
