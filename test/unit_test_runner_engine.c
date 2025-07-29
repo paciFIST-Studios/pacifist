@@ -89,11 +89,12 @@ char * global_module;
 #include "../test/log_tests/log.test.c"
 
 // Memory
-#include "../test/memory_tests/RedBlackTree.test.c"
 #include "../test/memory_tests/CompactHashTable.test.c"
 #include "../test/memory_tests/HashTable.test.c"
 #include "../test/memory_tests/LinkedList.test.c"
 #include "../test/memory_tests/MemoryArena.test.c"
+#include "../test/memory_tests/PFAllocator.test.c"
+#include "../test/memory_tests/RedBlackTree.test.c"
 
 // os
 #include "../test/os_tests/os_utility.test.c"
@@ -268,15 +269,6 @@ int main(void) {
     // -------------------------------------------------------------------//
     BUILD_SUITE("Memory");
 
-    //--------------//
-    // RedBlackTree //
-    //--------------//
-
-    ADD_TEST(enum_has_correct_members__ERedBlackTreeNodeColor_t);
-    ADD_TEST(enum_has_correct_members__ERedBlackTreeNodeDirection_t);
-    ADD_TEST(struct_has_correct_members__RedBlackTree_t);
-    ADD_TEST(struct_is_of_correct_size__RedBlackTree_t);
-    ADD_TEST(struct_has_correct_members__RedBlackTreeNode_t);
 
     // -----------------//
     // CompactHashTable //
@@ -431,6 +423,60 @@ int main(void) {
 
     // fn memory_arena_destroy
     //ADD_TEST(fn_memory_arena_destroy__is_defined);
+
+    //------------------------------------------------------------------------------------------------------//
+    // PFAllocator_t                                                                                        //
+    //------------------------------------------------------------------------------------------------------//
+
+
+    //----------------------//
+    // PFAllocator FreeList //
+    //----------------------//
+    ADD_TEST(enum_EAllocationPolicy_FreeList__is_defined);
+
+
+    
+    //--------------------------//
+    // PFAllocator RedBlackTree //
+    //--------------------------//
+
+
+
+    //-----------------------//
+    // PFAllocator Interface //
+    //-----------------------//
+
+
+    // static fn ptrs
+    ADD_TEST(static_fn_ptr_pf_malloc__is_defined);
+    ADD_TEST(static_fn_ptr_pf_realloc__is_defined);
+    ADD_TEST(static_fn_ptr_pf_free_is_defined);
+    ADD_TEST(static_fn_ptrs__can_be_used__if_they_are_set_with_stdlib_defaults);
+
+
+    // pf_allocator_initialize
+    ADD_TEST(fn_pf_allocator_initialize__is_defined);
+    ADD_TEST(fn_pf_allocator_initialize__returns_correct_error_code__for_null_ptr_to_base_memory);
+    ADD_TEST(fn_pf_allocator_initialize__sets_correct_error_message__for_null_ptr_to_base_memory);
+    ADD_TEST(fn_pf_allocator_initialize__returns_correct_error_code__for_invalid_memory_size);
+    ADD_TEST(fn_pf_allocator_initialize__sets_correct_error_message__for_invalid_memory_size);
+
+
+
+    //------------------------------------------------------------------------------------------------------//
+    // End PFAllocator_t                                                                                    //
+    //------------------------------------------------------------------------------------------------------//
+    
+
+    //--------------//
+    // RedBlackTree //
+    //--------------//
+
+    ADD_TEST(enum_has_correct_members__ERedBlackTreeNodeColor_t);
+    ADD_TEST(enum_has_correct_members__ERedBlackTreeNodeDirection_t);
+    ADD_TEST(struct_has_correct_members__RedBlackTree_t);
+    ADD_TEST(struct_is_of_correct_size__RedBlackTree_t);
+    ADD_TEST(struct_has_correct_members__RedBlackTreeNode_t);
     
 
     RUN_SUITE(fail_count);
