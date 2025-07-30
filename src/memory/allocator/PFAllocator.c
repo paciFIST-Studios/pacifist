@@ -7,7 +7,6 @@
 #include <stdlib.h>
 // framework
 // engine
-#include <alsa/control.h>
 
 #include "../../core/error.h"
 
