@@ -66,7 +66,7 @@ void pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list) {
     // we're not overwriting the beginning of the allocation, b/c this is where
     // the free list struct itself lives
     size_t const pf_free_list_size = sizeof(PFAllocator_FreeList_t);
-    void* pf_free_list_usable_memory_start = pf_free_list->base_memory + pf_free_list_size;
+    void* pf_free_list_usable_memory_start = (void*)((uint64_t)pf_free_list->base_memory + pf_free_list_size);
 
     // zero out the whole thing immediately, and hope it crashes, if anyone is still using it
     size_t const owned_memory_size = pf_free_list->owned_memory;
@@ -189,7 +189,7 @@ int32_t pf_allocator_initialize(void * base_memory, size_t const size) {
     }
 
 #ifdef USE_FREE_LIST_IMPLEMENTATION
-    return pf_allocator_free_list_initialize(base_memory, size);
+    return pf_allocator_free_list_initialize(&s_allocator.memory, base_memory, size);
 #else
     return pf_allocator_red_black_tree_initialize(base_memory, size);
 #endif

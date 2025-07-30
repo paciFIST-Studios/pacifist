@@ -97,7 +97,7 @@ END_TEST
 // fn pf_allocator_free_list_initialize ----------------------------------------------------------------------
 
 START_TEST(fn_pf_allocator_free_list_initialize__is_defined) {
-    int32_t(*fptr)(void*, size_t const) = &pf_allocator_free_list_initialize;
+    int32_t(*fptr)(PFAllocator_FreeList_t*, void*, size_t const) = &pf_allocator_free_list_initialize;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST

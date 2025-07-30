@@ -71,7 +71,7 @@ typedef struct PFAllocator_FreeList_t {
 
 void* pf_provided_memory_free_list_allocator(size_t const size);
 
-int32_t pf_allocator_free_list_initialize(void* base_memory, size_t const size);
+int32_t pf_allocator_free_list_initialize(PFAllocator_FreeList_t* pf_free_list, void* base_memory, size_t const size);
 
 void pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list);
 
