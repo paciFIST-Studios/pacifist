@@ -54,25 +54,26 @@ typedef struct PFAllocator_FreeListAllocationHeader_t {
     size_t const padding;
 } PFAllocator_FreeListAllocationHeader_t;
 
-typedef struct PFAllocator__FreeListNode_t {
-    PFAllocator_FreeListAllocationHeader_t* next;
-    size_t const block_size;
-} PFAllocator__FreeListNode_t;
+typedef struct PFAllocator_FreeListNode_t {
+    struct PFAllocator_FreeListNode_t* next;
+    size_t block_size;
+} PFAllocator_FreeListNode_t;
 
 typedef struct PFAllocator_FreeList_t {
     void * base_memory;
     size_t owned_memory;
     size_t used_memory;
 
-    PFAllocator__FreeListNode_t* head;
+    PFAllocator_FreeListNode_t* head;
     EAllocationPolicy_FreeList policy;
 } PFAllocator_FreeList_t;
 
-int32_t pf_allocator_free_list_initialize(void* base_memory, size_t const size);
 
 void* pf_provided_memory_free_list_allocator(size_t const size);
 
+int32_t pf_allocator_free_list_initialize(void* base_memory, size_t const size);
 
+void pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list);
 
 
 

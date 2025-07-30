@@ -16,11 +16,104 @@
 // PFAllocator FreeList 
 // -----------------------------------------------------------------------------------------------------------
 
+// EAllocationPolicy_FreeList --------------------------------------------------------------------------------
+
 START_TEST(enum_EAllocationPolicy_FreeList__is_defined) {
     EAllocationPolicy_FreeList policy;
     ck_assert_ptr_nonnull(&policy);
 }
 END_TEST
+
+START_TEST(enum_EAllocationPolicy_FreeList__has_expected_values) {
+    ck_assert_int_eq(0, EAPFL_POLICY_FIND_FIRST);
+    ck_assert_int_eq(1, EAPFL_POLICY_FIND_BEST);
+}
+END_TEST
+
+// struct PFAllocator_FreeListAllocationHeader_t -------------------------------------------------------------
+
+START_TEST(struct_PFAllocator_FreeListAllocationHeader_t__is_defined) {
+    PFAllocator_FreeListAllocationHeader_t header;
+    ck_assert_ptr_nonnull(&header);
+}
+END_TEST
+
+START_TEST(struct_PFAllocator_FreeListAllocationHeader_t__has_expected_size) {
+    ck_assert_int_eq(16, sizeof(PFAllocator_FreeListAllocationHeader_t));
+}
+END_TEST
+
+START_TEST(struct_PFAllocator_FreeListAllocationHeader_t__has_expected_members) {
+    PFAllocator_FreeListAllocationHeader_t const header = {0};
+    ck_assert_int_eq(0, header.block_size);
+    ck_assert_int_eq(0, header.padding);
+}
+END_TEST
+
+// struct PFAllocator_FreeListNode_t -------------------------------------------------------------------------
+
+START_TEST(struct_PFAllocator_FreeListNode_t__is_defined) {
+    PFAllocator_FreeListNode_t const node;
+    ck_assert_ptr_nonnull(&node);
+}
+END_TEST
+
+START_TEST(struct_PFAllocator_FreeListNode_t__has_expected_size) {
+   ck_assert_int_eq(16, sizeof(PFAllocator_FreeListNode_t)); 
+}
+END_TEST
+
+START_TEST(struct_PFAllocator_FreeListNode_t__has_expected_members) {
+    PFAllocator_FreeListNode_t const node = {0};
+    ck_assert_ptr_null(node.next);
+    ck_assert_int_eq(0, node.block_size);
+}
+END_TEST
+
+
+// struct PFAllocator_FreeList_t -----------------------------------------------------------------------------
+
+START_TEST(struct_PFAllocator_FreeList_t__is_defined) {
+    PFAllocator_FreeList_t const allocator = {0};
+    ck_assert_ptr_nonnull(&allocator);
+}
+END_TEST
+
+START_TEST(struct_PFAllocator_FreeList_t__has_expected_size) {
+    ck_assert_int_eq(40, sizeof(PFAllocator_FreeList_t));
+}
+END_TEST
+
+START_TEST(struct_PFAllocator_FreeList_t__has_expected_members) {
+    PFAllocator_FreeList_t const allocator = {0};
+    ck_assert_ptr_null(allocator.base_memory);
+    ck_assert_ptr_null(allocator.head);
+    ck_assert_int_eq(allocator.owned_memory, 0);
+    ck_assert_int_eq(allocator.used_memory, 0);
+    ck_assert_int_eq(allocator.policy, 0);
+}
+END_TEST
+
+// fn pf_allocator_free_list_initialize ----------------------------------------------------------------------
+
+START_TEST(fn_pf_allocator_free_list_initialize__is_defined) {
+    int32_t(*fptr)(void*, size_t const) = &pf_allocator_free_list_initialize;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+
+
+
+
+// fn pf_provided_memory_free_list_allocator -----------------------------------------------------------------
+
+START_TEST(fn_pf_provided_memory_free_list_allocator__is_defined) {
+    void*(*fptr)(size_t const) = &pf_provided_memory_free_list_allocator;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
 
 
 

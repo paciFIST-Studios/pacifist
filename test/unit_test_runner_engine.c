@@ -432,9 +432,32 @@ int main(void) {
     //----------------------//
     // PFAllocator FreeList //
     //----------------------//
+
+    // EAllocationPolicy_FreeList
     ADD_TEST(enum_EAllocationPolicy_FreeList__is_defined);
+    ADD_TEST(enum_EAllocationPolicy_FreeList__has_expected_values);
 
+    // PFAllocator_FreeListAllocationHeader_t
+    ADD_TEST(struct_PFAllocator_FreeListAllocationHeader_t__is_defined);
+    ADD_TEST(struct_PFAllocator_FreeListAllocationHeader_t__has_expected_size);
+    ADD_TEST(struct_PFAllocator_FreeListAllocationHeader_t__has_expected_members);
 
+    // PFAllocator_FreeListNode_t
+    ADD_TEST(struct_PFAllocator_FreeListNode_t__is_defined);
+    ADD_TEST(struct_PFAllocator_FreeListNode_t__has_expected_size);
+    ADD_TEST(struct_PFAllocator_FreeListNode_t__has_expected_members);
+
+    // PFAllocator_FreeList_t
+    ADD_TEST(struct_PFAllocator_FreeList_t__is_defined);
+    ADD_TEST(struct_PFAllocator_FreeList_t__has_expected_size);
+    ADD_TEST(struct_PFAllocator_FreeList_t__has_expected_members);
+
+    // fn pf_allocator_free_list_initialize
+    ADD_TEST(fn_pf_allocator_free_list_initialize__is_defined);
+
+    // fn pf_provided_memory_free_list_allocator
+    ADD_TEST(fn_pf_provided_memory_free_list_allocator__is_defined);
+    
     
     //--------------------------//
     // PFAllocator RedBlackTree //

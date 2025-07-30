@@ -7,6 +7,8 @@
 #include <stdlib.h>
 // framework
 // engine
+#include <alsa/control.h>
+
 #include "../../core/error.h"
 
 static PFAllocator_t s_allocator = {0};
@@ -15,18 +17,6 @@ static PFAllocator_t s_allocator = {0};
 // -----------------------------------------------------------------------------------------------------------
 // PFAllocator_FreeList_t
 // -----------------------------------------------------------------------------------------------------------
-
-int32_t pf_allocator_free_list_initialize(void* base_memory, size_t const size) {
-
-    pf_malloc = &malloc;
-    pf_realloc = &realloc;
-    pf_free = &free;
-
-
-    
-    return 0;
-}
-
 
 
 void* pf_provided_memory_free_list_allocator(size_t const size) {
@@ -43,6 +33,56 @@ void* pf_provided_memory_free_list_allocator(size_t const size) {
 }
 
 
+
+int32_t pf_allocator_free_list_initialize(PFAllocator_FreeList_t* pf_free_list, void* base_memory, size_t const size) {
+    if (pf_free_list == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator is not initialized!");
+        return -1;
+    }
+
+
+    pf_malloc = &malloc;
+    pf_realloc = &realloc;
+    pf_free = &free;
+
+    
+    
+    pf_free_list->base_memory = base_memory;
+    pf_free_list->owned_memory = size;
+    
+
+    return 0;
+}
+
+
+
+
+
+void pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list) {
+    if (pf_free_list == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator is not initialized!");
+        return;
+    }
+
+    // we're not overwriting the beginning of the allocation, b/c this is where
+    // the free list struct itself lives
+    size_t const pf_free_list_size = sizeof(PFAllocator_FreeList_t);
+    void* pf_free_list_usable_memory_start = pf_free_list->base_memory + pf_free_list_size;
+
+    // zero out the whole thing immediately, and hope it crashes, if anyone is still using it
+    size_t const owned_memory_size = pf_free_list->owned_memory;
+    for (size_t i = pf_free_list_size; i < owned_memory_size; i++) {
+        uint8_t* ptr = (void*)(pf_free_list->owned_memory + i);
+        *ptr = 0;
+    }
+
+    // memory is now fresh, so just start rebuilding
+    pf_free_list->used_memory = 0;
+    PFAllocator_FreeListNode_t* first_node = pf_free_list_usable_memory_start;
+    first_node->block_size = pf_free_list->owned_memory - pf_free_list_size;
+    first_node->next = NULL;
+    pf_free_list->head = first_node;
+}
 
 
 // -----------------------------------------------------------------------------------------------------------
