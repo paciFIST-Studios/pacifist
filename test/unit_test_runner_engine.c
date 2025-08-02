@@ -454,10 +454,36 @@ int main(void) {
 
     // fn pf_allocator_free_list_initialize
     ADD_TEST(fn_pf_allocator_free_list_initialize__is_defined);
-
-    // fn pf_provided_memory_free_list_allocator
-    ADD_TEST(fn_pf_provided_memory_free_list_allocator__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_initialize__returns_correct_error_code__for_null_free_list_param);
+    ADD_TEST(fn_pf_allocator_free_list_initialize__sets_correct_error_message__for_null_free_list_param);
+    ADD_TEST(fn_pf_allocator_free_list_initialize__returns_correct_error_code__for_null_base_memory_param);
+    ADD_TEST(fn_pf_allocator_free_list_initialize__sets_correct_error_message__for_null_base_memory_param);
+    ADD_TEST(fn_pf_allocator_free_list_initialize__returns_correct_error_code__for_zero_size_param);
+    ADD_TEST(fn_pf_allocator_free_list_initialize__sets_correct_error_message__for_zero_size_param);
+    // broken
+    //ADD_TEST(fn_pf_allocator_free_list_initialize__sets_pf_memory_functions__when_used);
     
+    // fn pf_allocator_provided_memory_free_list_allocator
+    ADD_TEST(fn_pf_allocator_provided_memory_free_list_allocator__is_defined);
+
+    // fn pf_allocator_free_list_free_all
+    ADD_TEST(fn_pf_allocator_free_list_free_all__is_defined);
+    
+    // fn pf_allocator_is_power_of_two
+    ADD_TEST(fn_pf_allocator_is_power_of_two__is_defined);
+
+    // fn pf_allocator_free_list_calculate_padding_and_header
+    ADD_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__is_defined);
+
+    // fn pf_allocator_free_list_find_first
+    ADD_TEST(fn_pf_allocator_free_list_find_first__is_defined);
+
+    // fn pf_allocator_free_list_find_best
+    ADD_TEST(fn_pf_allocator_free_list_find_best__is_defined);
+
+
+
+
     
     //--------------------------//
     // PFAllocator RedBlackTree //

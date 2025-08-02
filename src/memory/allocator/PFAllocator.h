@@ -12,6 +12,7 @@
 
 
 
+
 #define USE_PROVIDED_MEMORY 1
 #define USE_FREE_LIST_IMPLEMENTATION 1
 
@@ -69,12 +70,31 @@ typedef struct PFAllocator_FreeList_t {
 } PFAllocator_FreeList_t;
 
 
-void* pf_provided_memory_free_list_allocator(size_t const size);
 
 int32_t pf_allocator_free_list_initialize(PFAllocator_FreeList_t* pf_free_list, void* base_memory, size_t const size);
 
+void* pf_allocator_provided_memory_free_list_allocator(size_t const size);
+
 void pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list);
 
+int32_t pf_allocator_is_power_of_two(size_t const size);
+
+
+size_t pf_allocator_free_list_calculate_padding_and_header(uintptr_t ptr, uintptr_t alignment, size_t const header_size);
+
+PFAllocator_FreeListNode_t* pf_allocator_free_list_find_first(
+    PFAllocator_FreeList_t const * free_list,
+    size_t const list_size,
+    size_t const alignment,
+    size_t * padding,
+    PFAllocator_FreeListNode_t** previous_node);
+
+PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
+    PFAllocator_FreeList_t const * free_list,
+    size_t const list_size,
+    size_t const alignment,
+    size_t * padding,
+    PFAllocator_FreeListNode_t** previous_node);
 
 
 //  red-black-tree implementation of PFAllocator -------------------------------------------------------------
