@@ -43,6 +43,31 @@
  * 
  */
 
+// sets memory to zero before returning it
+// returns ptr to "new" memory, which is aligned correctly
+// does zero out memory
+// will accommodate several size regimes,
+// will return null for out of memory error
+// will set error message for out of memory error
+//static void* (*pf_malloc)(size_t const);
+
+
+// changes the size of this memory to the supplied size
+// does zero out memory which is being released (but you don't know that)
+// does zero out expanded memory
+// returns pointer to new memory, which is aligned correctly
+// if ptr is null, is like pf_malloc
+// will accommodate several size regimes,
+// will return null for out of memory error
+// will set error message for out of memory error
+//static void* (*pf_realloc)(void*, size_t const);
+
+
+// "frees" memory pointed to by this ptr.
+// sets ptr to null 
+//static void (*pf_free)(void*);
+
+
 // free-list implementation of a PFAllocator -----------------------------------------------------------------
 
 typedef enum EAllocationPolicy_FreeList {
@@ -67,6 +92,11 @@ typedef struct PFAllocator_FreeList_t {
 
     PFAllocator_FreeListNode_t* head;
     EAllocationPolicy_FreeList policy;
+
+    void* (*pf_malloc)(size_t const size);
+    void* (*pf_realloc)(void* ptr, size_t const size);
+    void  (*pf_free)(void* ptr);
+    
 } PFAllocator_FreeList_t;
 
 
@@ -148,29 +178,6 @@ typedef struct PFAllocator_t {
 
 
 
-// sets memory to zero before returning it
-// returns ptr to "new" memory, which is aligned correctly
-// does zero out memory
-// will accommodate several size regimes,
-// will return null for out of memory error
-// will set error message for out of memory error
-static void* (*pf_malloc)(size_t const);
-
-
-// changes the size of this memory to the supplied size
-// does zero out memory which is being released (but you don't know that)
-// does zero out expanded memory
-// returns pointer to new memory, which is aligned correctly
-// if ptr is null, is like pf_malloc
-// will accommodate several size regimes,
-// will return null for out of memory error
-// will set error message for out of memory error
-static void* (*pf_realloc)(void*, size_t const);
-
-
-// "frees" memory pointed to by this ptr.
-// sets ptr to null 
-static void (*pf_free)(void*);
 
 
 

@@ -48,10 +48,9 @@ int32_t pf_allocator_free_list_initialize(PFAllocator_FreeList_t* pf_free_list, 
         return PFEC_ERROR_INVALID_LENGTH;
     }
 
-    
-    pf_malloc = &malloc;
-    pf_realloc = &realloc;
-    pf_free = &free;
+    pf_free_list->pf_malloc = &malloc;
+    pf_free_list->pf_realloc = &realloc;
+    pf_free_list->pf_free = &free;
 
     pf_free_list->base_memory = base_memory;
     pf_free_list->owned_memory = size;
@@ -216,9 +215,9 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
 // -----------------------------------------------------------------------------------------------------------
 
 int32_t pf_allocator_red_black_tree_initialize(void* base_memory, size_t const size) {
-    pf_malloc = &malloc;
-    pf_realloc = &realloc;
-    pf_free = &free;
+    //pf_malloc = &malloc;
+    //pf_realloc = &realloc;
+    //pf_free = &free;
     return 0;
 }
 

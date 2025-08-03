@@ -460,8 +460,9 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_initialize__sets_correct_error_message__for_null_base_memory_param);
     ADD_TEST(fn_pf_allocator_free_list_initialize__returns_correct_error_code__for_zero_size_param);
     ADD_TEST(fn_pf_allocator_free_list_initialize__sets_correct_error_message__for_zero_size_param);
-    // broken
-    //ADD_TEST(fn_pf_allocator_free_list_initialize__sets_pf_memory_functions__when_used);
+    ADD_TEST(fn_pf_allocator_free_list_initialize__sets_pf_memory_functions__when_used);
+    ADD_TEST(fn_pf_allocator_free_list_initialize__sets_memory_values_correctly);
+    ADD_TEST(fn_pf_allocator_free_list_initialize__after_initialization_allocator_memory_fns_are_usable);
     
     // fn pf_allocator_provided_memory_free_list_allocator
     ADD_TEST(fn_pf_allocator_provided_memory_free_list_allocator__is_defined);
@@ -497,10 +498,10 @@ int main(void) {
 
 
     // static fn ptrs
-    ADD_TEST(static_fn_ptr_pf_malloc__is_defined);
-    ADD_TEST(static_fn_ptr_pf_realloc__is_defined);
-    ADD_TEST(static_fn_ptr_pf_free_is_defined);
-    ADD_TEST(static_fn_ptrs__can_be_used__if_they_are_set_with_stdlib_defaults);
+    //ADD_TEST(static_fn_ptr_pf_malloc__is_defined);
+    //ADD_TEST(static_fn_ptr_pf_realloc__is_defined);
+    //ADD_TEST(static_fn_ptr_pf_free_is_defined);
+    //ADD_TEST(static_fn_ptrs__can_be_used__if_they_are_set_with_stdlib_defaults);
 
 
     // pf_allocator_initialize

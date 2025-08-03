@@ -80,7 +80,7 @@ START_TEST(struct_PFAllocator_FreeList_t__is_defined) {
 END_TEST
 
 START_TEST(struct_PFAllocator_FreeList_t__has_expected_size) {
-    ck_assert_int_eq(40, sizeof(PFAllocator_FreeList_t));
+    ck_assert_int_eq(64, sizeof(PFAllocator_FreeList_t));
 }
 END_TEST
 
@@ -182,18 +182,48 @@ START_TEST(fn_pf_allocator_free_list_initialize__sets_correct_error_message__for
 END_TEST
 
 
-//START_TEST(fn_pf_allocator_free_list_initialize__sets_pf_memory_functions__when_used) {
-//    PFAllocator_FreeList_t allocator = {0};
-//    size_t const size = 64;
-//    char memory[size];
-//    ck_assert_int_eq(pf_allocator_free_list_initialize(&allocator, memory, size), 0);
-//
-//    // these are getting set in the header, but are null when they get back here
-//    ck_assert_ptr_nonnull(pf_malloc); 
-//    ck_assert_ptr_nonnull(pf_realloc); 
-//    ck_assert_ptr_nonnull(pf_free); 
-//}
-//END_TEST
+START_TEST(fn_pf_allocator_free_list_initialize__sets_pf_memory_functions__when_used) {
+    PFAllocator_FreeList_t allocator = {0};
+    size_t const size = 64;
+    char memory[size];
+    ck_assert_int_eq(pf_allocator_free_list_initialize(&allocator, memory, size), 0);
+
+    // these are getting set in the header, but are null when they get back here
+    ck_assert_ptr_nonnull(allocator.pf_malloc); 
+    ck_assert_ptr_nonnull(allocator.pf_realloc); 
+    ck_assert_ptr_nonnull(allocator.pf_free); 
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_initialize__sets_memory_values_correctly) {
+    PFAllocator_FreeList_t allocator = {0};
+    size_t const size = 64;
+    char memory[size];
+    ck_assert_int_eq(pf_allocator_free_list_initialize(&allocator, memory, size), 0);
+
+    ck_assert_ptr_eq(allocator.base_memory, memory);
+    ck_assert_int_eq(allocator.owned_memory, size);
+    ck_assert_int_eq(allocator.used_memory, 0);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_initialize__after_initialization_allocator_memory_fns_are_usable) {
+    PFAllocator_FreeList_t allocator = {0};
+    size_t const size = 64;
+    char memory[size];
+    ck_assert_int_eq(pf_allocator_free_list_initialize(&allocator, memory, size), 0);
+
+    size_t const allocated_size = 128;
+    size_t const allocated_resize = 256;
+    char* allocated_memory = allocator.pf_malloc(allocated_size);
+    ck_assert_ptr_nonnull(allocated_memory);
+    char* reallocated_memory = allocator.pf_realloc(allocated_memory, allocated_resize);
+    allocated_memory = NULL;
+    ck_assert_ptr_nonnull(reallocated_memory);
+    allocator.pf_free(reallocated_memory);
+    reallocated_memory = NULL;
+}
+END_TEST
 
 
 // fn pf_allocator_provided_memory_free_list_allocator -------------------------------------------------------
@@ -273,41 +303,41 @@ END_TEST
 
 
 // pf_malloc
-START_TEST(static_fn_ptr_pf_malloc__is_defined) {
-    pf_malloc = &malloc;
-    ck_assert_ptr_nonnull(pf_malloc);
-}
-END_TEST
-
-// pf_realloc
-START_TEST(static_fn_ptr_pf_realloc__is_defined) {
-    pf_realloc = &realloc;
-    ck_assert_ptr_nonnull(pf_realloc);
-}
-END_TEST
-
-// pf_free
-START_TEST(static_fn_ptr_pf_free_is_defined) {
-    pf_free = &free;
-    ck_assert_ptr_nonnull(pf_free);
-}
-END_TEST
-
-
-START_TEST(static_fn_ptrs__can_be_used__if_they_are_set_with_stdlib_defaults) {
-    pf_malloc = &malloc;
-    pf_realloc = &realloc;
-    pf_free = &free;
-
-    uint8_t * memory = pf_malloc(32);
-    ck_assert_ptr_nonnull(memory);
-    memory = pf_realloc(memory, 64);
-    ck_assert_ptr_nonnull(memory);
-    pf_free(memory);
-    memory = NULL;
-    ck_assert_ptr_null(memory);
-}
-END_TEST
+//START_TEST(static_fn_ptr_pf_malloc__is_defined) {
+//    pf_malloc = &malloc;
+//    ck_assert_ptr_nonnull(pf_malloc);
+//}
+//END_TEST
+//
+//// pf_realloc
+//START_TEST(static_fn_ptr_pf_realloc__is_defined) {
+//    pf_realloc = &realloc;
+//    ck_assert_ptr_nonnull(pf_realloc);
+//}
+//END_TEST
+//
+//// pf_free
+//START_TEST(static_fn_ptr_pf_free_is_defined) {
+//    pf_free = &free;
+//    ck_assert_ptr_nonnull(pf_free);
+//}
+//END_TEST
+//
+//
+//START_TEST(static_fn_ptrs__can_be_used__if_they_are_set_with_stdlib_defaults) {
+//    pf_malloc = &malloc;
+//    pf_realloc = &realloc;
+//    pf_free = &free;
+//
+//    uint8_t * memory = pf_malloc(32);
+//    ck_assert_ptr_nonnull(memory);
+//    memory = pf_realloc(memory, 64);
+//    ck_assert_ptr_nonnull(memory);
+//    pf_free(memory);
+//    memory = NULL;
+//    ck_assert_ptr_null(memory);
+//}
+//END_TEST
 
 
 
