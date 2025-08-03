@@ -40,7 +40,7 @@ START_TEST(struct_PFAllocator_FreeListAllocationHeader_t__is_defined) {
 END_TEST
 
 START_TEST(struct_PFAllocator_FreeListAllocationHeader_t__has_expected_size) {
-    ck_assert_int_eq(16, sizeof(PFAllocator_FreeListAllocationHeader_t));
+    ck_assert_int_eq(24, sizeof(PFAllocator_FreeListAllocationHeader_t));
 }
 END_TEST
 
@@ -67,10 +67,101 @@ END_TEST
 START_TEST(struct_PFAllocator_FreeListNode_t__has_expected_members) {
     PFAllocator_FreeListNode_t const node = {0};
     ck_assert_ptr_null(node.next);
-    ck_assert_int_eq(0, node.block_size);
+    ck_assert_int_eq(0, node.metadata);
 }
 END_TEST
 
+// fn pf_allocator_free_list_node_is_allocated ---------------------------------------------------------------
+START_TEST(fn_pf_allocator_free_list_node_is_allocated__is_defined) {
+    int32_t(*fptr)(PFAllocator_FreeListNode_t const *) = &pf_allocator_free_list_node_is_allocated;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_is_allocated__returns_correct_error_code__for_null_ptr_to_node_param) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(NULL), PFEC_ERROR_NULL_PTR);
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_is_allocated__sets_correct_error_message__for_null_ptr_to_node_param) {
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(NULL), PFEC_ERROR_NULL_PTR);
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Null ptr to PFAllocator_FreeListNode_t!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_is_allocated__returns_correct_value_for_allocated_node) {
+    PFAllocator_FreeListNode_t node = {0};
+    node.metadata |= (size_t) 1 << 63;
+    ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), TRUE);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_is_allocated__returns_correct_value_for_unallocated_node) {
+    PFAllocator_FreeListNode_t const node = {0};
+    ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), FALSE);
+}
+END_TEST
+
+// fn pf_allocator_free_list_node_set_is_allocated -----------------------------------------------------------
+
+START_TEST(fn_pf_allocator_free_list_node_set_is_allocated__is_defined) {
+    void(*fptr)(PFAllocator_FreeListNode_t*) = &pf_allocator_free_list_node_set_is_allocated;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_set_is_allocated__sets_correct_error_message__for_null_ptr_to_node_param) {
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    pf_allocator_free_list_node_set_is_allocated(NULL);
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Null ptr to PFAllocator_FreeListNode_t!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_set_is_allocated__sets_value_correctly__for_successful_use) {
+    PFAllocator_FreeListNode_t node = {0};
+    ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), FALSE);
+    pf_allocator_free_list_node_set_is_allocated(&node);
+    ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), TRUE);
+}
+END_TEST
+
+// fn pf_allocator_free_list_node_set_is_nota_allocated ------------------------------------------------------
+
+START_TEST(fn_pf_allocator_free_list_node_set_is_not_allocated__is_defined) {
+    void(*fptr)(PFAllocator_FreeListNode_t*) = &pf_allocator_free_list_node_set_is_not_allocated;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_set_is_not_allocated__sets_correct_error_message__for_null_ptr_to_node) {
+    PF_SUPPRESS_ERRORS
+    pf_allocator_free_list_node_set_is_allocated(NULL);
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Null ptr to PFAllocator_FreeListNode_t!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_Free_list_node_set_is_not_allocated__sets_value_correctly__for_successful_use) {
+    PFAllocator_FreeListNode_t node = {0};
+    node.metadata |= (size_t) 1 << 63;
+    ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), TRUE);
+    pf_allocator_free_list_node_set_is_not_allocated(&node);
+    ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), FALSE);
+}
+END_TEST
 
 // struct PFAllocator_FreeList_t -----------------------------------------------------------------------------
 
@@ -89,7 +180,7 @@ START_TEST(struct_PFAllocator_FreeList_t__has_expected_members) {
     PFAllocator_FreeList_t const allocator = {0};
     ck_assert_ptr_null(allocator.base_memory);
     ck_assert_ptr_null(allocator.head);
-    ck_assert_int_eq(allocator.owned_memory, 0);
+    ck_assert_int_eq(allocator.base_memory_size, 0);
     ck_assert_int_eq(allocator.used_memory, 0);
     ck_assert_int_eq(allocator.policy, 0);
 }
@@ -185,7 +276,7 @@ START_TEST(fn_pf_allocator_free_list_initialize__sets_memory_values_correctly) {
     ck_assert_int_eq(pf_allocator_free_list_initialize(&allocator, memory, size), 0);
 
     ck_assert_ptr_eq(allocator.base_memory, memory);
-    ck_assert_int_eq(allocator.owned_memory, size);
+    ck_assert_int_eq(allocator.base_memory_size, size);
     ck_assert_int_eq(allocator.used_memory, 0);
 }
 END_TEST
@@ -258,7 +349,7 @@ START_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__for_z
     size_t const size = 128;
     char memory[size];
     pf_allocator_free_list_initialize(&allocator, memory, size);
-    allocator.owned_memory = 0;
+    allocator.base_memory_size = 0;
     PF_SUPPRESS_ERRORS
     ck_assert_int_eq(pf_allocator_free_list_free_all(&allocator), PFEC_ERROR_INVALID_LENGTH);
     PF_UNSUPPRESS_ERRORS
@@ -270,7 +361,7 @@ START_TEST(fn_pf_allocator_free_list_free_all__sets_correct_error_message__for_z
     size_t const size = 128;
     char memory[size];
     pf_allocator_free_list_initialize(&allocator, memory, size);
-    allocator.owned_memory = 0;
+    allocator.base_memory_size = 0;
     PF_SUPPRESS_ERRORS
     ck_assert_int_eq(pf_allocator_free_list_free_all(&allocator), PFEC_ERROR_INVALID_LENGTH);
     PF_UNSUPPRESS_ERRORS
@@ -306,7 +397,6 @@ START_TEST(fn_pf_allocator_free_list_free_all__sets_correct_error_message__for_n
     ck_assert_in_error_buffer(expected);
 }
 END_TEST
-
 
 START_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__for_null_ptr_to_pf_realloc) {
     PFAllocator_FreeList_t allocator = {0};
@@ -362,17 +452,28 @@ START_TEST(fn_pf_allocator_free_list_free_all__sets_correct_error_message__for_n
 }
 END_TEST
 
+START_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__when_free_list_allocator_lives_inside_its_own_base_memory) {
+    size_t const size = 128;
+    uint8_t memory[size];
+    PFAllocator_FreeList_t* allocator = (PFAllocator_FreeList_t*)memory;
+    ck_assert_ptr_nonnull(allocator);
+    pf_allocator_free_list_initialize(allocator, memory, size);
+    ck_assert_int_eq(pf_allocator_free_list_free_all(allocator), PFEC_NO_ERROR);
+    // 128 - 64 (allocator) - 16 (node header) = 48
+    ck_assert_int_eq(allocator->head->metadata, 48);
+}
+END_TEST
 
-START_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__for_successful_use) {
+START_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__when_free_list_allocator_lives_outside_its_own_base_memory) {
     PFAllocator_FreeList_t allocator = {0};
     size_t const size = 128;
     char memory[size];
     pf_allocator_free_list_initialize(&allocator, memory, size);
     ck_assert_int_eq(pf_allocator_free_list_free_all(&allocator), PFEC_NO_ERROR);
-    
+    // 128 - 16 (node header) = 112
+    ck_assert_int_eq(allocator.head->metadata, 112);
 }
 END_TEST
-
 
 
 // fn pf_allocator_is_power_of_two ---------------------------------------------------------------------------

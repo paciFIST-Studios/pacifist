@@ -18,6 +18,44 @@
 // -----------------------------------------------------------------------------------------------------------
 
 
+int32_t pf_allocator_free_list_node_is_allocated(PFAllocator_FreeListNode_t const * node) {
+    if (node == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Null ptr to PFAllocator_FreeListNode_t!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+    size_t const metadata = node->metadata;
+    size_t const highest_bit_mask = (size_t) 1 << ((sizeof(size_t) * 8) - 1);
+    return (metadata & highest_bit_mask) == highest_bit_mask;
+}
+
+void pf_allocator_free_list_node_set_is_allocated(PFAllocator_FreeListNode_t * node) {
+    if (node == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Null ptr to PFAllocator_FreeListNode_t!");
+        return;
+    }
+    size_t const highest_bit_mask = (size_t) 1 << ((sizeof(size_t) * 8) - 1);
+    node->metadata |= highest_bit_mask;
+}
+
+void pf_allocator_free_list_node_set_is_not_allocated(PFAllocator_FreeListNode_t *node) {
+    if (node == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Null ptr to PFAllocator_FreeListNode_t!");
+        return;
+    }
+    // make a bit mask with all the bets set to one
+    size_t highest_bit_mask = -1;
+    // reset the bitmask, so the highest bit is set to zero
+    highest_bit_mask &= (size_t) 0 << ((sizeof(size_t) * 8) - 1);
+    node->metadata &= highest_bit_mask;
+}
+
+size_t pf_allocator_free_list_node_block_size(PFAllocator_FreeListNode_t *node) {
+    return 0;
+}
+
+size_t pf_allocator_free_list_node_padding(PFAllocator_FreeListNode_t *node) {
+    return 0;
+}
 
 int32_t pf_allocator_free_list_initialize(PFAllocator_FreeList_t* pf_free_list, void* base_memory, size_t const size) {
     if (pf_free_list == NULL) {
@@ -33,14 +71,52 @@ int32_t pf_allocator_free_list_initialize(PFAllocator_FreeList_t* pf_free_list, 
         return PFEC_ERROR_INVALID_LENGTH;
     }
 
-    pf_free_list->pf_malloc = &malloc;
-    pf_free_list->pf_realloc = &realloc;
-    pf_free_list->pf_free = &free;
+    // set the memory usage fns
+    pf_free_list->pf_malloc = &pf_allocator_free_list_malloc;
+    pf_free_list->pf_realloc = &pf_allocator_free_list_realloc;
+    pf_free_list->pf_free = &pf_allocator_free_list_free;
 
     pf_free_list->base_memory = base_memory;
-    pf_free_list->owned_memory = size;
+    pf_free_list->base_memory_size = size;
 
-    return 0;
+
+
+    // does the free-list struct live inside the memory it manages?
+    int32_t const bFreeListIsInBaseMemory = pf_free_list == pf_free_list->base_memory;
+
+    // we're not overwriting the beginning of the allocation, b/c this is where
+    // the free list struct itself lives
+    void* assignable_memory_start = NULL;
+    size_t assignable_memory_size = 0;
+
+    if (bFreeListIsInBaseMemory) {
+        // if the free list lives in its own base memory, then all of the work it does
+        // has to skip over the memory occupied by the struct itself.  In that case,
+        // both the usable memory and the assignable memory, are smaller than the
+        // base memory.
+        size_t const pf_free_list_size = sizeof(PFAllocator_FreeList_t);
+        assignable_memory_start = (void*)((uint64_t)pf_free_list->base_memory + pf_free_list_size);
+        assignable_memory_size = pf_free_list->base_memory_size - pf_free_list_size;
+    } else {
+        // if the free list lives outside of its own base memory, then all of the
+        // memory it owns is assignable, and we can just operate on the entire thing
+        assignable_memory_start = pf_free_list->base_memory;
+        assignable_memory_size = pf_free_list->base_memory_size;
+    }
+
+    // this should already be zeroed out, but let's not assume
+    for (size_t i = 0; i < assignable_memory_size; i++) {
+        uintptr_t* ptr = (void*)((uint64_t)assignable_memory_start + i);
+        *ptr = 0;
+    }
+
+    // memory is now fresh, so just start rebuilding
+    pf_free_list->used_memory = 0;
+    PFAllocator_FreeListNode_t* first_node = assignable_memory_start;
+    first_node->metadata = assignable_memory_size - sizeof(PFAllocator_FreeListNode_t);
+    first_node->next = NULL;
+    pf_free_list->head = first_node;
+    return PFEC_NO_ERROR;
 }
 
 
@@ -54,7 +130,7 @@ int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t has no initialized base memory!");
         return PFEC_ERROR_NULL_PTR;
     }
-    if (pf_free_list->owned_memory == 0) {
+    if (pf_free_list->base_memory_size == 0) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t has invalid owned memory size!");
         return PFEC_ERROR_INVALID_LENGTH;
     }
@@ -70,28 +146,49 @@ int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t->pf_free is unexpectedly null!");
         return PFEC_ERROR_NULL_PTR;
     }
+
+    return pf_allocator_free_list_initialize(
+        pf_free_list,
+        pf_free_list->base_memory,
+        pf_free_list->base_memory_size);
     
+    //// does the free-list struct live inside the memory it manages?
+    //int32_t const bFreeListIsInBaseMemory = pf_free_list == pf_free_list->base_memory;
 
-    // we're not overwriting the beginning of the allocation, b/c this is where
-    // the free list struct itself lives
-    size_t const pf_free_list_size = sizeof(PFAllocator_FreeList_t);
-    void* pf_free_list_usable_memory_start = (void*)((uint64_t)pf_free_list->base_memory + pf_free_list_size);
+    //// we're not overwriting the beginning of the allocation, b/c this is where
+    //// the free list struct itself lives
+    //void* assignable_memory_start = NULL;
+    //size_t assignable_memory_size = 0;
 
-    // zero out the whole thing immediately, and hope it crashes, if anyone is still using it
-    size_t const assignable_memory_size = pf_free_list->owned_memory - (uint64_t)pf_free_list_usable_memory_start;
-    for (size_t i = 0; i < assignable_memory_size; i++) {
-        uintptr_t* ptr = (void*)((uint64_t)pf_free_list_usable_memory_start + i);
-        *ptr = 0;
-    }
+    //if (bFreeListIsInBaseMemory) {
+    //    // if the free list lives in its own base memory, then all of the work it does
+    //    // has to skip over the memory occupied by the struct itself.  In that case,
+    //    // both the usable memory and the assignable memory, are smaller than the
+    //    // base memory.
+    //    size_t const pf_free_list_size = sizeof(PFAllocator_FreeList_t);
+    //    assignable_memory_start = (void*)((uint64_t)pf_free_list->base_memory + pf_free_list_size);
+    //    assignable_memory_size = pf_free_list->base_memory_size - pf_free_list_size;
+    //} else {
+    //    // if the free list lives outside of its own base memory, then all of the
+    //    // memory it owns is assignable, and we can just operate on the entire thing
+    //    assignable_memory_start = pf_free_list->base_memory;
+    //    assignable_memory_size = pf_free_list->base_memory_size;
+    //}
 
-    // memory is now fresh, so just start rebuilding
-    pf_free_list->used_memory = 0;
-    PFAllocator_FreeListNode_t* first_node = pf_free_list_usable_memory_start;
-    first_node->block_size = pf_free_list->owned_memory - pf_free_list_size;
-    first_node->next = NULL;
-    pf_free_list->head = first_node;
+    //// zero out the whole thing immediately, and hope it crashes, if anyone is still using it
+    //for (size_t i = 0; i < assignable_memory_size; i++) {
+    //    uintptr_t* ptr = (void*)((uint64_t)assignable_memory_start + i);
+    //    *ptr = 0;
+    //}
 
-    return PFEC_NO_ERROR;
+    //// memory is now fresh, so just start rebuilding
+    //pf_free_list->used_memory = 0;
+    //PFAllocator_FreeListNode_t* first_node = assignable_memory_start;
+    //first_node->block_size = assignable_memory_size - sizeof(PFAllocator_FreeListNode_t);
+    //first_node->next = NULL;
+    //pf_free_list->head = first_node;
+
+    //return PFEC_NO_ERROR;
 }
 
 int32_t pf_allocator_is_power_of_two(size_t const size) {
@@ -101,8 +198,8 @@ int32_t pf_allocator_is_power_of_two(size_t const size) {
 
 
 size_t pf_allocator_free_list_calculate_padding_and_header(
-    uintptr_t ptr,
-    uintptr_t alignment,
+    uintptr_t const ptr,
+    uintptr_t const alignment,
     size_t const header_size)
 {
     PF_ASSERT(pf_allocator_is_power_of_two(alignment));
@@ -132,7 +229,7 @@ size_t pf_allocator_free_list_calculate_padding_and_header(
 
 PFAllocator_FreeListNode_t* pf_allocator_free_list_find_first(
     PFAllocator_FreeList_t const * free_list,
-    size_t const requested_sz,
+    size_t const requested_size,
     size_t const alignment,
     size_t * out_padding,
     PFAllocator_FreeListNode_t** out_previous_node)
@@ -149,8 +246,8 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_first(
             (uintptr_t)alignment,
             header_size);
 
-        size_t const required_size = requested_sz + padding;
-        if (node->block_size >= required_size) {
+        size_t const required_sz = requested_size + padding;
+        if (node->metadata >= required_sz) {
             break;
         }
 
@@ -197,8 +294,8 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
         // negative.  However, in this case, required_size would be greater than the
         // block size, so we are still checking against that in the first logical
         // clause here
-        size_t const diff_space = node->block_size - requested_sz;
-        if (node->block_size >= required_size && (diff_space < smallest_diff_space)) {
+        size_t const diff_space = node->metadata - requested_sz;
+        if (node->metadata >= required_size && (diff_space < smallest_diff_space)) {
             best_node = node;
             smallest_diff_space = diff_space;
         }
@@ -213,7 +310,17 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     return best_node;
 }
 
+void * pf_allocator_free_list_malloc(size_t const size) {
+    return malloc(size);
+}
 
+void * pf_allocator_free_list_realloc(void *ptr, size_t const size) {
+    return realloc(ptr, size);
+}
+
+void pf_allocator_free_list_free(void *ptr) {
+    free(ptr);
+}
 
 
 // -----------------------------------------------------------------------------------------------------------

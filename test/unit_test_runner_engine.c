@@ -447,6 +447,23 @@ int main(void) {
     ADD_TEST(struct_PFAllocator_FreeListNode_t__has_expected_size);
     ADD_TEST(struct_PFAllocator_FreeListNode_t__has_expected_members);
 
+    // fn pf_allocator_free_list_node_is_allocated
+    ADD_TEST(fn_pf_allocator_free_list_node_is_allocated__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_node_is_allocated__returns_correct_value_for_allocated_node);
+    ADD_TEST(fn_pf_allocator_free_list_node_is_allocated__returns_correct_value_for_unallocated_node);
+    ADD_TEST(fn_pf_allocator_free_list_node_is_allocated__returns_correct_error_code__for_null_ptr_to_node_param);
+    ADD_TEST(fn_pf_allocator_free_list_node_is_allocated__sets_correct_error_message__for_null_ptr_to_node_param);
+
+    // fn pf_allocator_free_list_node_set_is_allocated
+    ADD_TEST(fn_pf_allocator_free_list_node_set_is_allocated__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_node_set_is_allocated__sets_correct_error_message__for_null_ptr_to_node_param);
+    ADD_TEST(fn_pf_allocator_free_list_node_set_is_allocated__sets_value_correctly__for_successful_use);
+
+    // fn pf_allocator_free_list_node_set_is_not_allocated
+    ADD_TEST(fn_pf_allocator_free_list_node_set_is_not_allocated__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_node_set_is_not_allocated__sets_correct_error_message__for_null_ptr_to_node);
+    ADD_TEST(fn_pf_allocator_Free_list_node_set_is_not_allocated__sets_value_correctly__for_successful_use);
+    
     // PFAllocator_FreeList_t
     ADD_TEST(struct_PFAllocator_FreeList_t__is_defined);
     ADD_TEST(struct_PFAllocator_FreeList_t__has_expected_size);
@@ -485,8 +502,8 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__for_null_ptr_to_pf_free);
     ADD_TEST(fn_pf_allocator_free_list_free_all__sets_correct_error_message__for_null_ptr_to_pf_free);
 
-    ADD_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__for_successful_use);
-    
+    ADD_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__when_free_list_allocator_lives_inside_its_own_base_memory);
+    ADD_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__when_free_list_allocator_lives_outside_its_own_base_memory);
     
     // fn pf_allocator_is_power_of_two
     ADD_TEST(fn_pf_allocator_is_power_of_two__is_defined);

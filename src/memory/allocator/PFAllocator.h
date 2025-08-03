@@ -76,18 +76,34 @@ typedef enum EAllocationPolicy_FreeList {
 } EAllocationPolicy_FreeList;
 
 typedef struct PFAllocator_FreeListAllocationHeader_t {
+    struct PFAllocator_FreeListAllocationHeader_t* next;
     size_t const block_size;
     size_t const padding;
 } PFAllocator_FreeListAllocationHeader_t;
 
 typedef struct PFAllocator_FreeListNode_t {
     struct PFAllocator_FreeListNode_t* next;
-    size_t block_size;
+    // the top 5 bits are used for metadata:
+    // top bit: 1 = is allocated, 0 = is free
+    // next 4 bits: padding before data starts
+    size_t metadata;
 } PFAllocator_FreeListNode_t;
+
+int32_t pf_allocator_free_list_node_is_allocated(PFAllocator_FreeListNode_t const * node);
+
+void pf_allocator_free_list_node_set_is_allocated(PFAllocator_FreeListNode_t* node);
+
+void pf_allocator_free_list_node_set_is_not_allocated(PFAllocator_FreeListNode_t* node);
+
+size_t pf_allocator_free_list_node_block_size(PFAllocator_FreeListNode_t* node);
+
+size_t pf_allocator_free_list_node_padding(PFAllocator_FreeListNode_t* node);
+
+
 
 typedef struct PFAllocator_FreeList_t {
     void * base_memory;
-    size_t owned_memory;
+    size_t base_memory_size;
     size_t used_memory;
 
     PFAllocator_FreeListNode_t* head;
@@ -108,21 +124,21 @@ int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list);
 int32_t pf_allocator_is_power_of_two(size_t const size);
 
 
-size_t pf_allocator_free_list_calculate_padding_and_header(uintptr_t ptr, uintptr_t alignment, size_t const header_size);
+size_t pf_allocator_free_list_calculate_padding_and_header(uintptr_t const ptr, uintptr_t const alignment, size_t const header_size);
 
 PFAllocator_FreeListNode_t* pf_allocator_free_list_find_first(
     PFAllocator_FreeList_t const * free_list,
-    size_t const list_size,
+    size_t const requested_size,
     size_t const alignment,
-    size_t * padding,
-    PFAllocator_FreeListNode_t** previous_node);
+    size_t*  out_padding,
+    PFAllocator_FreeListNode_t** out_previous_node);
 
 PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     PFAllocator_FreeList_t const * free_list,
     size_t const list_size,
     size_t const alignment,
-    size_t * padding,
-    PFAllocator_FreeListNode_t** previous_node);
+    size_t * out_padding,
+    PFAllocator_FreeListNode_t** out_previous_node);
 
 
 
