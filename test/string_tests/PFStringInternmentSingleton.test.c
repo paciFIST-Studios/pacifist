@@ -2,6 +2,7 @@
 
 // include
 #include <check.h>
+#include "../pftest_utilities.h"
 #include "../../src/string/PFStringInternmentSingleton.h"
 
 // stdlib
@@ -52,7 +53,7 @@ END_TEST
 
 START_TEST(fn_pf_string_internment_initialize__returns_correct_error_code__for_null_string_internment_param) {
     PF_SUPPRESS_ERRORS
-    int32_t ret = pf_string_internment_initialize(NULL, NULL, 0);
+    int32_t const ret = pf_string_internment_initialize(NULL, NULL, 0);
     PF_UNSUPPRESS_ERRORS
     ck_assert_int_eq(ret, PFEC_ERROR_NULL_PTR);
 }
@@ -64,20 +65,14 @@ START_TEST(fn_pf_string_internment_initialize__sets_correct_error_message__for_n
     pf_string_internment_initialize(NULL, NULL, 0);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected[] = "Null ptr to PFStringInternmentSingleton";
-    size_t const expected_length = strlen(expected);
-
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
+    char const * expected = "Null ptr to PFStringInternmentSingleton";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
 START_TEST(pf_string_internment_initialize__returns_correct_error_code__for_null_memory_base_param) {
     PFStringInternmentSingleton_t string_internment = {0};
-    
+
     pf_clear_error();
     PF_SUPPRESS_ERRORS
     int32_t const ret = pf_string_internment_initialize(&string_internment, NULL, 0);
@@ -93,14 +88,8 @@ START_TEST(pf_string_internment_initialize__sets_correct_error_message__for_null
     pf_string_internment_initialize(&string_internment, NULL, 0);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected[] = "Null ptr to PFStringInternmentSingleton memory base";
-    size_t const expected_length = pf_strlen(expected);
-
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
+    char const * expected = "Null ptr to PFStringInternmentSingleton memory base";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
@@ -127,14 +116,8 @@ START_TEST(pf_string_internment_initialize__sets_correct_error_message__for_inva
     pf_string_internment_initialize(&string_internment, memory, 0);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected[] = "Invalid memory size for PFStringInternmentSingleton";
-    size_t const expected_length = strlen(expected);
-
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
+    char const * expected = "Invalid memory size for PFStringInternmentSingleton";
+    ck_assert_in_error_buffer(expected);
 
     free(memory);
 }
@@ -189,14 +172,8 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     pf_string_internment_emplace_cstr(NULL, NULL, 0);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected[] = "Null ptr to PFStringInternmentSingleton";
-    size_t const expected_length = pf_strlen(expected);
-
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
+    char const * expected = "Null ptr to PFStringInternmentSingleton";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
@@ -218,14 +195,8 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     pf_string_internment_emplace_cstr(&string_internment, NULL, 0);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected[] = "Null ptr to PFStringInternmentSingleton usable memory base";
-    size_t const expected_length = pf_strlen(expected);
-
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
+    char const * expected = "Null ptr to PFStringInternmentSingleton usable memory base";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
@@ -255,14 +226,8 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     pf_string_internment_emplace_cstr(&string_internment, NULL, 0);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected[] = "PFStringInternmentSingleton invalid owned memory size";
-    size_t const expected_length = pf_strlen(expected);
-
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
+    char const * expected = "PFStringInternmentSingleton invalid owned memory size";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
@@ -294,14 +259,8 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     pf_string_internment_emplace_cstr(&string_internment, NULL, 0);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected[] = "PFStringInternmentSingleton is using memory it doesn't own";
-    size_t const expected_length = pf_strlen(expected);
-
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
+    char const * expected = "PFStringInternmentSingleton is using memory it doesn't own";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
@@ -330,14 +289,8 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     pf_string_internment_emplace_cstr(&string_internment, NULL, 0);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected[] = "Null ptr to cstring";
-    size_t const expected_length = pf_strlen(expected);
-
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
+    char const * expected = "Null ptr to cstring";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
@@ -371,14 +324,8 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     pf_string_internment_emplace_cstr(&string_internment, test_string, 0);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected[] = "Invalid string length";
-    size_t const expected_length = pf_strlen(expected);
-
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
+    char const * expected = "Invalid string length";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
@@ -417,14 +364,8 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     pf_string_internment_emplace_cstr(&string_internment, test_string, test_length);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected[] = "Ran out of memory for PFStringInternmentSingleton";
-    size_t const expected_length = pf_strlen(expected);
-
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
+    char const * expected = "Ran out of memory for PFStringInternmentSingleton";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
@@ -461,14 +402,8 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     pf_string_internment_emplace_cstr(&string_internment, test_string, test_length);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected[] = "Ran out of tracking indices for PFStringInternmentSingleton";
-    size_t const expected_length = pf_strlen(expected);
-
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
+    char const * expected = "Ran out of tracking indices for PFStringInternmentSingleton";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 

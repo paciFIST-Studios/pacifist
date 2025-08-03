@@ -2,6 +2,7 @@
 
 // include
 #include <check.h>
+#include "../pftest_utilities.h"
 #include "../../src/string/pstring.h"
 // stdlib
 #include <stdlib.h>
@@ -9,7 +10,6 @@
 // engine
 #include "../../src/core/define.h"
 #include "../../src/core/error.h"
-#include "../../src/memory/hash_table/HashTable.h"
 
 // struct PString_t ------------------------------------------------------------------------------------------
 
@@ -53,12 +53,8 @@ START_TEST(fn_pstring_contains_pstr_sub__logs_correct_error__if_substring_is_lon
     ck_assert_int_eq(FALSE, pf_pstring_contains_pstr_sub(pstr1, pstr2));
     PF_UNSUPPRESS_ERRORS
 
-    char const expected_error[] = "Searching for substring whose length is longer than the base string!";
-    size_t const expected_length = pf_strlen(expected_error);
-    char * found_error = pf_get_error();
-
-    PString_t const pstr_found_error = { .string = found_error, .length = pf_strlen(found_error) };
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(pstr_found_error, expected_error, expected_length));
+    char const * expected_error = "Searching for substring whose length is longer than the base string!";
+    ck_assert_in_error_buffer(expected_error);
 }
 END_TEST
 
@@ -149,13 +145,8 @@ START_TEST(fn_pstring_slice__sets_correct_error_message__for_pstring_arg_with_nu
     PString_t const result = pf_pstring_slice(pstr, 0, 1);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected_error[] = "Null pointer passed to base string!";
-    size_t const expected_length = pf_strlen(expected_error);
-    ck_assert_int_eq(TRUE,  pf_pstring_contains_char_sub(error, expected_error, expected_length)); 
+    char const * expected_error = "Null pointer passed to base string!";
+    ck_assert_in_error_buffer(expected_error);
 }
 END_TEST
 
@@ -176,13 +167,8 @@ START_TEST(fn_pstring_slive__sets_correct_error_message__for_pstr_arg_with_zero_
     PString_t const result = pf_pstring_slice(pstr, 0, 1);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected_error[] = "Invalid string length!";
-    size_t const expected_length = pf_strlen(expected_error);
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected_error, expected_length));
+    char const * expected_error = "Invalid string length!";
+    ck_assert_in_error_buffer(expected_error);
 }
 END_TEST
 
@@ -201,13 +187,8 @@ START_TEST(fn_pstring_slice__sets_correct_error_message__for_request_of_zero_len
     PString_t const result = pf_pstring_slice(pstr, 2, 2);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected_error[] = "Cannot create a zero-length slice!";
-    size_t const expected_length = pf_strlen(expected_error);
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected_error, expected_length));
+    char const * expected_error = "Cannot create a zero-length slice!";
+    ck_assert_in_error_buffer(expected_error);
 }
 END_TEST
 
@@ -226,13 +207,8 @@ START_TEST(fn_pstring_slice__sets_correct_error_message__for_out_of_bounds_begin
     PString_t const result = pf_pstring_slice(pstr, 2, 1);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
     char const expected_error[] = "Begin parameter wants out of bounds access to string!";
-    size_t const expected_length = pf_strlen(expected_error);
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected_error, expected_length));
+    ck_assert_in_error_buffer(expected_error);
 }
 END_TEST
 
@@ -254,13 +230,8 @@ START_TEST(fn_pstring_slice__sets_correct_error_message__for_out_of_bounds_end_i
     PString_t const result = pf_pstring_slice(pstr, 0, 2);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected_error[] = "End parameter wants out of bounds access to string!";
-    size_t const expected_length = pf_strlen(expected_error);
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected_error, expected_length));
+    char const * expected_error = "End parameter wants out of bounds access to string!";
+    ck_assert_in_error_buffer(expected_error);
 }
 END_TEST
 

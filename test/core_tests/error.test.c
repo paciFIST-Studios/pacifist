@@ -12,16 +12,6 @@
 // engine
 // game
 
-// macro BUILD_AND_SET_ERROR_MESSAGE --------------------------------------------------------------
-
-//START_TEST(macro_build_and_set_error_message__is_defined) {
-//# ifdef BUILD_AND_SET_ERROR_MESSAGE
-//    ck_assert_int_eq(1, 1);
-//#else
-//    ck_assert_int_eq(1, 2);
-//#endif
-//}
-//END_TEST
 
 // fn get_error_buffer_size -----------------------------------------------------------------------
 
@@ -134,7 +124,7 @@ START_TEST(fn_clear_error__fills_buffer_with_zeroes) {
     pf_set_error_not_suppressed();
     pf_set_error(test_buffer, test_length);
 
-    char* error = pf_get_error();
+    char const * error = pf_get_error();
     ck_assert_ptr_nonnull(error);
 
     for (size_t i = 0; i < test_length-1; i++) {

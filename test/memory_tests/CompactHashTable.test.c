@@ -440,9 +440,9 @@ START_TEST(fn_compact_hash_table_lookup__returns_stored_value__for_correctly_loo
     char const * stored_key = compact_hash_table_insert(ht, test_key, test_key_len, EPDT__char_ptr_t, (void*)test_key);
     ck_assert_ptr_nonnull(stored_key);
     ck_assert(strncmp(test_key, stored_key, test_key_len) == 0);
-    void* value = compact_hash_table_lookup(ht, test_key, test_key_len); 
+    void const * value = compact_hash_table_lookup(ht, test_key, test_key_len); 
     ck_assert_ptr_nonnull(value);
-    char* stored_value = value;
+    char const * stored_value = value;
     ck_assert(strncmp(test_key, stored_value, test_key_len) == 0);
     ck_assert(compact_hash_table_destroy(ht));
 }

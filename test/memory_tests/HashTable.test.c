@@ -174,7 +174,7 @@ END_TEST
 // struct HashTableIterator_t ------------------------------------------------------------------------------------------
 
 START_TEST(struct_HashTableIterator_t__is_defined) {
-    HashTableIterator_t iterator;
+    HashTableIterator_t const iterator;
     ck_assert_ptr_nonnull(&iterator);
 }
 END_TEST

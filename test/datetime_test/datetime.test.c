@@ -2,6 +2,7 @@
 
 // includes
 #include <check.h>
+#include "../pftest_utilities.h"
 #include "../../src/date/datetime.h"
 
 // stdlib
@@ -51,13 +52,8 @@ START_TEST(fn_get_date_time_string__sets_correct_error_message__for_null_out_buf
     get_datetime_string(NULL, 0);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected[] = "Requires valid ptr to out buffer";
-    size_t const expected_length = pf_strlen(expected);
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
+    char const * expected = "Requires valid ptr to out buffer";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
@@ -78,14 +74,8 @@ START_TEST(fn_get_date_time_string__sets_correct_error_message__for_invalid_out_
     get_datetime_string(out_buffer, 0);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected[] = "Output buffer too small";
-    size_t const expected_length = pf_strlen(expected);
-
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
+    char const * expected = "Output buffer too small";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 

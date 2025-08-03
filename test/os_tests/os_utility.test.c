@@ -2,6 +2,7 @@
 
 // include
 #include <check.h>
+#include "../pftest_utilities.h"
 #include "../../src/os/os_utility.h"
 
 // stdlib
@@ -12,7 +13,6 @@
 // engine
 #include "../../src/core/define.h"
 #include "../../src/core/error.h"
-#include "../../src/string/pstring.h"
 
 // fn file_size --------------------------------------------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ START_TEST(fn_file_size__returns_correct_error_code__for_null_path) {
 }
 
 START_TEST(fn_file_size__returns_correct_error_code__for_zero_path_length) {
-    char * path = "";
+    char const * path = "";
     PF_SUPPRESS_ERRORS
     ck_assert(file_size(path, 0) == PFEC_ERROR_INVALID_LENGTH);
     PF_UNSUPPRESS_ERRORS
@@ -53,40 +53,21 @@ START_TEST(fn_file_size__writes_correct_error__for_null_path) {
     file_size(NULL, 0);
     PF_UNSUPPRESS_ERRORS
     
-    
-    // retrieve the error and put it in a pstring
-    char * error = pf_get_error();
-    size_t const error_length = pf_strlen(error);
-    PString_t const msg = { .string = error, .length = error_length };
-
-    // set up the expected result
     char const * expected = "Invalid ptr to file path";  
-    size_t const expected_length = pf_strlen(expected);
-
-    // did we get the expected result?
-    ck_assert_int_eq(1, pf_pstring_contains_char_sub(msg, expected, expected_length));
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
 START_TEST(fn_file_size__writes_correct_error__for_zero_path_length) {
     // call the fn in a condition where it generates this error
-    char * file_path = "";
+    char const * file_path = "";
 
     PF_SUPPRESS_ERRORS
     file_size(file_path, 0);
     PF_UNSUPPRESS_ERRORS
     
-    // retrieve the error and put it in a pstring
-    char * error = pf_get_error();
-    size_t const error_length = pf_strlen(error);
-    PString_t const msg = { .string = error, .length = error_length };
-
-    // set up the expected result
     char const * expected = "Invalid file path length";  
-    size_t const expected_length = pf_strlen(expected);
-
-    // did we get the expected result?
-    ck_assert_int_eq(1, pf_pstring_contains_char_sub(msg, expected, expected_length));
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
@@ -100,17 +81,8 @@ START_TEST(fn_file_size__writes_correct_error__if_file_does_not_exist) {
     file_size(path, pf_strlen(path));
     PF_UNSUPPRESS_ERRORS
     
-    // retrieve the error and put it in a pstring
-    char * error = pf_get_error();
-    size_t const error_length = pf_strlen(error);
-    PString_t const msg = { .string = error, .length = error_length };
-
-    // set up the expected result
-    char const * expected = "File does not exist";  
-    size_t const expected_length = pf_strlen(expected);
-
-    // did we get the expected result?
-    ck_assert_int_eq(1, pf_pstring_contains_char_sub(msg, expected, expected_length));
+    char const * expected = "File does not exist";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
@@ -131,7 +103,7 @@ START_TEST(fn_is_file__returns_correct_error_code__for_null_path) {
 END_TEST
 
 START_TEST(fn_is_file__returns_correct_error_code__for_zero_path_length) {
-    char * path = "";
+    char const * path = "";
     PF_SUPPRESS_ERRORS
     ck_assert_int_eq(is_file(path, 0), PFEC_ERROR_INVALID_LENGTH);
     PF_UNSUPPRESS_ERRORS
@@ -165,17 +137,8 @@ START_TEST(fn_is_file__writes_correct_error__for_null_path) {
     is_file(NULL, 1);
     PF_UNSUPPRESS_ERRORS
     
-    // retrieve the error and put it in a pstring
-    char * error = pf_get_error();
-    size_t const error_length = pf_strlen(error);
-    PString_t const msg = { .string = error, .length = error_length };
-
-    // set up the expected result
-    char const * expected = "Invalid ptr to file path";  
-    size_t const expected_length = pf_strlen(expected);
-
-    // did we get the expected result?
-    ck_assert_int_eq(1, pf_pstring_contains_char_sub(msg, expected, expected_length));
+    char const * expected = "Invalid ptr to file path";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
@@ -186,17 +149,8 @@ START_TEST(fn_is_file__writes_correct_error__for_zero_path_length) {
     is_file(path, 0);
     PF_UNSUPPRESS_ERRORS
     
-    // retrieve the error and put it in a pstring
-    char * error = pf_get_error();
-    size_t const error_length = pf_strlen(error);
-    PString_t const msg = { .string = error, .length = error_length };
-
-    // set up the expected result
-    char const * expected = "Invalid file path length";  
-    size_t const expected_length = pf_strlen(expected);
-
-    // did we get the expected result?
-    ck_assert_int_eq(1, pf_pstring_contains_char_sub(msg, expected, expected_length));
+    char const * expected = "Invalid file path length";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
@@ -225,16 +179,16 @@ START_TEST(fn_if_directory__returns_correct_error_code__for_zero_path_length) {
 END_TEST
 
 START_TEST(fn_is_directory__returns_zero__if_path_is_not_a_directory) {
-    char* path = __FILE__;
+    char const * path = __FILE__;
     size_t const len = pf_strlen(path);
 
     // learning a path is not a directory should not cause an error
     pf_clear_error();
-    
+
     ck_assert_int_eq(FALSE, is_directory(path, len));
 
     // verify this does not cause an error
-    char * error = pf_get_error();
+    char const * error = pf_get_error();
     size_t const error_length = pf_strlen(error);
     for (size_t i = 0; i < error_length; i++) {
         ck_assert(error[i] == '\0');
@@ -257,39 +211,20 @@ START_TEST(fn_is_directory__writes_correct_error__for_null_path) {
     // call the fn in a condition where it generates this error
     is_directory(NULL, 1);
     PF_UNSUPPRESS_ERRORS
-    
-    // retrieve the error and put it in a pstring
-    char * error = pf_get_error();
-    size_t const error_length = pf_strlen(error);
-    PString_t const msg = { .string = error, .length = error_length };
 
-    // set up the expected result
-    char const * expected = "Invalid ptr to file path";  
-    size_t const expected_length = pf_strlen(expected);
-
-    // did we get the expected result?
-    ck_assert_int_eq(1, pf_pstring_contains_char_sub(msg, expected, expected_length));
+    char const * expected = "Invalid ptr to file path";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
 START_TEST(fn_is_directory__writes_correct_error__for_zero_path_length) {
     // call the fn in a condition where it generates this error
-    char * path = "";
+    char const * path = "";
     PF_SUPPRESS_ERRORS
     is_directory(path, 0);
     PF_UNSUPPRESS_ERRORS
-    
-    // retrieve the error and put it in a pstring
-    char * error = pf_get_error();
-    size_t const error_length = pf_strlen(error);
-    PString_t const msg = { .string = error, .length = error_length };
 
-    // set up the expected result
-    char const * expected = "Invalid file path length";  
-    size_t const expected_length = pf_strlen(expected);
-
-    // did we get the expected result?
-    ck_assert_int_eq(1, pf_pstring_contains_char_sub(msg, expected, expected_length));
-    
+    char const * expected = "Invalid file path length";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
