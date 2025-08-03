@@ -466,11 +466,27 @@ int main(void) {
     
     // fn pf_allocator_free_list_free_all
     ADD_TEST(fn_pf_allocator_free_list_free_all__is_defined);
+
     ADD_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__for_null_param);
+    ADD_TEST(fn_pf_allocator_free_list_free_all__sets_correct_error_message__for_null_param);
 
+    ADD_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__for_null_base_memory_ptr_in_free_list);
+    ADD_TEST(fn_pf_allocator_free_list_free_all__sets_correct_error_message__for_null_base_memory_ptr_in_free_list);
 
+    ADD_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__for_zero_owned_memory_in_free_list);
+    ADD_TEST(fn_pf_allocator_free_list_free_all__sets_correct_error_message__for_zero_owned_memory_in_free_list);
 
+    ADD_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__for_null_ptr_to_pf_malloc);
+    ADD_TEST(fn_pf_allocator_free_list_free_all__sets_correct_error_message__for_null_ptr_to_pf_malloc);
 
+    ADD_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__for_null_ptr_to_pf_realloc);
+    ADD_TEST(fn_pf_allocator_free_list_free_all__sets_correct_error_message__for_null_ptr_to_pf_realloc)
+
+    ADD_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__for_null_ptr_to_pf_free);
+    ADD_TEST(fn_pf_allocator_free_list_free_all__sets_correct_error_message__for_null_ptr_to_pf_free);
+
+    ADD_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__for_successful_use);
+    
     
     // fn pf_allocator_is_power_of_two
     ADD_TEST(fn_pf_allocator_is_power_of_two__is_defined);
