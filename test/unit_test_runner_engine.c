@@ -464,11 +464,13 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_initialize__sets_memory_values_correctly);
     ADD_TEST(fn_pf_allocator_free_list_initialize__after_initialization_allocator_memory_fns_are_usable);
     
-    // fn pf_allocator_provided_memory_free_list_allocator
-    ADD_TEST(fn_pf_allocator_provided_memory_free_list_allocator__is_defined);
-
     // fn pf_allocator_free_list_free_all
     ADD_TEST(fn_pf_allocator_free_list_free_all__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__for_null_param);
+
+
+
+
     
     // fn pf_allocator_is_power_of_two
     ADD_TEST(fn_pf_allocator_is_power_of_two__is_defined);
@@ -505,11 +507,11 @@ int main(void) {
 
 
     // pf_allocator_initialize
-    ADD_TEST(fn_pf_allocator_initialize__is_defined);
-    ADD_TEST(fn_pf_allocator_initialize__returns_correct_error_code__for_null_ptr_to_base_memory);
-    ADD_TEST(fn_pf_allocator_initialize__sets_correct_error_message__for_null_ptr_to_base_memory);
-    ADD_TEST(fn_pf_allocator_initialize__returns_correct_error_code__for_invalid_memory_size);
-    ADD_TEST(fn_pf_allocator_initialize__sets_correct_error_message__for_invalid_memory_size);
+    //ADD_TEST(fn_pf_allocator_initialize__is_defined);
+    //ADD_TEST(fn_pf_allocator_initialize__returns_correct_error_code__for_null_ptr_to_base_memory);
+    //ADD_TEST(fn_pf_allocator_initialize__sets_correct_error_message__for_null_ptr_to_base_memory);
+    //ADD_TEST(fn_pf_allocator_initialize__returns_correct_error_code__for_invalid_memory_size);
+    //ADD_TEST(fn_pf_allocator_initialize__sets_correct_error_message__for_invalid_memory_size);
 
 
 

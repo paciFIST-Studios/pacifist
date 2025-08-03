@@ -2,6 +2,7 @@
 
 // include
 #include <check.h>
+#include "../pftest_utilities.h"
 #include "../../src/memory/allocator/PFAllocator.h"
 
 // stdlib
@@ -116,14 +117,18 @@ START_TEST(fn_pf_allocator_free_list_initialize__sets_correct_error_message__for
     ck_assert_int_eq(pf_allocator_free_list_initialize(NULL, NULL, 0), PFEC_ERROR_NULL_PTR);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
+    char const * expected = "Cannot initialize PFAllocator_FreeList_t without valid ptr to free list allocator!";
+    ck_assert_in_error_buffer(expected);
 
-    char const expected[] = "Cannot initialize PFAllocator_FreeList_t without valid ptr to free list allocator!";
-    size_t const expected_length = pf_strlen(expected);
+    
+    //char const * error_message = pf_get_error();
+    //size_t const error_length = pf_strlen(error_message);
+    //PString_t const error = { .string = (char*)error_message, .length = error_length };
 
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
+    //char const expected[] = "Cannot initialize PFAllocator_FreeList_t without valid ptr to free list allocator!";
+    //size_t const expected_length = pf_strlen(expected);
+
+    //ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
 }
 END_TEST
 
@@ -142,14 +147,8 @@ START_TEST(fn_pf_allocator_free_list_initialize__sets_correct_error_message__for
     ck_assert_int_eq(pf_allocator_free_list_initialize(&allocator, NULL, 0), PFEC_ERROR_NULL_PTR);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length};
-
-    char const expected[] = "Cannot initialize PFAllocator_FreeList_t without valid base_memory ptr!";
-    size_t const expected_length = pf_strlen(expected);
-
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
+    char const * expected = "Cannot initialize PFAllocator_FreeList_t without valid base_memory ptr!";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
@@ -170,14 +169,8 @@ START_TEST(fn_pf_allocator_free_list_initialize__sets_correct_error_message__for
     ck_assert_int_eq(pf_allocator_free_list_initialize(&allocator, memory, 0), PFEC_ERROR_INVALID_LENGTH);
     PF_UNSUPPRESS_ERRORS
 
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length};
-
-    char const expected[] = "Cannot initialize PFAllocator_FreeList_t to zero size!";
-    size_t const expected_length = pf_strlen(expected);
-
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
+    char const * expected = "Cannot initialize PFAllocator_FreeList_t to zero size!";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
@@ -226,21 +219,33 @@ START_TEST(fn_pf_allocator_free_list_initialize__after_initialization_allocator_
 END_TEST
 
 
-// fn pf_allocator_provided_memory_free_list_allocator -------------------------------------------------------
-
-START_TEST(fn_pf_allocator_provided_memory_free_list_allocator__is_defined) {
-    void*(*fptr)(size_t const) = &pf_allocator_provided_memory_free_list_allocator;
-    ck_assert_ptr_nonnull(fptr);
-}
-END_TEST
-
 // fn pf_allocator_free_list_free_all ------------------------------------------------------------------------
 
 START_TEST(fn_pf_allocator_free_list_free_all__is_defined) {
-    void(*fptr)(PFAllocator_FreeList_t*) = pf_allocator_free_list_free_all;
+    int32_t(*fptr)(PFAllocator_FreeList_t*) = pf_allocator_free_list_free_all;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
+
+START_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__for_null_param) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(pf_allocator_free_list_free_all(NULL), PFEC_ERROR_NULL_PTR);
+    PF_UNSUPPRESS_ERRORS
+}
+
+START_TEST(fn_pf_allocator_free_list_free_all__sets_correct_error_message__for_null_param) {
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(pf_allocator_free_list_free_all(NULL), PFEC_ERROR_NULL_PTR);
+    PF_UNSUPPRESS_ERRORS
+
+    char const expected[] = "";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+
+
 
 // fn pf_allocator_is_power_of_two ---------------------------------------------------------------------------
 
@@ -344,68 +349,68 @@ END_TEST
 
 
 
-// fn pf_allocator_initialize --------------------------------------------------------------------------------
-
-START_TEST(fn_pf_allocator_initialize__is_defined) {
-    int32_t(*fptr)(void*, size_t const) = &pf_allocator_initialize;
-    ck_assert_ptr_nonnull(fptr);
-}
-END_TEST
-
-
-START_TEST(fn_pf_allocator_initialize__returns_correct_error_code__for_null_ptr_to_base_memory) {
-    PF_SUPPRESS_ERRORS
-    int32_t const ret = pf_allocator_initialize(NULL, 0);
-    PF_UNSUPPRESS_ERRORS
-    ck_assert_int_eq(ret, PFEC_ERROR_NULL_PTR);
-}
-END_TEST
-
-START_TEST(fn_pf_allocator_initialize__sets_correct_error_message__for_null_ptr_to_base_memory) {
-    pf_clear_error();
-    PF_SUPPRESS_ERRORS
-    pf_allocator_initialize(NULL, 0);
-    PF_UNSUPPRESS_ERRORS
-
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected_error[] = "Null ptr to base memory";
-    size_t const expected_length = pf_strlen(expected_error);
-
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected_error, expected_length));
-}
-END_TEST
-
-START_TEST(fn_pf_allocator_initialize__returns_correct_error_code__for_invalid_memory_size) {
-    size_t const size = 64;
-    uint8_t memory[size];
-    PF_SUPPRESS_ERRORS
-    int32_t const ret = pf_allocator_initialize(memory, 0);
-    PF_UNSUPPRESS_ERRORS
-    ck_assert_int_eq(ret, PFEC_ERROR_INVALID_LENGTH);
-}
-END_TEST
-
-
-START_TEST(fn_pf_allocator_initialize__sets_correct_error_message__for_invalid_memory_size) {
-    uint8_t memory[64];
-    pf_clear_error();
-    PF_SUPPRESS_ERRORS
-    pf_allocator_initialize(memory, 0);
-    PF_UNSUPPRESS_ERRORS
-
-    char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
-    PString_t const error = { .string = (char*)error_message, .length = error_length };
-
-    char const expected_error[] = "Invalid memory size";
-    size_t const expected_length = pf_strlen(expected_error);
-
-    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected_error, expected_length));
-}
-END_TEST
+//// fn pf_allocator_initialize --------------------------------------------------------------------------------
+//
+//START_TEST(fn_pf_allocator_initialize__is_defined) {
+//    int32_t(*fptr)(void*, size_t const) = &pf_allocator_initialize;
+//    ck_assert_ptr_nonnull(fptr);
+//}
+//END_TEST
+//
+//
+//START_TEST(fn_pf_allocator_initialize__returns_correct_error_code__for_null_ptr_to_base_memory) {
+//    PF_SUPPRESS_ERRORS
+//    int32_t const ret = pf_allocator_initialize(NULL, 0);
+//    PF_UNSUPPRESS_ERRORS
+//    ck_assert_int_eq(ret, PFEC_ERROR_NULL_PTR);
+//}
+//END_TEST
+//
+//START_TEST(fn_pf_allocator_initialize__sets_correct_error_message__for_null_ptr_to_base_memory) {
+//    pf_clear_error();
+//    PF_SUPPRESS_ERRORS
+//    pf_allocator_initialize(NULL, 0);
+//    PF_UNSUPPRESS_ERRORS
+//
+//    char const * error_message = pf_get_error();
+//    size_t const error_length = pf_strlen(error_message);
+//    PString_t const error = { .string = (char*)error_message, .length = error_length };
+//
+//    char const expected_error[] = "Null ptr to base memory";
+//    size_t const expected_length = pf_strlen(expected_error);
+//
+//    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected_error, expected_length));
+//}
+//END_TEST
+//
+//START_TEST(fn_pf_allocator_initialize__returns_correct_error_code__for_invalid_memory_size) {
+//    size_t const size = 64;
+//    uint8_t memory[size];
+//    PF_SUPPRESS_ERRORS
+//    int32_t const ret = pf_allocator_initialize(memory, 0);
+//    PF_UNSUPPRESS_ERRORS
+//    ck_assert_int_eq(ret, PFEC_ERROR_INVALID_LENGTH);
+//}
+//END_TEST
+//
+//
+//START_TEST(fn_pf_allocator_initialize__sets_correct_error_message__for_invalid_memory_size) {
+//    uint8_t memory[64];
+//    pf_clear_error();
+//    PF_SUPPRESS_ERRORS
+//    pf_allocator_initialize(memory, 0);
+//    PF_UNSUPPRESS_ERRORS
+//
+//    char const * error_message = pf_get_error();
+//    size_t const error_length = pf_strlen(error_message);
+//    PString_t const error = { .string = (char*)error_message, .length = error_length };
+//
+//    char const expected_error[] = "Invalid memory size";
+//    size_t const expected_length = pf_strlen(expected_error);
+//
+//    ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected_error, expected_length));
+//}
+//END_TEST
 
 
 

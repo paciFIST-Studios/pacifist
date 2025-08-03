@@ -103,9 +103,7 @@ typedef struct PFAllocator_FreeList_t {
 
 int32_t pf_allocator_free_list_initialize(PFAllocator_FreeList_t* pf_free_list, void* base_memory, size_t const size);
 
-void* pf_allocator_provided_memory_free_list_allocator(size_t const size);
-
-void pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list);
+int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list);
 
 int32_t pf_allocator_is_power_of_two(size_t const size);
 
@@ -125,6 +123,21 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     size_t const alignment,
     size_t * padding,
     PFAllocator_FreeListNode_t** previous_node);
+
+
+
+void* pf_allocator_free_list_malloc(size_t const size);
+
+void* pf_allocator_free_list_realloc(void* ptr, size_t const size);
+
+void pf_allocator_free_list_free(void* ptr);
+
+
+
+
+
+
+
 
 
 //  red-black-tree implementation of PFAllocator -------------------------------------------------------------
@@ -158,19 +171,17 @@ void* pf_provided_memory_red_black_tree_allocator(size_t const size);
 
 // generic fns -----------------------------------------------------------------------------------------------
 
-typedef struct PFAllocator_t {
-    void* (*malloc)(size_t const size);
-    void* (*realloc)(void* ptr, size_t const size);
-    void  (*free)(void* ptr);
-
-#ifdef USE_FREE_LIST_IMPLEMENTATION
-    PFAllocator_FreeList_t memory;
-#else
-    PFAllocator__RedBlackTree_t memory;
-#endif
-} PFAllocator_t;
-
-
+//typedef struct PFAllocator_t {
+//    void* (*malloc)(size_t const size);
+//    void* (*realloc)(void* ptr, size_t const size);
+//    void  (*free)(void* ptr);
+//
+//#ifdef USE_FREE_LIST_IMPLEMENTATION
+//    PFAllocator_FreeList_t memory;
+//#else
+//    PFAllocator__RedBlackTree_t memory;
+//#endif
+//} PFAllocator_t;
 
 
 
@@ -182,7 +193,9 @@ typedef struct PFAllocator_t {
 
 
 
-int32_t pf_allocator_initialize(void * base_memory, size_t const size);
+
+
+//int32_t pf_allocator_initialize(void * base_memory, size_t const size);
 
 
 #endif //PF_ALLOCATOR_H

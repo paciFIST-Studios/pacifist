@@ -11,26 +11,11 @@
 #include "../../core/define.h"
 #include "../../core/error.h"
 
-static PFAllocator_t s_allocator = {0};
 
 
 // -----------------------------------------------------------------------------------------------------------
 // PFAllocator_FreeList_t
 // -----------------------------------------------------------------------------------------------------------
-
-
-void* pf_allocator_provided_memory_free_list_allocator(size_t const size) {
-    if (s_allocator.memory.base_memory == NULL || s_allocator.memory.owned_memory == 0){
-        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator is not initialized!");
-        return NULL;
-    }
-    if (s_allocator.memory.used_memory > s_allocator.memory.owned_memory) {
-        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator is using memory it doesn't own!");
-        return NULL;
-    }
-
-    return NULL;
-}
 
 
 
@@ -60,13 +45,32 @@ int32_t pf_allocator_free_list_initialize(PFAllocator_FreeList_t* pf_free_list, 
 
 
 
-
-
-void pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list) {
+int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list) {
     if (pf_free_list == NULL) {
-        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator is not initialized!");
-        return;
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t* pointer is null!");
+        return PFEC_ERROR_NULL_PTR;
     }
+    if (pf_free_list->base_memory == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t has no initialized base memory!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+    if (pf_free_list->owned_memory == 0) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t has invalid owned memory size!");
+        return PFEC_ERROR_INVALID_LENGTH;
+    }
+    if (pf_free_list->pf_malloc == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t->pf_malloc is unexpectedly null!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+    if (pf_free_list->pf_realloc == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t->pf_realloc is unexpectedly null!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+    if (pf_free_list->pf_free == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t->pf_free is unexpectedly null!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+    
 
     // we're not overwriting the beginning of the allocation, b/c this is where
     // the free list struct itself lives
@@ -74,9 +78,9 @@ void pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list) {
     void* pf_free_list_usable_memory_start = (void*)((uint64_t)pf_free_list->base_memory + pf_free_list_size);
 
     // zero out the whole thing immediately, and hope it crashes, if anyone is still using it
-    size_t const owned_memory_size = pf_free_list->owned_memory;
-    for (size_t i = pf_free_list_size; i < owned_memory_size; i++) {
-        uint8_t* ptr = (void*)(pf_free_list->owned_memory + i);
+    size_t const assignable_memory_size = pf_free_list->owned_memory - (uint64_t)pf_free_list_usable_memory_start;
+    for (size_t i = 0; i < assignable_memory_size; i++) {
+        uintptr_t* ptr = (void*)((uint64_t)pf_free_list_usable_memory_start + i);
         *ptr = 0;
     }
 
@@ -86,6 +90,8 @@ void pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list) {
     first_node->block_size = pf_free_list->owned_memory - pf_free_list_size;
     first_node->next = NULL;
     pf_free_list->head = first_node;
+
+    return PFEC_NO_ERROR;
 }
 
 int32_t pf_allocator_is_power_of_two(size_t const size) {
@@ -304,22 +310,22 @@ void* pf_provided_memory_red_black_tree_allocator_allocator(size_t const size) {
 
 
 
-int32_t pf_allocator_initialize(void * base_memory, size_t const size) {
-    if (base_memory == NULL) {
-        PF_LOG_ERROR(PF_ALLOCATOR, "Null ptr to base memory");
-        return PFEC_ERROR_NULL_PTR;
-    }
-    if (size == 0) {
-        PF_LOG_ERROR(PF_ALLOCATOR, "Invalid memory size");
-        return PFEC_ERROR_INVALID_LENGTH;
-    }
-
-#ifdef USE_FREE_LIST_IMPLEMENTATION
-    return pf_allocator_free_list_initialize(&s_allocator.memory, base_memory, size);
-#else
-    return pf_allocator_red_black_tree_initialize(base_memory, size);
-#endif
-}
+//int32_t pf_allocator_initialize(void * base_memory, size_t const size) {
+//    if (base_memory == NULL) {
+//        PF_LOG_ERROR(PF_ALLOCATOR, "Null ptr to base memory");
+//        return PFEC_ERROR_NULL_PTR;
+//    }
+//    if (size == 0) {
+//        PF_LOG_ERROR(PF_ALLOCATOR, "Invalid memory size");
+//        return PFEC_ERROR_INVALID_LENGTH;
+//    }
+//
+//#ifdef USE_FREE_LIST_IMPLEMENTATION
+//    return pf_allocator_free_list_initialize(&s_allocator.memory, base_memory, size);
+//#else
+//    return pf_allocator_red_black_tree_initialize(base_memory, size);
+//#endif
+//}
 
 
 
