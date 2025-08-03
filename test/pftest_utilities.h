@@ -13,7 +13,7 @@
 #include "../src/string/pstring.h"
 
 
-
+// asserts that the supplied string is a substring of the error currently located in the engine error buffer
 static inline void ck_assert_in_error_buffer(char const * expected){
     char const * error_message = pf_get_error();
     size_t const error_length = pf_strlen(error_message);
