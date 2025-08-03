@@ -469,6 +469,13 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_node_get_block_size__returns_correct_block_size__without_disturbing_other_metadata);
     ADD_TEST(fn_pf_allocator_free_list_node_get_block_size__returns_correct_error_code__for_null_ptr_to_node);
     ADD_TEST(fn_pf_allocator_free_list_node_get_block_size__sets_correct_error_message__for_null_ptr_to_node);
+
+    // fn pf_allocator_free_list_node_set_block_size
+    ADD_TEST(fn_pf_allocator_free_list_node_set_block_size__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_node_set_block_size__returns_correct_error_code__for_null_ptr_to_node);
+    ADD_TEST(fn_pf_allocator_free_list_node_set_block_size__sets_correct_error_message__for_null_ptr_to_node);
+    ADD_TEST(fn_pf_allocator_free_list_node_set_block_size__returns_correct_error_code__for_too_large_block_size);
+    ADD_TEST(fn_pf_allocator_free_list_node_set_block_size__sets_correct_error_message__for_too_large_block_size);
     
     // PFAllocator_FreeList_t
     ADD_TEST(struct_PFAllocator_FreeList_t__is_defined);

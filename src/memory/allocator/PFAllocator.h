@@ -86,6 +86,22 @@ typedef struct PFAllocator_FreeListNode_t {
     // the top 5 bits are used for metadata:
     // top bit: 1 = is allocated, 0 = is free
     // next 4 bits: padding before data starts
+    /**
+     * NOTE: we're doing it w/ size_t, in an attempt to make this program
+     *      executable on 32bit and 64bit systems.  On a 64bit system,
+     *      this allocator can deal with single blocks in the petabyte range,
+     *      so I'm just going to completely ignore it.
+     *
+     *      On a 32bit system, the allocator has a max allocation size of
+     *      134,217,727 bytes in a single allocation block.  134(ish) mb
+     *      is still pretty big, but it's conceivable to have something which
+     *      wouldn't fit.  Especially for things like, a texture atlas which
+     *      covers every texture in the game.  In these cases, we'd still be
+     *      able to use an arena allocator to store those objects, or we
+     *      could create some other bespoke allocator which has large node headers,
+     *      and can handle a larger contiguous block of memory.  Either way,
+     *      it feels like this should(TM) be viable for our uses
+     */
     size_t metadata;
 } PFAllocator_FreeListNode_t;
 
@@ -97,7 +113,7 @@ void pf_allocator_free_list_node_set_is_not_allocated(PFAllocator_FreeListNode_t
 
 size_t pf_allocator_free_list_node_get_block_size(PFAllocator_FreeListNode_t const * node);
 
-int32_t pf_allocator_free_list_node_set_block_size(PFAllocator_FreeListNode_t * node);
+int32_t pf_allocator_free_list_node_set_block_size(PFAllocator_FreeListNode_t * node, size_t const block_size);
 
 size_t pf_allocator_free_list_node_padding(PFAllocator_FreeListNode_t* node);
 

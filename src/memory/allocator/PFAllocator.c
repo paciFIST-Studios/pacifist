@@ -58,11 +58,31 @@ size_t pf_allocator_free_list_node_get_block_size(PFAllocator_FreeListNode_t con
     size_t const metadata = node->metadata;
     // this should mask all of the bits, except for the top 5,
     // and it should work for both x64 and x86
-    size_t const mask = ((2ULL << ((sizeof(size_t) * 8) - 5)) - 1);
+    size_t const mask = ((1ULL << ((sizeof(size_t) * 8) - 5)) - 1);
     return metadata & mask;
 }
 
-int32_t pf_allocator_free_list_node_set_block_size(PFAllocator_FreeListNode_t *node) {
+int32_t pf_allocator_free_list_node_set_block_size(PFAllocator_FreeListNode_t * node, size_t const block_size) {
+    if (node == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Null ptr to PFAllocator_FreeListNode_t!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+
+    size_t const all_but_top_five_bits = ((2ULL << ((sizeof(size_t) * 8) - 5)) - 1);
+    if (block_size > all_but_top_five_bits) {
+        // TODO: make a variadic logging macro or something
+        char const * error_message_base = "Cannot set a block size larget than %lu on current platform! Tried to set block_size=%lu";
+        size_t const error_message_base_length = pf_strlen(error_message_base);
+        char error_message[error_message_base_length + 64];
+        sprintf(error_message, error_message_base, all_but_top_five_bits, block_size);
+ 
+        PF_LOG_CRITICAL(PF_ALLOCATOR, error_message);
+        return PFEC_ERROR_OUT_OF_BOUNDS_MEMORY_USE; 
+    }
+    
+    // mask out top 5 bits
+    size_t const mask = ~all_but_top_five_bits;
+    node->metadata &= (mask | block_size);
 
     return PFEC_NO_ERROR;
 }

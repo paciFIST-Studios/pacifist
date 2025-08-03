@@ -7,6 +7,7 @@
 
 // stdlib
 #include <stdlib.h>
+#include <stdio.h>
 // framework
 // engine
 #include "../../src/core/define.h"
@@ -191,7 +192,6 @@ END_TEST
 
 START_TEST(fn_pf_allocator_free_list_node_get_block_size__returns_correct_block_size__without_disturbing_other_metadata) {
     PFAllocator_FreeListNode_t node = {0};
-    // set block size as 64
     size_t const block_size = 64;
     node.metadata = block_size;
     pf_allocator_free_list_node_set_is_allocated(&node);
@@ -204,8 +204,56 @@ END_TEST
 
 // fn pf_allocator_free_list_node_set_block_size -------------------------------------------------------------
 
+START_TEST(fn_pf_allocator_free_list_node_set_block_size__is_defined) {
+    int32_t (*fptr)(PFAllocator_FreeListNode_t*, size_t const) = &pf_allocator_free_list_node_set_block_size;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
 
+START_TEST(fn_pf_allocator_free_list_node_set_block_size__returns_correct_error_code__for_null_ptr_to_node) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(pf_allocator_free_list_node_set_block_size(NULL, 30), PFEC_ERROR_NULL_PTR);
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
 
+START_TEST(fn_pf_allocator_free_list_node_set_block_size__sets_correct_error_message__for_null_ptr_to_node) {
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(pf_allocator_free_list_node_set_block_size(NULL, 30), PFEC_ERROR_NULL_PTR);
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Null ptr to PFAllocator_FreeListNode_t!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_set_block_size__returns_correct_error_code__for_too_large_block_size) {
+    PFAllocator_FreeListNode_t node = {0};
+    PF_SUPPRESS_ERRORS
+    // here, -1 is like SIZE_T_MAX
+    ck_assert_int_eq(pf_allocator_free_list_node_set_block_size(&node, -1), PFEC_ERROR_OUT_OF_BOUNDS_MEMORY_USE);
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_set_block_size__sets_correct_error_message__for_too_large_block_size) {
+    PFAllocator_FreeListNode_t node = {0};
+    size_t const block_size = -1;
+    size_t const all_but_top_five_bits = ((1ULL << ((sizeof(size_t) * 8) - 5)) - 1);
+
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(pf_allocator_free_list_node_set_block_size(&node, -1), PFEC_ERROR_OUT_OF_BOUNDS_MEMORY_USE);
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected1 = "Cannot set a block size larget than";
+    char const * expected2 = " on current platform! Tried to set block_size=";
+
+    ck_assert_in_error_buffer(expected1);
+    ck_assert_in_error_buffer(expected2);
+}
+END_TEST
 
 // struct PFAllocator_FreeList_t -----------------------------------------------------------------------------
 
