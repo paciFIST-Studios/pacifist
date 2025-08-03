@@ -136,7 +136,7 @@ START_TEST(fn_pf_allocator_free_list_node_set_is_allocated__sets_value_correctly
 }
 END_TEST
 
-// fn pf_allocator_free_list_node_set_is_nota_allocated ------------------------------------------------------
+// fn pf_allocator_free_list_node_set_is_not_allocated ------------------------------------------------------
 
 START_TEST(fn_pf_allocator_free_list_node_set_is_not_allocated__is_defined) {
     void(*fptr)(PFAllocator_FreeListNode_t*) = &pf_allocator_free_list_node_set_is_not_allocated;
@@ -162,6 +162,50 @@ START_TEST(fn_pf_allocator_Free_list_node_set_is_not_allocated__sets_value_corre
     ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), FALSE);
 }
 END_TEST
+
+// fn pf_allocator_free_list_node_get_block_size -------------------------------------------------------------
+
+START_TEST(fn_pf_allocator_free_list_node_get_block_size__is_defined) {
+   size_t(*fptr)(PFAllocator_FreeListNode_t const *) = &pf_allocator_free_list_node_get_block_size;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_get_block_size__returns_correct_error_code__for_null_ptr_to_node) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(pf_allocator_free_list_node_get_block_size(NULL), PFEC_ERROR_NULL_PTR);
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_get_block_size__sets_correct_error_message__for_null_ptr_to_node) {
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(pf_allocator_free_list_node_get_block_size(NULL), PFEC_ERROR_NULL_PTR);
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Null ptr to PFAllocator_FreeListNode_t!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_get_block_size__returns_correct_block_size__without_disturbing_other_metadata) {
+    PFAllocator_FreeListNode_t node = {0};
+    // set block size as 64
+    size_t const block_size = 64;
+    node.metadata = block_size;
+    pf_allocator_free_list_node_set_is_allocated(&node);
+    ck_assert_int_ne(node.metadata, 64);
+    size_t const ret = pf_allocator_free_list_node_get_block_size(&node);
+    ck_assert_int_eq(ret, block_size);
+    ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), TRUE);
+}
+END_TEST
+
+// fn pf_allocator_free_list_node_set_block_size -------------------------------------------------------------
+
+
+
 
 // struct PFAllocator_FreeList_t -----------------------------------------------------------------------------
 

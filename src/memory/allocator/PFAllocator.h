@@ -95,7 +95,9 @@ void pf_allocator_free_list_node_set_is_allocated(PFAllocator_FreeListNode_t* no
 
 void pf_allocator_free_list_node_set_is_not_allocated(PFAllocator_FreeListNode_t* node);
 
-size_t pf_allocator_free_list_node_block_size(PFAllocator_FreeListNode_t* node);
+size_t pf_allocator_free_list_node_get_block_size(PFAllocator_FreeListNode_t const * node);
+
+int32_t pf_allocator_free_list_node_set_block_size(PFAllocator_FreeListNode_t * node);
 
 size_t pf_allocator_free_list_node_padding(PFAllocator_FreeListNode_t* node);
 

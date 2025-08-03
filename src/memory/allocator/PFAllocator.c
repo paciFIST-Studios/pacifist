@@ -49,8 +49,22 @@ void pf_allocator_free_list_node_set_is_not_allocated(PFAllocator_FreeListNode_t
     node->metadata &= highest_bit_mask;
 }
 
-size_t pf_allocator_free_list_node_block_size(PFAllocator_FreeListNode_t *node) {
-    return 0;
+size_t pf_allocator_free_list_node_get_block_size(PFAllocator_FreeListNode_t const * node) {
+    if (node == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Null ptr to PFAllocator_FreeListNode_t!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+
+    size_t const metadata = node->metadata;
+    // this should mask all of the bits, except for the top 5,
+    // and it should work for both x64 and x86
+    size_t const mask = ((2ULL << ((sizeof(size_t) * 8) - 5)) - 1);
+    return metadata & mask;
+}
+
+int32_t pf_allocator_free_list_node_set_block_size(PFAllocator_FreeListNode_t *node) {
+
+    return PFEC_NO_ERROR;
 }
 
 size_t pf_allocator_free_list_node_padding(PFAllocator_FreeListNode_t *node) {
