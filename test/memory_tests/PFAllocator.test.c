@@ -194,8 +194,10 @@ START_TEST(fn_pf_allocator_free_list_node_get_block_size__returns_correct_block_
     PFAllocator_FreeListNode_t node = {0};
     size_t const block_size = 64;
     node.metadata = block_size;
+    printf("setting is_allocated\n");
     pf_allocator_free_list_node_set_is_allocated(&node);
     ck_assert_int_ne(node.metadata, 64);
+    printf("getting block size\n");
     size_t const ret = pf_allocator_free_list_node_get_block_size(&node);
     ck_assert_int_eq(ret, block_size);
     ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), TRUE);
@@ -254,6 +256,66 @@ START_TEST(fn_pf_allocator_free_list_node_set_block_size__sets_correct_error_mes
     ck_assert_in_error_buffer(expected2);
 }
 END_TEST
+
+
+START_TEST(fn_pf_allocator_free_list_node_set_block_size__sets_block_size_correctly_and_does_not_disturb_other_bits__when_called) {
+    PFAllocator_FreeListNode_t node = {0};
+
+    for (size_t i = 1; i < 31; i++) {
+        node.metadata = 0;
+        size_t const block_size = 16 * i;
+        //printf("\n\n\n");
+        //printf("Setting block size: %lu\n", block_size);
+        ck_assert_int_eq(pf_allocator_free_list_node_set_block_size(&node, block_size), PFEC_NO_ERROR);
+        ck_assert_int_eq(pf_allocator_free_list_node_get_block_size(&node), block_size);
+    }
+
+
+}
+END_TEST
+
+
+
+// fn pf_allocator_free_list_node_get_padding ----------------------------------------------------------------
+
+START_TEST(fn_pf_allocator_free_list_node_get_padding_is_defined) {
+    size_t (*fptr)(PFAllocator_FreeListNode_t const *) = &pf_allocator_free_list_node_get_padding;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_get_padding__returns_correct_error_code__for_null_ptr_to_node) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(pf_allocator_free_list_node_get_padding(NULL), PFEC_ERROR_NULL_PTR);
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_get_padding__sets_correct_error_message__for_null_ptr_to_node) {
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(pf_allocator_free_list_node_get_padding(NULL), PFEC_ERROR_NULL_PTR);
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Null ptr to PFAllocator_FreeListNode_t!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_get_padding__returns_correct_padding_value__during_correct_use) {
+    for (int32_t i = 0; i < 8; i++) {
+        PFAllocator_FreeListNode_t node = {0};
+        pf_allocator_free_list_node_set_padding(&node, i);
+        pf_allocator_free_list_node_set_block_size(&node, 16 > 16*i ? 16 : 16*i);
+        pf_allocator_free_list_node_set_is_allocated(&node);
+        ck_assert_int_eq(pf_allocator_free_list_node_get_padding(&node), i);
+    }
+}
+END_TEST
+
+// fn pf_allocator_free_list_node_set_padding ----------------------------------------------------------------
+
+
 
 // struct PFAllocator_FreeList_t -----------------------------------------------------------------------------
 

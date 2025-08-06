@@ -10,14 +10,13 @@
 // engine
 
 
-
-
-
 #define USE_PROVIDED_MEMORY 1
 #define USE_FREE_LIST_IMPLEMENTATION 1
 
+#define FREE_LIST_32BIT_MAX_BLOCK_SIZE 0x7FFFFFF
+#define FREE_LIST_64BIT_MAX_BLOCK_SIZE 0x7FFFFFFFFFFFFFF
 
- 
+
 /**
  * PFAllocator is meant to be a general purpose allocator, which
  * seems to replace the normal calls to malloc, realloc, and free
@@ -45,7 +44,6 @@
 
 // sets memory to zero before returning it
 // returns ptr to "new" memory, which is aligned correctly
-// does zero out memory
 // will accommodate several size regimes,
 // will return null for out of memory error
 // will set error message for out of memory error
@@ -115,7 +113,9 @@ size_t pf_allocator_free_list_node_get_block_size(PFAllocator_FreeListNode_t con
 
 int32_t pf_allocator_free_list_node_set_block_size(PFAllocator_FreeListNode_t * node, size_t const block_size);
 
-size_t pf_allocator_free_list_node_padding(PFAllocator_FreeListNode_t* node);
+size_t pf_allocator_free_list_node_get_padding(PFAllocator_FreeListNode_t const * node);
+
+int32_t pf_allocator_free_list_node_set_padding(PFAllocator_FreeListNode_t* node, size_t const padding);
 
 
 

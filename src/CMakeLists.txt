@@ -97,6 +97,7 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/type/typed_pointer.h
         memory/allocator/PFAllocator.c
         memory/allocator/allocator_utilities.h
+        core/debug.h
         # u,v,w,x,y,z 
 )
 
