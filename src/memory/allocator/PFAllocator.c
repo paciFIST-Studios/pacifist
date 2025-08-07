@@ -13,6 +13,8 @@
 #include "../../core/error.h"
 
 // Defines
+#define BITS_PER_BYTE 8
+
 #define FREE_LIST_32BIT_MAX_BLOCK_SIZE 0x7FFFFFF
 #define FREE_LIST_64BIT_MAX_BLOCK_SIZE 0x7FFFFFFFFFFFFFF
 
@@ -103,18 +105,8 @@ size_t pf_allocator_free_list_node_get_padding(PFAllocator_FreeListNode_t const 
         return PFEC_ERROR_NULL_PTR;
     }
 
-    //printf("\n\nget_padding\n");
-    //DEBUG_PRINT_BITS(node->metadata);
-
-    //printf("expected result (shifted)\n");
-    //DEBUG_PRINT_BITS(node->metadata & FREE_LIST_NODE_METADATA__MASK_PADDING);
-
     size_t const shifted_padding = (node->metadata & FREE_LIST_NODE_METADATA__MASK_PADDING);
-    size_t const padding_shift = sizeof(size_t) * 8 - 5;
-
-    //printf("expected result (unshifted)\n");
-    //DEBUG_PRINT_BITS(shifted_padding >> padding_shift);
-    
+    size_t const padding_shift = (sizeof(size_t) * BITS_PER_BYTE) - FREE_LIST_NODE_METADATA_BITS;
     return shifted_padding >> padding_shift;
 }
 
@@ -124,25 +116,9 @@ int32_t pf_allocator_free_list_node_set_padding(PFAllocator_FreeListNode_t* node
         return PFEC_ERROR_NULL_PTR;
     }
 
-    //printf("\n\nset_padding\n");
-    //printf("padding\n");
-    //DEBUG_PRINT_BITS(padding);
-
-    size_t const padding_shift = sizeof(size_t) * 8 - 5;
+    size_t const padding_shift = (sizeof(size_t) * BITS_PER_BYTE) - FREE_LIST_NODE_METADATA_BITS;
     size_t const shifted_pad_value = padding << padding_shift;
-    //printf("shifted_pad_value\n");
-    //DEBUG_PRINT_BITS(shifted_pad_value);
-
-    //printf("data\n");
-    //DEBUG_PRINT_BITS(node->metadata);
-
-    //printf("expected result\n");
-    //DEBUG_PRINT_BITS(node->metadata | (shifted_pad_value & FREE_LIST_NODE_METADATA__MASK_PADDING));
-    
     node->metadata |= (shifted_pad_value & FREE_LIST_NODE_METADATA__MASK_PADDING);
-    //printf("operation result\n");
-    //DEBUG_PRINT_BITS(node->metadata);
-    
     return PFEC_NO_ERROR;
 }
 
