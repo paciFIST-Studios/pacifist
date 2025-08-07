@@ -12,7 +12,30 @@
 #include "../../core/define.h"
 #include "../../core/error.h"
 
+// Defines
+#define FREE_LIST_32BIT_MAX_BLOCK_SIZE 0x7FFFFFF
+#define FREE_LIST_64BIT_MAX_BLOCK_SIZE 0x7FFFFFFFFFFFFFF
 
+// these masks are pre-computed, b/c it's just too complicated to do it at runtime
+// we can do it at runtime, but the number of bits used this way aren't going to
+// change very often (if ever), so it's just faster and easier to pre-compute
+#define FREE_LIST_NODE_METADATA_BITS 5
+#define FREE_LIST_NODE_METADATA_32BIT_MASK_IS_ALLOCATED 0x80000000
+#define FREE_LIST_NODE_METADATA_64BIT_MASK_IS_ALLOCATED 0x8000000000000000
+#define FREE_LIST_NODE_METADATA_32BIT_MASK_PADDING 0x78000000
+#define FREE_LIST_NODE_METADATA_64BIT_MASK_PADDING 0x7800000000000000
+#define FREE_LIST_NODE_METADATA_32BIT_MASK_BLOCK_SIZE 0x7FFFFFF
+#define FREE_LIST_NODE_METADATA_64BIT_MASK_BLOCK_SIZE 0x7FFFFFFFFFFFFFF
+
+#ifdef ENVIRONMENT_64
+#define FREE_LIST_NODE_METADATA__MASK_IS_ALLOCATED FREE_LIST_NODE_METADATA_64BIT_MASK_IS_ALLOCATED
+#define FREE_LIST_NODE_METADATA__MASK_BLOCK_SIZE FREE_LIST_NODE_METADATA_64BIT_MASK_BLOCK_SIZE
+#define FREE_LIST_NODE_METADATA__MASK_PADDING FREE_LIST_NODE_METADATA_64BIT_MASK_PADDING
+#else
+#define FREE_LIST_NODE_METADATA__MASK_IS_ALLOCATED FREE_LIST_NODE_METADATA_32BIT_MASK_IS_ALLOCATED
+#define FREE_LIST_NODE_METADATA__MASK_BLOCK_SIZE FREE_LIST_NODE_METADATA_32BIT_MASK_BLOCK_SIZE
+#define FREE_LIST_NODE_METADATA__MASK_PADDING FREE_LIST_NODE_METADATA_32BIT_MASK_PADDING
+#endif
 
 // -----------------------------------------------------------------------------------------------------------
 // PFAllocator_FreeList_t
@@ -24,10 +47,8 @@ int32_t pf_allocator_free_list_node_is_allocated(PFAllocator_FreeListNode_t cons
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Null ptr to PFAllocator_FreeListNode_t!");
         return PFEC_ERROR_NULL_PTR;
     }
-    size_t const metadata = node->metadata;
-    //DEBUG_PRINT_BITS(node->metadata);
-    size_t const highest_bit_mask = (size_t) 1 << ((sizeof(size_t) * 8) - 1);
-    return (metadata & highest_bit_mask) == highest_bit_mask;
+
+    return (node->metadata & FREE_LIST_NODE_METADATA__MASK_IS_ALLOCATED) > 0;
 }
 
 void pf_allocator_free_list_node_set_is_allocated(PFAllocator_FreeListNode_t * node) {
@@ -35,12 +56,8 @@ void pf_allocator_free_list_node_set_is_allocated(PFAllocator_FreeListNode_t * n
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Null ptr to PFAllocator_FreeListNode_t!");
         return;
     }
-    DEBUG_PRINT_BITS(node->metadata);
-    size_t const total_metadata_bits = sizeof(size_t) * 8;
-    size_t const mask_shift = total_metadata_bits - 1;
-    size_t const mask = 1UL << mask_shift;
-    node->metadata |= mask;
-    DEBUG_PRINT_BITS(node->metadata);
+    
+    node->metadata |= FREE_LIST_NODE_METADATA__MASK_IS_ALLOCATED;
 }
 
 void pf_allocator_free_list_node_set_is_not_allocated(PFAllocator_FreeListNode_t *node) {
@@ -48,10 +65,7 @@ void pf_allocator_free_list_node_set_is_not_allocated(PFAllocator_FreeListNode_t
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Null ptr to PFAllocator_FreeListNode_t!");
         return;
     }
-    size_t const total_metadata_bits = sizeof(size_t) * 8;
-    size_t const mask_shift = total_metadata_bits - 1;
-    size_t const mask = ~(1ULL << mask_shift);
-    node->metadata &= mask;
+    node->metadata &= ~FREE_LIST_NODE_METADATA__MASK_IS_ALLOCATED;
 }
 
 size_t pf_allocator_free_list_node_get_block_size(PFAllocator_FreeListNode_t const * node) {
@@ -59,22 +73,7 @@ size_t pf_allocator_free_list_node_get_block_size(PFAllocator_FreeListNode_t con
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Null ptr to PFAllocator_FreeListNode_t!");
         return PFEC_ERROR_NULL_PTR;
     }
-
-    // we're not writing to the top 5, b/c that contains padding and is_allocated
-    // should work on x86 and x64
-    size_t const total_metadata_bits = sizeof(size_t) * 8;
-    size_t const mask_shift = total_metadata_bits - 5;
-    size_t mask = (1 << mask_shift);
-    mask |= (1 << (mask_shift + 1));
-    mask |= (1 << (mask_shift + 2));
-    mask |= (1 << (mask_shift + 3));
-    mask |= (1 << (mask_shift + 4));
-
-    
-    DEBUG_PRINT_BITS(mask);
-    DEBUG_PRINT_BITS(node->metadata);
-    DEBUG_PRINT_BITS(node->metadata & mask);
-    return node->metadata & mask;
+    return (node->metadata & FREE_LIST_NODE_METADATA__MASK_BLOCK_SIZE);
 }
 
 int32_t pf_allocator_free_list_node_set_block_size(PFAllocator_FreeListNode_t * node, size_t const block_size) {
@@ -83,23 +82,19 @@ int32_t pf_allocator_free_list_node_set_block_size(PFAllocator_FreeListNode_t * 
         return PFEC_ERROR_NULL_PTR;
     }
 
-    size_t const total_metadata_bits = sizeof(size_t) * 8;
-    size_t const mask_shift = total_metadata_bits - 5;
-    size_t const mask = ~(1ULL << mask_shift);
-    if (block_size > mask) {
-        // TODO: make a variadic logging macro or something
-        char const * error_message_base = "Cannot set a block size larget than %lu on current platform! Tried to set block_size=%lu";
-        size_t const error_message_base_length = pf_strlen(error_message_base);
-        char error_message[error_message_base_length + 64];
-        sprintf(error_message, error_message_base, mask, block_size);
- 
-        PF_LOG_CRITICAL(PF_ALLOCATOR, error_message);
-        return PFEC_ERROR_OUT_OF_BOUNDS_MEMORY_USE; 
+    if (block_size < FREE_LIST_NODE_METADATA__MASK_BLOCK_SIZE) {
+        node->metadata |= (block_size & FREE_LIST_NODE_METADATA__MASK_BLOCK_SIZE);
+        return PFEC_NO_ERROR;
     }
 
-    node->metadata |= (mask & block_size);
+    // TODO: make a variadic logging macro or something
+    char const * error_message_base = "Cannot set a block size larget than %lu on current platform! Tried to set block_size=%lu";
+    size_t const error_message_base_length = pf_strlen(error_message_base);
+    char error_message[error_message_base_length + 64];
+    sprintf(error_message, error_message_base, FREE_LIST_NODE_METADATA__MASK_BLOCK_SIZE, block_size);
 
-    return PFEC_NO_ERROR;
+    PF_LOG_CRITICAL(PF_ALLOCATOR, error_message);
+    return PFEC_ERROR_OUT_OF_BOUNDS_MEMORY_USE; 
 }
 
 size_t pf_allocator_free_list_node_get_padding(PFAllocator_FreeListNode_t const * node) {
@@ -108,20 +103,19 @@ size_t pf_allocator_free_list_node_get_padding(PFAllocator_FreeListNode_t const 
         return PFEC_ERROR_NULL_PTR;
     }
 
-    size_t const total_metadata_bits = sizeof(size_t) * 8;
-    size_t const mask_shift = total_metadata_bits - 5;
-    size_t const mask = (size_t)0xF << mask_shift;
+    //printf("\n\nget_padding\n");
+    //DEBUG_PRINT_BITS(node->metadata);
 
-    printf("mask\n");
-    DEBUG_PRINT_BITS(mask);
+    //printf("expected result (shifted)\n");
+    //DEBUG_PRINT_BITS(node->metadata & FREE_LIST_NODE_METADATA__MASK_PADDING);
 
-    printf("mask & data\n");
-    DEBUG_PRINT_BITS(node->metadata & mask);
+    size_t const shifted_padding = (node->metadata & FREE_LIST_NODE_METADATA__MASK_PADDING);
+    size_t const padding_shift = sizeof(size_t) * 8 - 5;
+
+    //printf("expected result (unshifted)\n");
+    //DEBUG_PRINT_BITS(shifted_padding >> padding_shift);
     
-    //size_t const top_five_bits = ~((1ULL << ((sizeof(size_t) * 8) - 5)) - 1);
-    //size_t const all_but_top_bit = -1 & (size_t) 0 << ((sizeof(size_t) * 8) - 1);
-    //size_t const padding_mask = top_five_bits & all_but_top_bit;
-    return node->metadata & mask;
+    return shifted_padding >> padding_shift;
 }
 
 int32_t pf_allocator_free_list_node_set_padding(PFAllocator_FreeListNode_t* node, size_t const padding) {
@@ -130,23 +124,23 @@ int32_t pf_allocator_free_list_node_set_padding(PFAllocator_FreeListNode_t* node
         return PFEC_ERROR_NULL_PTR;
     }
 
+    //printf("\n\nset_padding\n");
+    //printf("padding\n");
+    //DEBUG_PRINT_BITS(padding);
+
+    size_t const padding_shift = sizeof(size_t) * 8 - 5;
+    size_t const shifted_pad_value = padding << padding_shift;
+    //printf("shifted_pad_value\n");
+    //DEBUG_PRINT_BITS(shifted_pad_value);
+
+    //printf("data\n");
     //DEBUG_PRINT_BITS(node->metadata);
-    size_t const total_metadata_bits = sizeof(size_t) * 8;
-    size_t const padding_shift = total_metadata_bits - 1 - 4;
-    size_t const padding_mask = ((size_t)0xF << padding_shift);
 
-    // by &ing the opposite of this mask, we & a value which is all ones,
-    // except for these four bits.  Any bit which is set, will remain set,
-    // and any bit which is unset, will remain unset.  However, any bit
-    // in the masked range, will become unset (b/c the mask does not set these)
-    node->metadata &= ~padding_mask;
-
-    // any bits from our padding value which are set, will &ed against a
-    // 4 bit mask, to ensure only these bits are used to set the new value.
-    // Then those 4 bits are moved to the correct position.  The destination
-    // bits are already clear, so we can use or-equals to set them, and retain
-    // the content of other bits
-    node-> metadata |= ((padding & 0xF) << padding_shift);
+    //printf("expected result\n");
+    //DEBUG_PRINT_BITS(node->metadata | (shifted_pad_value & FREE_LIST_NODE_METADATA__MASK_PADDING));
+    
+    node->metadata |= (shifted_pad_value & FREE_LIST_NODE_METADATA__MASK_PADDING);
+    //printf("operation result\n");
     //DEBUG_PRINT_BITS(node->metadata);
     
     return PFEC_NO_ERROR;

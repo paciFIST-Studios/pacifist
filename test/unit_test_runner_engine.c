@@ -458,11 +458,12 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_node_set_is_allocated__is_defined);
     ADD_TEST(fn_pf_allocator_free_list_node_set_is_allocated__sets_correct_error_message__for_null_ptr_to_node_param);
     ADD_TEST(fn_pf_allocator_free_list_node_set_is_allocated__sets_value_correctly__for_successful_use);
+    ADD_TEST(fn_pf_allocator_free_list_node_set_is_not_allocated__works_correctly_without_distrubing_other_bits__when_called);
 
     // fn pf_allocator_free_list_node_set_is_not_allocated
     ADD_TEST(fn_pf_allocator_free_list_node_set_is_not_allocated__is_defined);
     ADD_TEST(fn_pf_allocator_free_list_node_set_is_not_allocated__sets_correct_error_message__for_null_ptr_to_node);
-    ADD_TEST(fn_pf_allocator_Free_list_node_set_is_not_allocated__sets_value_correctly__for_successful_use);
+    ADD_TEST(fn_pf_allocator_free_list_node_set_is_not_allocated__sets_value_correctly__for_successful_use);
 
     // fn pf_allocator_free_list_node_get_block_size
     ADD_TEST(fn_pf_allocator_free_list_node_get_block_size__is_defined);
@@ -478,11 +479,11 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_node_set_block_size__sets_correct_error_message__for_too_large_block_size);
     ADD_TEST(fn_pf_allocator_free_list_node_set_block_size__sets_block_size_correctly_and_does_not_disturb_other_bits__when_called);
 
-    // fn pf_allocator_free_list_node_get_padding
+    //// fn pf_allocator_free_list_node_get_padding
     ADD_TEST(fn_pf_allocator_free_list_node_get_padding_is_defined);
     ADD_TEST(fn_pf_allocator_free_list_node_get_padding__returns_correct_error_code__for_null_ptr_to_node);
     ADD_TEST(fn_pf_allocator_free_list_node_get_padding__sets_correct_error_message__for_null_ptr_to_node);
-    //ADD_TEST(fn_pf_allocator_free_list_node_get_padding__returns_correct_padding_value__during_correct_use);
+    ADD_TEST(fn_pf_allocator_free_list_node_get_padding__returns_correct_padding_value__during_correct_use);
     
     // PFAllocator_FreeList_t
     ADD_TEST(struct_PFAllocator_FreeList_t__is_defined);

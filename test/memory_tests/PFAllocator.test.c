@@ -99,7 +99,7 @@ END_TEST
 
 START_TEST(fn_pf_allocator_free_list_node_is_allocated__returns_correct_value_for_allocated_node) {
     PFAllocator_FreeListNode_t node = {0};
-    node.metadata |= (size_t) 1 << 63;
+    pf_allocator_free_list_node_set_is_allocated(&node);
     ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), TRUE);
 }
 END_TEST
@@ -131,9 +131,14 @@ END_TEST
 
 START_TEST(fn_pf_allocator_free_list_node_set_is_allocated__sets_value_correctly__for_successful_use) {
     PFAllocator_FreeListNode_t node = {0};
-    ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), FALSE);
-    pf_allocator_free_list_node_set_is_allocated(&node);
-    ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), TRUE);
+
+    for (size_t i = 0; i < 31; i++) {
+        node.metadata = 16*i;
+        ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), FALSE);
+        pf_allocator_free_list_node_set_is_allocated(&node);
+        ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), TRUE);
+    }
+    
 }
 END_TEST
 
@@ -155,7 +160,7 @@ START_TEST(fn_pf_allocator_free_list_node_set_is_not_allocated__sets_correct_err
 }
 END_TEST
 
-START_TEST(fn_pf_allocator_Free_list_node_set_is_not_allocated__sets_value_correctly__for_successful_use) {
+START_TEST(fn_pf_allocator_free_list_node_set_is_not_allocated__sets_value_correctly__for_successful_use) {
     PFAllocator_FreeListNode_t node = {0};
     node.metadata |= (size_t) 1 << 63;
     ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), TRUE);
@@ -163,6 +168,31 @@ START_TEST(fn_pf_allocator_Free_list_node_set_is_not_allocated__sets_value_corre
     ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), FALSE);
 }
 END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_set_is_not_allocated__works_correctly_without_distrubing_other_bits__when_called) {
+    PFAllocator_FreeListNode_t node = {0};
+    // size_t is unsigned, so -1 will wrap around, making it the largest possible number,
+    // that number is: all bits are 1
+    node.metadata = -1;
+    ck_assert_int_eq(node.metadata, ((size_t)-1));
+
+    // the highest bit holds is_allocated information, and it is 1 right now
+    pf_allocator_free_list_node_set_is_not_allocated(&node);
+    // now, the highest bit should be zero, and all the others are 1
+
+    // this mask, produces a 1 in the highest bit, with all others being zero
+#ifdef ENVIRONMENT_64
+    size_t const mask = 1ULL << 63;
+#else
+    size_t const mask 1UL << 31;
+#endif
+
+    // we compare against the opposite of the mask, making the highest bit zero,
+    // and all other bits 1
+    ck_assert_int_eq(node.metadata, ~mask);
+}
+END_TEST
+
 
 // fn pf_allocator_free_list_node_get_block_size -------------------------------------------------------------
 
@@ -192,15 +222,18 @@ END_TEST
 
 START_TEST(fn_pf_allocator_free_list_node_get_block_size__returns_correct_block_size__without_disturbing_other_metadata) {
     PFAllocator_FreeListNode_t node = {0};
-    size_t const block_size = 64;
-    node.metadata = block_size;
-    printf("setting is_allocated\n");
-    pf_allocator_free_list_node_set_is_allocated(&node);
-    ck_assert_int_ne(node.metadata, 64);
-    printf("getting block size\n");
-    size_t const ret = pf_allocator_free_list_node_get_block_size(&node);
-    ck_assert_int_eq(ret, block_size);
-    ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), TRUE);
+    size_t const bit_size_block_size = sizeof(size_t) - 5;
+
+    for (size_t i = 1; i < bit_size_block_size; i++) {
+        size_t const block_size = 16*i;
+        node.metadata = block_size;
+        ck_assert_int_eq(node.metadata, block_size);
+        pf_allocator_free_list_node_set_is_allocated(&node);
+        ck_assert_int_ne(node.metadata, block_size);
+
+        size_t const ret = pf_allocator_free_list_node_get_block_size(&node);
+        ck_assert_int_eq(ret, block_size);
+    }
 }
 END_TEST
 
@@ -306,8 +339,11 @@ START_TEST(fn_pf_allocator_free_list_node_get_padding__returns_correct_padding_v
     for (int32_t i = 0; i < 8; i++) {
         PFAllocator_FreeListNode_t node = {0};
         pf_allocator_free_list_node_set_padding(&node, i);
+        ck_assert_int_eq(pf_allocator_free_list_node_get_padding(&node), i);
         pf_allocator_free_list_node_set_block_size(&node, 16 > 16*i ? 16 : 16*i);
+        ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), FALSE);
         pf_allocator_free_list_node_set_is_allocated(&node);
+        ck_assert_int_eq(pf_allocator_free_list_node_is_allocated(&node), TRUE);
         ck_assert_int_eq(pf_allocator_free_list_node_get_padding(&node), i);
     }
 }
