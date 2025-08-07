@@ -70,12 +70,36 @@ static char const GLOBAL_TYPE_STRING__META_DATA_REFLECTION_TEST_STRUCT2_T[] = "M
 static char const GLOBAL_TYPE_STRING__META_DATA_REGISTRY_CONST_PTR_T[] = "MetaDataRegistry_const_ptr_t";
 static char const GLOBAL_TYPE_STRING__META_DATA_REGISTRY_PTR_T[] = "MetaDataRegistry_ptr_t";
 static char const GLOBAL_TYPE_STRING__META_DATA_REGISTRY_T[] = "MetaDataRegistry_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_FREE_LIST_ALLOCATION_HEADER_CONST_PTR_T[] = "PFAllocator_FreeListAllocationHeader_const_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_FREE_LIST_ALLOCATION_HEADER_PTR_T[] = "PFAllocator_FreeListAllocationHeader_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_FREE_LIST_ALLOCATION_HEADER_T[] = "PFAllocator_FreeListAllocationHeader_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_FREE_LIST_NODE_CONST_PTR_T[] = "PFAllocator_FreeListNode_const_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_FREE_LIST_NODE_PTR_T[] = "PFAllocator_FreeListNode_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_FREE_LIST_NODE_T[] = "PFAllocator_FreeListNode_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_FREE_LIST_CONST_PTR_T[] = "PFAllocator_FreeList_const_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_FREE_LIST_PTR_T[] = "PFAllocator_FreeList_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_FREE_LIST_T[] = "PFAllocator_FreeList_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_RED_BLACK_TREE_ALLOCATION_HEADER_CONST_PTR_T[] = "PFAllocator_RedBlackTreeAllocationHeader_const_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_RED_BLACK_TREE_ALLOCATION_HEADER_PTR_T[] = "PFAllocator_RedBlackTreeAllocationHeader_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_RED_BLACK_TREE_ALLOCATION_HEADER_T[] = "PFAllocator_RedBlackTreeAllocationHeader_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_RED_BLACK_TREE_NODE_CONST_PTR_T[] = "PFAllocator_RedBlackTreeNode_const_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_RED_BLACK_TREE_NODE_PTR_T[] = "PFAllocator_RedBlackTreeNode_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_RED_BLACK_TREE_NODE_T[] = "PFAllocator_RedBlackTreeNode_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_RED_BLACK_TREE_CONST_PTR_T[] = "PFAllocator_RedBlackTree_const_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_RED_BLACK_TREE_PTR_T[] = "PFAllocator_RedBlackTree_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_RED_BLACK_TREE_T[] = "PFAllocator_RedBlackTree_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_CONST_PTR_T[] = "PFAllocator_const_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_PTR_T[] = "PFAllocator_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFALLOCATOR_T[] = "PFAllocator_t";
 static char const GLOBAL_TYPE_STRING__PFENGINE_STATE_CONST_PTR_T[] = "PFEngineState_const_ptr_t";
 static char const GLOBAL_TYPE_STRING__PFENGINE_STATE_PTR_T[] = "PFEngineState_ptr_t";
 static char const GLOBAL_TYPE_STRING__PFENGINE_STATE_T[] = "PFEngineState_t";
 static char const GLOBAL_TYPE_STRING__PFLOG_CATEGORY_CONST_PTR_T[] = "PFLogCategory_const_ptr_t";
 static char const GLOBAL_TYPE_STRING__PFLOG_CATEGORY_PTR_T[] = "PFLogCategory_ptr_t";
 static char const GLOBAL_TYPE_STRING__PFLOG_CATEGORY_T[] = "PFLogCategory_t";
+static char const GLOBAL_TYPE_STRING__PFSTRING_INTERNMENT_SINGLETON_CONST_PTR_T[] = "PFStringInternmentSingleton_const_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFSTRING_INTERNMENT_SINGLETON_PTR_T[] = "PFStringInternmentSingleton_ptr_t";
+static char const GLOBAL_TYPE_STRING__PFSTRING_INTERNMENT_SINGLETON_T[] = "PFStringInternmentSingleton_t";
 static char const GLOBAL_TYPE_STRING__PSTRING_CONST_PTR_T[] = "PString_const_ptr_t";
 static char const GLOBAL_TYPE_STRING__PSTRING_PTR_T[] = "PString_ptr_t";
 static char const GLOBAL_TYPE_STRING__PSTRING_T[] = "PString_t";
@@ -91,9 +115,6 @@ static char const GLOBAL_TYPE_STRING__SNAKE_GAME_STATE_T[] = "SnakeGameState_t";
 static char const GLOBAL_TYPE_STRING__STRING_COPY_FUNCTION_CONST_PTR_T[] = "StringCopyFunction_const_ptr_t";
 static char const GLOBAL_TYPE_STRING__STRING_COPY_FUNCTION_PTR_T[] = "StringCopyFunction_ptr_t";
 static char const GLOBAL_TYPE_STRING__STRING_COPY_FUNCTION_T[] = "StringCopyFunction_t";
-static char const GLOBAL_TYPE_STRING__STRING_INTERNMENT_SINGLETON_CONST_PTR_T[] = "StringInternmentSingleton_const_ptr_t";
-static char const GLOBAL_TYPE_STRING__STRING_INTERNMENT_SINGLETON_PTR_T[] = "StringInternmentSingleton_ptr_t";
-static char const GLOBAL_TYPE_STRING__STRING_INTERNMENT_SINGLETON_T[] = "StringInternmentSingleton_t";
 static char const GLOBAL_TYPE_STRING__TYPED_PTR_CONST_PTR_T[] = "TypedPtr_const_ptr_t";
 static char const GLOBAL_TYPE_STRING__TYPED_PTR_PTR_T[] = "TypedPtr_ptr_t";
 static char const GLOBAL_TYPE_STRING__TYPED_PTR_T[] = "TypedPtr_t";
@@ -190,12 +211,36 @@ typedef enum EProjectDataTypes_t {	EPDT__Undefined_t,
 	EPDT__MetaDataRegistry_const_ptr_t,
 	EPDT__MetaDataRegistry_ptr_t,
 	EPDT__MetaDataRegistry_t,
+	EPDT__PFAllocator_FreeListAllocationHeader_const_ptr_t,
+	EPDT__PFAllocator_FreeListAllocationHeader_ptr_t,
+	EPDT__PFAllocator_FreeListAllocationHeader_t,
+	EPDT__PFAllocator_FreeListNode_const_ptr_t,
+	EPDT__PFAllocator_FreeListNode_ptr_t,
+	EPDT__PFAllocator_FreeListNode_t,
+	EPDT__PFAllocator_FreeList_const_ptr_t,
+	EPDT__PFAllocator_FreeList_ptr_t,
+	EPDT__PFAllocator_FreeList_t,
+	EPDT__PFAllocator_RedBlackTreeAllocationHeader_const_ptr_t,
+	EPDT__PFAllocator_RedBlackTreeAllocationHeader_ptr_t,
+	EPDT__PFAllocator_RedBlackTreeAllocationHeader_t,
+	EPDT__PFAllocator_RedBlackTreeNode_const_ptr_t,
+	EPDT__PFAllocator_RedBlackTreeNode_ptr_t,
+	EPDT__PFAllocator_RedBlackTreeNode_t,
+	EPDT__PFAllocator_RedBlackTree_const_ptr_t,
+	EPDT__PFAllocator_RedBlackTree_ptr_t,
+	EPDT__PFAllocator_RedBlackTree_t,
+	EPDT__PFAllocator_const_ptr_t,
+	EPDT__PFAllocator_ptr_t,
+	EPDT__PFAllocator_t,
 	EPDT__PFEngineState_const_ptr_t,
 	EPDT__PFEngineState_ptr_t,
 	EPDT__PFEngineState_t,
 	EPDT__PFLogCategory_const_ptr_t,
 	EPDT__PFLogCategory_ptr_t,
 	EPDT__PFLogCategory_t,
+	EPDT__PFStringInternmentSingleton_const_ptr_t,
+	EPDT__PFStringInternmentSingleton_ptr_t,
+	EPDT__PFStringInternmentSingleton_t,
 	EPDT__PString_const_ptr_t,
 	EPDT__PString_ptr_t,
 	EPDT__PString_t,
@@ -211,9 +256,6 @@ typedef enum EProjectDataTypes_t {	EPDT__Undefined_t,
 	EPDT__StringCopyFunction_const_ptr_t,
 	EPDT__StringCopyFunction_ptr_t,
 	EPDT__StringCopyFunction_t,
-	EPDT__StringInternmentSingleton_const_ptr_t,
-	EPDT__StringInternmentSingleton_ptr_t,
-	EPDT__StringInternmentSingleton_t,
 	EPDT__TypedPtr_const_ptr_t,
 	EPDT__TypedPtr_ptr_t,
 	EPDT__TypedPtr_t,
