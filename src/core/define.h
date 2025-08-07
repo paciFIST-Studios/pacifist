@@ -3,6 +3,32 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
+
+#if _WIN32 || _WIN64
+#define IS_WINDOWS_SYSTEM
+#else
+#if __GNUC__
+#define IS_NIX_SYSTEM
+#endif
+#endif
+
+#ifdef IS_WINDOWS_SYSTEM
+#if _WIN64
+#define ENVIRONMENT_64
+#else
+#define ENVIRONMENT_32
+#endif
+#endif
+
+#ifdef IS_NIX_SYSTEM
+#if __x86_64__ || __ppc64__
+#define ENVIRONMENT_64
+#else
+#define ENVIRONMENT_32
+#endif
+#endif
+
+
 // Common Types --------------------------------------------------------------------------------------------------------
 
 // use of LongLong (LL) indicates to most compilers that this is 64 bit.
