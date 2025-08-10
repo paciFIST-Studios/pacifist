@@ -44,6 +44,14 @@
 //
 //global_variable FILE* gpLogFile = NULL;
 
+
+static SDL_Window* s_sdl_program_window = NULL;
+static SDL_Renderer* s_sdl_renderer = NULL;
+
+static SDL_Surface* s_sdl_surface = NULL;
+static SDL_Texture* s_sdl_texture = NULL;
+
+
 static size_t const s_application_memory_size = Mebibytes(64);
 static MemoryArena_t* s_program_lifetime_memory_arena = NULL;
 
@@ -112,45 +120,35 @@ void deallocate_application_memory(void* memory, size_t const size) {
 
 
 int32_t try_initialize_video_systems() {
-#if _WIN32
-   SetProcessDPIAware();
-#endif
 
+   // initialize SDL video system
    if (SDL_Init(SDL_INIT_VIDEO) == FALSE) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize SDL!",
          SDL_GetError(), NULL);
       return FALSE;
    }
 
-   //char const * glsl_version = "#version 130";
-   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+   // create and initialize main window
+   {
+      SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+      s_sdl_program_window= SDL_CreateWindow("paciFIST Studios", 828, 988, windowFlags);
 
-   SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
-   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-   //SDL_DisplayMode* currentDisplayMode;
-   //SDL_GetCurrentDisplayMode(0, currentDisplayMode);
-   //float main_scale = igImGUI_ImplSDL3_GetContentScaleForDisplay(0);
-   SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
-
-   SDL_Window* pMainWindow = SDL_CreateWindow("paciFIST Studios", 1280, 720, windowFlags);
-
-   if (pMainWindow == NULL) {
-      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Could initialzie main window!", SDL_GetError(), NULL);
-      return FALSE;
+      if (s_sdl_program_window== NULL) {
+         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize main window!", SDL_GetError(), NULL);
+         return FALSE;
+      }
    }
 
-   //SDL_GLContext glContext = SDL_GL_CreateContext(pMainWindow);
-   SDL_GL_SetSwapInterval(1);
+   // create and initialize renderer
+   {
+      s_sdl_renderer = SDL_CreateRenderer(s_sdl_program_window, NULL);
+      if (s_sdl_renderer == NULL) {
+         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize renderer!", SDL_GetError(), NULL);
+         SDL_DestroyWindow(s_sdl_program_window);
+         return FALSE;
+      }
+   }
 
-
-   
-   
    return TRUE;
 }
 
@@ -164,15 +162,19 @@ SDL_AppResult SDL_AppInit(void ** appstate, int argc, char* argv[]) {
       return SDL_APP_FAILURE;
    }
    
-   //if (!igDebugCheckVersionAndDataLayout(igGetVersion(), sizeof(ImGuiIO), sizeof(ImGuiStyle),
-   //   sizeof(ImVec2), sizeof(ImVec4), sizeof(ImDrawVert),
-   //   sizeof(ImDrawIdx))){
-   //   SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize CImgui!",
-   //      SDL_GetError(), NULL);
-   //   return SDL_APP_FAILURE;
-   //}
 
+   char const * splash_image_file_path = "/home/ellie/git/paciFIST/src/splash.bmp";
+   s_sdl_surface = SDL_LoadBMP(splash_image_file_path);
+   if (s_sdl_surface == NULL) {
+      printf("Could not load splash image! %s\n", splash_image_file_path);
+   }
 
+   s_sdl_texture = SDL_CreateTextureFromSurface(s_sdl_renderer, s_sdl_surface);
+   if (s_sdl_texture == NULL) {
+      printf("Could not create sdl texture from surface!\n");
+   }
+   SDL_DestroySurface(s_sdl_surface);
+   s_sdl_surface = NULL;
 
 
 
@@ -214,7 +216,10 @@ SDL_AppResult SDL_AppInit(void ** appstate, int argc, char* argv[]) {
 
 
 SDL_AppResult SDL_AppEvent(void * appstate, SDL_Event * event) {
-
+   if (event->type == SDL_EVENT_QUIT) {
+      return SDL_APP_SUCCESS;
+   }
+   
    return SDL_APP_CONTINUE;
 }
 
@@ -223,14 +228,19 @@ SDL_AppResult SDL_AppIterate(void * appstate) {
    SDL_Log("Hey girl! love youu!");
    SDL_Log("You're doing your best!");
 
+   SDL_RenderClear(s_sdl_renderer);
+   SDL_RenderTexture(s_sdl_renderer, s_sdl_texture, NULL, NULL);
+   SDL_RenderPresent(s_sdl_renderer);
+
+   
    return SDL_APP_CONTINUE;
-   // end program
-   //return SDL_APP_SUCCESS;
 }
 
 void SDL_AppQuit(void * appstate, SDL_AppResult result) {
    deallocate_application_memory(s_program_lifetime_memory_arena, s_application_memory_size);
 
+   SDL_DestroyRenderer(s_sdl_renderer);
+   SDL_DestroyWindow(s_sdl_program_window);
 }
 
 
