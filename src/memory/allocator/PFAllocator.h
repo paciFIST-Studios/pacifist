@@ -151,7 +151,7 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_first(
 
 PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     PFAllocator_FreeList_t const * free_list,
-    size_t const list_size,
+    size_t const requested_size,
     size_t const alignment,
     size_t * out_padding,
     PFAllocator_FreeListNode_t** out_previous_node);

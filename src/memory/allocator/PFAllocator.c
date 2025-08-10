@@ -92,7 +92,7 @@ int32_t pf_allocator_free_list_node_set_block_size(PFAllocator_FreeListNode_t * 
     // TODO: make a variadic logging macro or something
     char const * error_message_base = "Cannot set a block size larget than %lu on current platform! Tried to set block_size=%lu";
     size_t const error_message_base_length = pf_strlen(error_message_base);
-    char error_message[error_message_base_length + 64];
+    char error_message[error_message_base_length + 128];
     sprintf(error_message, error_message_base, FREE_LIST_NODE_METADATA__MASK_BLOCK_SIZE, block_size);
 
     PF_LOG_CRITICAL(PF_ALLOCATOR, error_message);
@@ -304,9 +304,10 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_first(
     PFAllocator_FreeListNode_t* prev_node = NULL;
 
     size_t padding = 0;
-    size_t const header_size = sizeof(PFAllocator_FreeListAllocationHeader_t);
-    
+
     while (node != NULL) {
+        size_t const header_size = sizeof(PFAllocator_FreeListAllocationHeader_t);
+        
         padding = pf_allocator_free_list_calculate_padding_and_header(
             (uintptr_t)node,
             (uintptr_t)alignment,
@@ -330,7 +331,7 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_first(
 
 PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     PFAllocator_FreeList_t const * free_list,
-    size_t const requested_sz,
+    size_t const requested_size,
     size_t const alignment,
     size_t* out_padding,
     PFAllocator_FreeListNode_t** out_previous_node)
@@ -347,21 +348,22 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     PFAllocator_FreeListNode_t* best_node = NULL;
 
     size_t padding = 0;
-    size_t const header_size = sizeof(PFAllocator_FreeListAllocationHeader_t);
 
     while (node != NULL) {
+        size_t const header_size = sizeof(PFAllocator_FreeListAllocationHeader_t);
+ 
         padding = pf_allocator_free_list_calculate_padding_and_header(
             (uintptr_t)node,
             (uintptr_t)alignment,
             header_size);
 
-        size_t const required_size = requested_sz + padding;
+        size_t const req_size = requested_size + padding;
         // technically, we are losing part of the information where diff_space would be
         // negative.  However, in this case, required_size would be greater than the
         // block size, so we are still checking against that in the first logical
         // clause here
-        size_t const diff_space = node->metadata - requested_sz;
-        if (node->metadata >= required_size && (diff_space < smallest_diff_space)) {
+        size_t const diff_space = node->metadata - req_size;
+        if (node->metadata >= req_size && (diff_space < smallest_diff_space)) {
             best_node = node;
             smallest_diff_space = diff_space;
         }
