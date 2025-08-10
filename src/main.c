@@ -8,6 +8,10 @@
 #include "SDL3/SDL.h"
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_main.h"
+#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#include "../vendor/cimgui/cimgui.h"
+#include "../vendor/cimgui/cimgui_impl.h"
+
 // engine
 #include "core/define.h"
 #include "core/error.h"
@@ -15,7 +19,19 @@
 #include "log/log.h"
 #include "memory/allocator/MemoryArena.h"
 // game
-#include "_games/snake.h"
+
+
+
+#ifdef IMGUI_HAS_IMSTR
+#define igBegin igBegin_Str
+#define igSliderFloat igSliderFloat_Str
+#define igCheckbox igCheckbox_Str
+#define igColorEdit3 igColorEdit3_Str
+#define igButton igButton_Str
+#endif
+
+#define igGetIO igGetIO_Nil
+
 
 
 
@@ -94,13 +110,73 @@ void deallocate_application_memory(void* memory, size_t const size) {
 }
 
 
-SDL_AppResult SDL_AppInit(void ** appstate, int argc, char* argv[]) {
-    if (SDL_Init(SDL_INIT_VIDEO) == FALSE) {
-       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize SDL!",
-          SDL_GetError(), NULL);
-       return SDL_APP_FAILURE;
-    }   
 
+int32_t try_initialize_video_systems() {
+#if _WIN32
+   SetProcessDPIAware();
+#endif
+
+   if (SDL_Init(SDL_INIT_VIDEO) == FALSE) {
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize SDL!",
+         SDL_GetError(), NULL);
+      return FALSE;
+   }
+
+   //char const * glsl_version = "#version 130";
+   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
+   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
+   SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
+   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+   //SDL_DisplayMode* currentDisplayMode;
+   //SDL_GetCurrentDisplayMode(0, currentDisplayMode);
+   //float main_scale = igImGUI_ImplSDL3_GetContentScaleForDisplay(0);
+   SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+
+   SDL_Window* pMainWindow = SDL_CreateWindow("paciFIST Studios", 1280, 720, windowFlags);
+
+   if (pMainWindow == NULL) {
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Could initialzie main window!", SDL_GetError(), NULL);
+      return FALSE;
+   }
+
+   //SDL_GLContext glContext = SDL_GL_CreateContext(pMainWindow);
+   SDL_GL_SetSwapInterval(1);
+
+
+   
+   
+   return TRUE;
+}
+
+
+
+
+
+SDL_AppResult SDL_AppInit(void ** appstate, int argc, char* argv[]) {
+
+   if (!try_initialize_video_systems()) {
+      return SDL_APP_FAILURE;
+   }
+   
+   //if (!igDebugCheckVersionAndDataLayout(igGetVersion(), sizeof(ImGuiIO), sizeof(ImGuiStyle),
+   //   sizeof(ImVec2), sizeof(ImVec4), sizeof(ImDrawVert),
+   //   sizeof(ImDrawIdx))){
+   //   SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize CImgui!",
+   //      SDL_GetError(), NULL);
+   //   return SDL_APP_FAILURE;
+   //}
+
+
+
+
+
+   
     // this is the only place in the program which should allocate memory
     void* application_memory = allocate_application_memory(s_application_memory_size);
     if (application_memory == NULL) {
@@ -122,11 +198,11 @@ SDL_AppResult SDL_AppInit(void ** appstate, int argc, char* argv[]) {
     // first allocation from within the memory arena is the game state,
     // which includes a pointer to the arena itself,
     // so more things can be allocated from the arena later.
-    SnakeGameState_t * snake_game_state = PUSH_STRUCT(s_program_lifetime_memory_arena, SnakeGameState_t);
-    snake_game_state->program_lifetime_memory_arena = s_program_lifetime_memory_arena;
+    //SnakeGameState_t * snake_game_state = PUSH_STRUCT(s_program_lifetime_memory_arena, SnakeGameState_t);
+    //snake_game_state->program_lifetime_memory_arena = s_program_lifetime_memory_arena;
 
-    // since we have a pointer to the arena living inside the game state, just set the game state as the app state
-    *appstate = snake_game_state;
+    //// since we have a pointer to the arena living inside the game state, just set the game state as the app state
+    //*appstate = snake_game_state;
 
 
 
@@ -147,8 +223,9 @@ SDL_AppResult SDL_AppIterate(void * appstate) {
    SDL_Log("Hey girl! love youu!");
    SDL_Log("You're doing your best!");
 
+   return SDL_APP_CONTINUE;
    // end program
-   return SDL_APP_SUCCESS;
+   //return SDL_APP_SUCCESS;
 }
 
 void SDL_AppQuit(void * appstate, SDL_AppResult result) {

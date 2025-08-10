@@ -33,18 +33,24 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -pedantic")
 # goes in this list too
 # TODO: Update so we automatically get files, but we need an "allow list" and a "block list", and for something to be included it needs to be on the "allow list" and NOT on the "block list":w
 set(ENGINE_LIB_SOURCE_FILES
-        
+        # _games/littlest_necromancer
+        ${CMAKE_CURRENT_SOURCE_DIR}/_games/littlest_necromancer.h
         # _games/snake
         ${CMAKE_CURRENT_SOURCE_DIR}/_games/snake.h
-        
+
+
         # algo
         ${CMAKE_CURRENT_SOURCE_DIR}/algo/search.h
         ${CMAKE_CURRENT_SOURCE_DIR}/algo/search.c
         # bit
         ${CMAKE_CURRENT_SOURCE_DIR}/bit/bitfield.h
+        # config
+        ${CMAKE_CURRENT_SOURCE_DIR}/config/PFConfigurationFileParser.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/config/PFConfigurationParser.c
         # core 
         ${CMAKE_CURRENT_SOURCE_DIR}/core/assert.h
         ${CMAKE_CURRENT_SOURCE_DIR}/core/common.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/core/debug.h
         ${CMAKE_CURRENT_SOURCE_DIR}/core/define.h
         ${CMAKE_CURRENT_SOURCE_DIR}/core/error.h
         ${CMAKE_CURRENT_SOURCE_DIR}/core/error.c
@@ -64,9 +70,13 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log.c
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log_category.h
         # memory
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/type/typed_pointer.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/PFAllocator.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/allocator_utilities.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/handle/PFMemoryHandle.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/QuickHashTable.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/CompactHashTable.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/CompactHashTable.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/PFCompactHashTable.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/PFCompactHashTable.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/list/LinkedList.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/list/LinkedList.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/HashTable.h
@@ -80,24 +90,20 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/os/path.h
         ${CMAKE_CURRENT_SOURCE_DIR}/os/os_utility.h
         ${CMAKE_CURRENT_SOURCE_DIR}/os/os_utility.c
-        # parsers
-        ${CMAKE_CURRENT_SOURCE_DIR}/parsers/ConfigFileParser.h
-        # project_types.h
+        # project data types
         ${CMAKE_CURRENT_SOURCE_DIR}/project_data_types.h
         # q
         # reflection
         ${CMAKE_CURRENT_SOURCE_DIR}/reflection/metadata_reflection_system.c
         ${CMAKE_CURRENT_SOURCE_DIR}/reflection/metadata_reflection_system.h
+        # resource
+        ${CMAKE_CURRENT_SOURCE_DIR}/resource/PFResourceManager.h
         # string
         ${CMAKE_CURRENT_SOURCE_DIR}/string/PFStringInternmentSingleton.h
         ${CMAKE_CURRENT_SOURCE_DIR}/string/PFStringInternmentSingleton.c
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.h
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.c
         # type
-        ${CMAKE_CURRENT_SOURCE_DIR}/type/typed_pointer.h
-        memory/allocator/PFAllocator.c
-        memory/allocator/allocator_utilities.h
-        core/debug.h
         # u,v,w,x,y,z 
 )
 
