@@ -89,7 +89,7 @@ char * global_module;
 #include "../test/log_tests/log.test.c"
 
 // Memory
-#include "../test/memory_tests/CompactHashTable.test.c"
+#include "../test/memory_tests/PFCompactHashTable.test.c"
 #include "../test/memory_tests/HashTable.test.c"
 #include "../test/memory_tests/LinkedList.test.c"
 #include "../test/memory_tests/MemoryArena.test.c"

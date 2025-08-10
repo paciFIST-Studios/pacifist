@@ -2,7 +2,7 @@
 
 // include
 #include <check.h>
-#include "../../src/memory/hash_table/CompactHashTable.h"
+#include "../../src/memory/hash_table/PFCompactHashTable.h"
 
 // stdlib
 #include <stdlib.h>

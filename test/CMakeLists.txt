@@ -31,7 +31,7 @@ set(TEST_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/algo_tests/search.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/bit/bitfield.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/RedBlackTree.test.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/CompactHashTable.test.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/PFCompactHashTable.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/HashTable.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/LinkedList.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/MemoryArena.test.c
