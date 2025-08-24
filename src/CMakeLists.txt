@@ -34,7 +34,8 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -pedantic")
 # TODO: Update so we automatically get files, but we need an "allow list" and a "block list", and for something to be included it needs to be on the "allow list" and NOT on the "block list":w
 set(ENGINE_LIB_SOURCE_FILES
         # _games/littlest_necromancer
-        ${CMAKE_CURRENT_SOURCE_DIR}/_games/littlest_necromancer.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/_games/LittlestNecromancer/LittlestNecromancer.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/_games/LittlestNecromancer/LNGameMode.h
         # _games/snake
         ${CMAKE_CURRENT_SOURCE_DIR}/_games/snake.h
 
@@ -62,7 +63,7 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/PFEngineState.h
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/PFEngineState.c
         # f,g,h
-        # io
+        # imgui
         # j,k
         # log
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log_utility.h

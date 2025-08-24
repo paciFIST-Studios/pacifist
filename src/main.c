@@ -4,13 +4,32 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 // framework
+
+//#include <GL/glew.h>
+
 #define SDL_MAIN_USE_CALLBACKS 1
-#include "SDL3/SDL.h"
-#include "SDL3/SDL_init.h"
-#include "SDL3/SDL_main.h"
-#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
-#include "../vendor/cimgui/cimgui.h"
-#include "../vendor/cimgui/cimgui_impl.h"
+#define SDL_ENABLE_OLD_NAMES
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_init.h>
+#include <SDL3/SDL_main.h>
+#include <SDL3/SDL_opengles2.h>
+#include <SDL3_image/SDL_image.h>
+#include <SDL3_ttf/SDL_ttf.h>
+#include <SDL3_mixer/SDL_mixer.h>
+
+// nuklear imgui
+//#define NK_INCLUDE_FIXED_TYPES
+//#define NK_INCLUDE_STANDARD_IO
+//#define NK_INCLUDE_STANDARD_VARARGS
+//#define NK_INCLUDE_DEFAULT_ALLOCATOR
+//#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
+//#define NK_INCLUDE_FONT_BAKING
+//#define NK_INCLUDE_DEFAULT_FONT
+//#define NK_IMPLEMENTATION
+//#define NK_SDL_RENDERER_IMPLEMENTATION
+//#include "imgui/nuklear.h"
+//#include "imgui/pf_nuklear_sdl3_renderer.h"
+
 
 // engine
 #include "core/define.h"
@@ -21,35 +40,21 @@
 // game
 
 
-
-#ifdef IMGUI_HAS_IMSTR
-#define igBegin igBegin_Str
-#define igSliderFloat igSliderFloat_Str
-#define igCheckbox igCheckbox_Str
-#define igColorEdit3 igColorEdit3_Str
-#define igButton igButton_Str
-#endif
-
-#define igGetIO igGetIO_Nil
-
-
-
-
 /** NOTE:   With SDL3, initialization has changed to a callback system,
  *          and no longer uses the int main fn entry point.
  *
  */
-//global_variable SDL_Window* gpWindow = NULL;
-//global_variable SDL_Renderer* gpRenderer = NULL;
-//
-//global_variable FILE* gpLogFile = NULL;
-
+#define WINDOW_RES_X 1280
+#define WINDOW_RES_Y 720
+#define WINDOW_CENTER_X 640
+#define WINDOW_CENTER_y 360
 
 static SDL_Window* s_sdl_program_window = NULL;
 static SDL_Renderer* s_sdl_renderer = NULL;
 
 static SDL_Surface* s_sdl_surface = NULL;
 static SDL_Texture* s_sdl_texture = NULL;
+
 
 
 static size_t const s_application_memory_size = Mebibytes(64);
@@ -118,8 +123,7 @@ void deallocate_application_memory(void* memory, size_t const size) {
 }
 
 
-
-int32_t try_initialize_video_systems() {
+int32_t try_initialize_video_systems(void) {
 
    // initialize SDL video system
    if (SDL_Init(SDL_INIT_VIDEO) == FALSE) {
@@ -128,15 +132,16 @@ int32_t try_initialize_video_systems() {
       return FALSE;
    }
 
+
    // create and initialize main window
    {
       SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
-      s_sdl_program_window= SDL_CreateWindow("paciFIST Studios", 828, 988, windowFlags);
-
+      s_sdl_program_window = SDL_CreateWindow("paciFIST Studios", WINDOW_RES_X, WINDOW_RES_Y, windowFlags);
       if (s_sdl_program_window== NULL) {
          SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize main window!", SDL_GetError(), NULL);
          return FALSE;
       }
+
    }
 
    // create and initialize renderer
@@ -152,7 +157,34 @@ int32_t try_initialize_video_systems() {
    return TRUE;
 }
 
+int32_t try_initialize_sdl_image(void) {
+   return TRUE;
+}
 
+int32_t try_initialize_sdl_font(void){
+   return TRUE;
+}
+
+int32_t try_initialize_sdl_audio(void) {
+   return TRUE;
+}
+
+int32_t try_initialize_nuklear(void) {
+//   s_nk_context = nk_sdl_init(s_sdl_program_window, s_sdl_renderer);
+//   const size_t max_memory = 1024 * 16;
+//   nk_init_fixed(s_nk_context, calloc(1, max_memory), max_memory, NULL);
+//
+//   if (nk_begin(s_nk_context, "test_window", nk_rect(0, 0, 200, 200), 0)) {
+//      nk_layout_row_static(s_nk_context, 30, 80, 1);
+//      if (nk_button_label(s_nk_context, "button")) {
+//         PF_LOG_VERBOSE(PF_APPLICATION, "button pressed!");
+//      }
+//   }
+
+
+   
+   return TRUE;
+}
 
 
 
@@ -161,8 +193,24 @@ SDL_AppResult SDL_AppInit(void ** appstate, int argc, char* argv[]) {
    if (!try_initialize_video_systems()) {
       return SDL_APP_FAILURE;
    }
-   
 
+   if (!try_initialize_sdl_image()) {
+      return SDL_APP_FAILURE;
+   }
+
+   if (!try_initialize_sdl_font()) {
+      return SDL_APP_FAILURE;
+   }
+
+   if(!try_initialize_sdl_audio()) {
+      return SDL_APP_FAILURE;
+   }
+
+   if (!try_initialize_nuklear()) {
+      return SDL_APP_FAILURE;
+   }
+
+   
    char const * splash_image_file_path = "/home/ellie/git/paciFIST/src/splash.bmp";
    s_sdl_surface = SDL_LoadBMP(splash_image_file_path);
    if (s_sdl_surface == NULL) {
@@ -219,17 +267,27 @@ SDL_AppResult SDL_AppEvent(void * appstate, SDL_Event * event) {
    if (event->type == SDL_EVENT_QUIT) {
       return SDL_APP_SUCCESS;
    }
+   if (event->type == SDL_EVENT_KEY_DOWN) {
+      if (event->key.key == SDLK_ESCAPE) {
+         return SDL_APP_SUCCESS;
+      }
+   }
    
    return SDL_APP_CONTINUE;
 }
 
 
 SDL_AppResult SDL_AppIterate(void * appstate) {
-   SDL_Log("Hey girl! love youu!");
-   SDL_Log("You're doing your best!");
+   //SDL_Log("Hey girl! love youu!");
+   //SDL_Log("You're doing your best!");
 
    SDL_RenderClear(s_sdl_renderer);
-   SDL_RenderTexture(s_sdl_renderer, s_sdl_texture, NULL, NULL);
+   SDL_FRect destination_rect;
+   destination_rect.w = 828;
+   destination_rect.h = 988;
+   destination_rect.x = WINDOW_CENTER_X - (destination_rect.w / 2);
+   destination_rect.y = 0;
+   SDL_RenderTexture(s_sdl_renderer, s_sdl_texture, NULL, &destination_rect);
    SDL_RenderPresent(s_sdl_renderer);
 
    
@@ -237,6 +295,8 @@ SDL_AppResult SDL_AppIterate(void * appstate) {
 }
 
 void SDL_AppQuit(void * appstate, SDL_AppResult result) {
+   //nk_end(s_nk_context);
+   
    deallocate_application_memory(s_program_lifetime_memory_arena, s_application_memory_size);
 
    SDL_DestroyRenderer(s_sdl_renderer);

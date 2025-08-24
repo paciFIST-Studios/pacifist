@@ -103,6 +103,19 @@ char * global_module;
 #include "../test/string_tests/PString.test.c"
 #include "../test/string_tests/PFStringInternmentSingleton.test.c"
 
+
+
+// Game Tests
+
+// LittlestNecromancer
+#include "../test/_game/LittlestNecromancer_tests/LNGameMode.test.c"
+
+
+
+
+
+
+
 int main(void) {
     /*  Setting NO_FORK here allows us to ensure that check does not spin up child processes to handle
      *  test execution.  One the one hand, this means we're now running the tests serially (I guess),
@@ -118,6 +131,7 @@ int main(void) {
     printf("Using GNUC compiler\n\n");
 #endif
 
+    printf("\n\n---------------------\n| Engine Code Tests |\n---------------------\n\n");
     
     int fail_count = 0;
     
@@ -735,6 +749,50 @@ int main(void) {
     // End String Test Suite                                              //
     // -------------------------------------------------------------------//
 
+
+
+    // -------------------------------------------------------------------//
+    //                                                                    //
+    // -------------------------------------------------------------------//
+    //                                                                    //
+    // -------------------------------------------------------------------//
+    //                                                                    //
+    // -------------------------------------------------------------------//
+    //                                                                    //
+    // -------------------------------------------------------------------//
+
+    printf("\n\n-----------------------\n| Gameplay Code Tests |\n-----------------------\n\n");
+
+
+    
+    // -------------------------------------------------------------------//
+    // Start LittlestNecromancer Test Suite                               //
+    // -------------------------------------------------------------------//
+
+    BUILD_SUITE("Littlest Necromancer");
+
+    //---------------//
+    // ELNGameMode_t //
+    //---------------//
+
+    ADD_TEST(fn_enum_ELNGameMode_t__is_defined);
+
+
+
+
+
+
+    
+    RUN_SUITE(fail_count);
+    
+    // -------------------------------------------------------------------//
+    // End LittlestNecromancer Test Suite                                 //
+    // -------------------------------------------------------------------//
+
+
+
+
+    
 
     
 

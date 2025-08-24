@@ -11,7 +11,7 @@
 // struct PFEngineState_t ------------------------------------------------------------------------------------
 
 START_TEST(fn_struct_PFEngineState_t__is_defined) {
-    PFEngineState_t const engine_state;
+    PFEngineState_t const engine_state = {0};
     ck_assert_ptr_nonnull(&engine_state);
 }
 
