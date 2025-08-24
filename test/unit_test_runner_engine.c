@@ -769,15 +769,32 @@ int main(void) {
     // Start LittlestNecromancer Test Suite                               //
     // -------------------------------------------------------------------//
 
-    BUILD_SUITE("Littlest Necromancer");
+    printf("Littlest Necromancer\n\n");
+    
+    BUILD_SUITE("ELNGameMode_t");
 
     //---------------//
     // ELNGameMode_t //
     //---------------//
 
     ADD_TEST(fn_enum_ELNGameMode_t__is_defined);
-
-
+    ADD_TEST(fn_enum_ELNGameMode_t__has_expected_number_of_states);
+    ADD_TEST(fn_enum_ELNGameMode_t__application_startup_value__is_defined);
+    ADD_TEST(fn_enum_ELNGameMode_t__application_main_menu_value__is_defined);
+    ADD_TEST(fn_enum_ELNGameMode_t__application_demo_value__is_defined);
+    ADD_TEST(fn_enum_ELNGameMode_t__application_loading_value__is_defined);
+    ADD_TEST(fn_enum_ELNGameMode_t__application_settings_value__is_defined);
+    ADD_TEST(fn_enum_ELNGameMode_t__application_about_value__is_defined);
+    ADD_TEST(fn_enum_ELNGameMode_t__gameplay_value__is_defined);
+    ADD_TEST(fn_enum_ELNGameMode_t__gameplay_pause_value__is_defined);
+    ADD_TEST(fn_enum_ELNGameMode_t__gameplay_character_creator_value__is_defined);
+    ADD_TEST(fn_enum_ELNGameMode_t__gameplay_decorate_area_value__is_defined);
+    ADD_TEST(fn_enum_ELNGameMode_t__gameplay_dialogue_value__is_defined);
+    ADD_TEST(fn_enum_ELNGameMode_t__gameplay_inventory_value__is_defined);
+    ADD_TEST(fn_enum_ELNGameMode_t__gameplay_npc_friends_value__is_defined);
+    ADD_TEST(fn_enum_ELNGameMode_t__gameplay_quest_tracker_value__is_defined);
+    ADD_TEST(fn_enum_ELNGameMode_t__gameplay_trade_value__is_defined);
+    ADD_TEST(fn_enum_ELNGameMode_t__gameplay_world_map_navigation_value__is_defined);
 
 
 

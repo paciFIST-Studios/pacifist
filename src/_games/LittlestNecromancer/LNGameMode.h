@@ -18,21 +18,30 @@ typedef enum ELNGameMode_t{
     ELNGM_APPLICATION_SETTINGS,
     /* In this state, the application allows the user to interact with the about screen */
     ELNGM_APPLICATION_ABOUT,
-    /* In this state, gameplay is occurring, but is paused */
-    ELNGM_GAMEPLAY_PAUSE,
-    /* In this state, gameplay is occurring, and the PlayerCharacter is navigating the world map */
-    ELNGM_GAMEPLAY_WORLD_MAP_NAVIGATION,
     /* In this state, gameplay is occurring, and the PlayerCharacter can perform various gameplay interactions */
     ELNGM_GAMEPLAY,
-    /* In this state, gameplay is occurring, but a dialogue is playing. */
-    ELNGM_GAMEPLAY_DIALOGUE,
-    /* In this state, gameplay is occurring, but the PlayerCharacter is at a shop */
-    ELNGM_GAMEPLAY_SHOP,
+    /* In this state, gameplay is occurring, but is paused */
+    ELNGM_GAMEPLAY_PAUSE,
     /* In this state, gameplay is occurring, but the PlayerCharacter is in Character Creator Mode */
     ELNGM_GAMEPLAY_CHARACTER_CREATOR,
     /* In this state, gameplay is occurring, but decorator mode is active */
-    ELNGM_GAMEPLAY_DECORATOR,
+    ELNGM_GAMEPLAY_DECORATE_AREA,
+    /* In this state, gameplay is occurring, but a dialogue is playing. */
+    ELNGM_GAMEPLAY_DIALOGUE,
+    /* In this state, gameplay is occurring, but an inventory screen is active */
+    ELNGM_GAMEPLAY_INVENTORY,
+    /* In this state, gameplay is occurring, but an NPC friendship screen is active */
+    ELNGM_GAMEPLAY_NPC_FRIENDS,
+    /* In this state, gameplay is occurring, but a quest menu is active */
+    ELNGM_GAMEPLAY_QUEST_TRACKER,
+    /* In this state, gameplay is occurring, but the PlayerCharacter is performing some kind of trade */
+    ELNGM_GAMEPLAY_TRADE,
+    /* In this state, gameplay is occurring, and the PlayerCharacter is navigating the world map */
+    ELNGM_GAMEPLAY_WORLD_MAP_NAVIGATION,
 
+
+    /* this should always come last */ 
+    ELNGM_COUNT
 
 } ELNGameMode_t;
 #endif  //LITTLEST_NECROMANCER_GAME_MODE_H
