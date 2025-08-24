@@ -132,6 +132,13 @@ def parse_files_for_type_symbols(file_paths: list) -> list:
                 if pruned == '':
                     continue
                 
+                # sometimes we're accidentally grabbing a ptr, b/c it's from external code
+                if '*' in pruned:
+                    continue
+                
+                if pruned.lower() == 'nk':
+                    continue
+                
                 if pruned not in type_symbol_results:
                     type_symbol_results.append(pruned)
                     continue
