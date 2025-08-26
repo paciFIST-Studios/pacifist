@@ -104,6 +104,9 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/string/PFStringInternmentSingleton.c
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.h
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.c
+        gui/PFDebugGui.h
+        gui/PFGuiState.h
+        _games/LittlestNecromancer/LittlestNecromancer.c
         # type
         # u,v,w,x,y,z 
 )

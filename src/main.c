@@ -38,7 +38,7 @@
 #include "log/log.h"
 #include "memory/allocator/MemoryArena.h"
 // game
-
+#include "_games/LittlestNecromancer/LittlestNecromancer.h"
 
 /** NOTE:   With SDL3, initialization has changed to a callback system,
  *          and no longer uses the int main fn entry point.
@@ -190,39 +190,39 @@ int32_t try_initialize_nuklear(void) {
 
 SDL_AppResult SDL_AppInit(void ** appstate, int argc, char* argv[]) {
 
-   if (!try_initialize_video_systems()) {
-      return SDL_APP_FAILURE;
-   }
+    if (!try_initialize_video_systems()) {
+       return SDL_APP_FAILURE;
+    }
 
-   if (!try_initialize_sdl_image()) {
-      return SDL_APP_FAILURE;
-   }
+    if (!try_initialize_sdl_image()) {
+       return SDL_APP_FAILURE;
+    }
 
-   if (!try_initialize_sdl_font()) {
-      return SDL_APP_FAILURE;
-   }
+    if (!try_initialize_sdl_font()) {
+       return SDL_APP_FAILURE;
+    }
 
-   if(!try_initialize_sdl_audio()) {
-      return SDL_APP_FAILURE;
-   }
+    if(!try_initialize_sdl_audio()) {
+       return SDL_APP_FAILURE;
+    }
 
-   if (!try_initialize_nuklear()) {
-      return SDL_APP_FAILURE;
-   }
+    if (!try_initialize_nuklear()) {
+       return SDL_APP_FAILURE;
+    }
 
-   
-   char const * splash_image_file_path = "/home/ellie/git/paciFIST/src/splash.bmp";
-   s_sdl_surface = SDL_LoadBMP(splash_image_file_path);
-   if (s_sdl_surface == NULL) {
-      printf("Could not load splash image! %s\n", splash_image_file_path);
-   }
+    
+    char const * splash_image_file_path = "/home/ellie/git/paciFIST/src/splash.bmp";
+    s_sdl_surface = SDL_LoadBMP(splash_image_file_path);
+    if (s_sdl_surface == NULL) {
+       printf("Could not load splash image! %s\n", splash_image_file_path);
+    }
 
-   s_sdl_texture = SDL_CreateTextureFromSurface(s_sdl_renderer, s_sdl_surface);
-   if (s_sdl_texture == NULL) {
-      printf("Could not create sdl texture from surface!\n");
-   }
-   SDL_DestroySurface(s_sdl_surface);
-   s_sdl_surface = NULL;
+    s_sdl_texture = SDL_CreateTextureFromSurface(s_sdl_renderer, s_sdl_surface);
+    if (s_sdl_texture == NULL) {
+       printf("Could not create sdl texture from surface!\n");
+    }
+    SDL_DestroySurface(s_sdl_surface);
+    s_sdl_surface = NULL;
 
 
 
@@ -243,37 +243,88 @@ SDL_AppResult SDL_AppInit(void ** appstate, int argc, char* argv[]) {
    // This struct owns the string internment struct, 
     s_engine_state = PUSH_STRUCT(s_program_lifetime_memory_arena, PFEngineState_t);
 
-   
-    // 
-    // first allocation from within the memory arena is the game state,
-    // which includes a pointer to the arena itself,
-    // so more things can be allocated from the arena later.
-    //SnakeGameState_t * snake_game_state = PUSH_STRUCT(s_program_lifetime_memory_arena, SnakeGameState_t);
-    //snake_game_state->program_lifetime_memory_arena = s_program_lifetime_memory_arena;
+    // create the lifetime state of the game, which has access to the engine state, but isn't the engine state
+    LittlestNecromancerGameLifetimeState_t  * ln_game_state = PUSH_STRUCT(s_program_lifetime_memory_arena,
+       LittlestNecromancerGameLifetimeState_t);
+    littlest_necromancer_game_lifetime_state_initialize(ln_game_state);
 
-    //// since we have a pointer to the arena living inside the game state, just set the game state as the app state
-    //*appstate = snake_game_state;
-
-
-
-
-
+    ln_game_state->program_lifetime_memory_arena = s_program_lifetime_memory_arena;
     
+    // we'll use the game state struct to handle all the calls from outside of the game:
+    // hardware, os, etc
+    *appstate = ln_game_state;
+
     return SDL_APP_CONTINUE; 
 }
 
 
 SDL_AppResult SDL_AppEvent(void * appstate, SDL_Event * event) {
-   if (event->type == SDL_EVENT_QUIT) {
-      return SDL_APP_SUCCESS;
-   }
-   if (event->type == SDL_EVENT_KEY_DOWN) {
-      if (event->key.key == SDLK_ESCAPE) {
-         return SDL_APP_SUCCESS;
-      }
-   }
-   
-   return SDL_APP_CONTINUE;
+    if (appstate == NULL) {
+        PF_LOG_CRITICAL(PF_APPLICATION, "Lost access to application lifetime state!");
+        return SDL_APP_FAILURE;
+    }
+
+    LittlestNecromancerGameLifetimeState_t* ln_game_state = appstate;
+
+    switch (event->type) {
+
+        case SDL_EVENT_QUIT:
+            return SDL_APP_SUCCESS;
+
+        case SDL_EVENT_KEY_DOWN: {
+           if (event->key.key == SDLK_ESCAPE) {
+              return SDL_APP_SUCCESS;
+           }
+
+           if (ln_game_state->pf_handle_key_down != NULL) {
+               ln_game_state->pf_handle_key_down(event->key.key, event->key.mod);
+           } else {
+               PF_LOG_CRITICAL(PF_APPLICATION, "Application is missing function: \"pf_handle_key_down\"!");
+               return SDL_APP_FAILURE;
+           }
+        } break;
+
+        case SDL_EVENT_KEY_UP: {
+            if (ln_game_state->pf_handle_key_up != NULL) {
+                ln_game_state->pf_handle_key_up(event->key.key, event->key.mod);
+            } else {
+                PF_LOG_CRITICAL(PF_APPLICATION, "Application is missing function: \"pf_handle_key_up\"!");
+                return SDL_APP_FAILURE;
+            }
+        } break;
+
+        case SDL_MOUSEMOTION: {
+            if (ln_game_state->pf_handle_mouse_movement != NULL) {
+                ln_game_state->pf_handle_mouse_movement(event->motion.x, event->motion.y);
+            } else {
+                PF_LOG_CRITICAL(PF_APPLICATION, "Application is missing function: \"pf_handle_mouse_movement\"!");
+                return SDL_APP_FAILURE;
+            }
+        } break;
+
+        case SDL_MOUSEBUTTONDOWN: {
+            if (ln_game_state->pf_handle_mouse_down != NULL) {
+                ln_game_state->pf_handle_mouse_down(event->button.button);
+            } else {
+                PF_LOG_CRITICAL(PF_APPLICATION, "Application is missing function: \"pf_handle_mouse_down\"!");
+                return SDL_APP_FAILURE;
+            }
+        } break;
+
+        case SDL_MOUSEBUTTONUP: {
+            if (ln_game_state->pf_handle_mouse_up != NULL) {
+                ln_game_state->pf_handle_mouse_up(event->button.button);
+            } else {
+                PF_LOG_CRITICAL(PF_APPLICATION, "Application is missing function: \"pf_handle_mouse_up\"!");
+                return SDL_APP_FAILURE;
+            }
+        } break;
+
+      default:
+         break;
+    }
+
+    return SDL_APP_CONTINUE;
 }
 
 
