@@ -92,7 +92,7 @@ char * global_module;
 #include "../test/memory_tests/PFCompactHashTable.test.c"
 #include "../test/memory_tests/HashTable.test.c"
 #include "../test/memory_tests/LinkedList.test.c"
-#include "../test/memory_tests/MemoryArena.test.c"
+#include "../test/memory_tests/PFMemoryArena.test.c"
 #include "../test/memory_tests/PFAllocator.test.c"
 #include "../test/memory_tests/RedBlackTree.test.c"
 
@@ -425,12 +425,22 @@ int main(void) {
     ADD_TEST(struct_MemoryArena_t__is_correct_size);
 
     // fn memory_arena_set_bytes_to_zero
-    ADD_TEST(fn_memory_arena_set_bytes_to_zero__is_defined);
-    ADD_TEST(fn_memory_arena_set_bytes_to_zero__does_not_overflow_requested_size);
+    ADD_TEST(fn_pf_memory_arena_set_bytes_to_zero__is_defined);
+    ADD_TEST(fn_pf_memory_arena_set_bytes_to_zero__does_not_overflow_requested_size);
 
     // fn memory_arena_create_with_memory
-    ADD_TEST(fn_memory_arena_create_with_memory__is_defined);
-    ADD_TEST(fn_memory_arena_create_with_memory__uses_memory_to_create_new_arena_correctly);
+    ADD_TEST(fn_pf_memory_arena_create_with_memory__is_defined);
+    ADD_TEST(fn_pf_memory_arena_create_with_memory__uses_memory_to_create_new_arena_correctly);
+
+    // fn pf_memory_arena_push_size
+    ADD_TEST(fn_pf_memory_arena_push_size__is_defined);
+    ADD_TEST(fn_pf_memory_arena_push_size__returns_null__for_null_ptr_to_arena);
+    ADD_TEST(fn_pf_memory_arena_push_size__returns_null__for_not_enough_memory);
+    ADD_TEST(fn_pf_memory_arena_push_size__returns_null__for_zero_request);
+    ADD_TEST(fn_pf_memory_arena_push_size__writes_correct_error__for_null_ptr_to_arena);
+    ADD_TEST(fn_pf_memory_arena_push_size__writes_correct_error__for_not_enough_memory);
+    ADD_TEST(fn_pf_memory_arena_push_size__writes_correct_error__for_zero_request);
+    
     
     //// fn memory_arena_create_with_allocator
     //ADD_TEST(fn_memory_arena_create_with_allocator__is_defined);
@@ -662,12 +672,25 @@ int main(void) {
     //---------------------//
     ADD_TEST(fn_struct_PFResourceManager_t__is_defined);
     ADD_TEST(fn_struct_PFResourceManager_t__has_expected_size);
+
+    // pf_resource_manager_initialize
     ADD_TEST(fn_pf_resource_manager_initialize__is_defined);
+    //ADD_TEST(fn_pf_resource_manager_initialize__initializes_resource_manager_allocator_when_called);
+
+    // pf_resource_manager_register_resource_with_path
     ADD_TEST(fn_pf_resource_manager_register_resource_with_path__is_defined);
+
+    // pf_resource_manager_load_resource_with_name
     ADD_TEST(fn_pf_resource_manager_load_resource_with_name__is_defined);
+
+    // pf_resource_manager_get_resource_with_name
     ADD_TEST(fn_pf_resource_manager_get_resource_with_name__is_defined);
+
+    // pf_resource_manager_unload_resource_with_name
     ADD_TEST(fp_pf_resource_manager_unload_resource_with_name__is_defined);
-    ADD_TEST(fn_pf_resource_manager_unreqigster_resource_with_name__is_defined);
+
+    // pf_resource_manager_unregister_resource_with_name
+    ADD_TEST(fn_pf_resource_manager_unregister_resource_with_name__is_defined);
 
 
 
