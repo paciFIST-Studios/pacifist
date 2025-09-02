@@ -38,7 +38,7 @@
 #include "log/log.h"
 #include "memory/allocator/MemoryArena.h"
 // game
-#include "_games/LittlestNecromancer/LittlestNecromancer.h"
+#include "_games/Slain/Slain.h"
 
 /** NOTE:   With SDL3, initialization has changed to a callback system,
  *          and no longer uses the int main fn entry point.
@@ -52,6 +52,7 @@
 static SDL_Window* s_sdl_program_window = NULL;
 static SDL_Renderer* s_sdl_renderer = NULL;
 
+__attribute__((unused))
 static SDL_Surface* s_sdl_surface = NULL;
 static SDL_Texture* s_sdl_texture = NULL;
 
@@ -60,8 +61,11 @@ static SDL_Texture* s_sdl_texture = NULL;
 static size_t const s_application_memory_size = Mebibytes(64);
 static MemoryArena_t* s_program_lifetime_memory_arena = NULL;
 
+static size_t s_engine_configuration = 0;
+__attribute__((unused))
 static PFEngineState_t * s_engine_state = NULL;
 
+static size_t s_project_configuration = 0;
 
 // TODO: set up cppcheck (installed plugin), cscout, and GCC static analysis, analyzer(goblint)
 // TODO: set up doxygen, to run in all cmake configs
@@ -144,7 +148,7 @@ int32_t try_initialize_video_systems(void) {
 
    }
 
-   // create and initialize renderer
+   // create and initialize software renderer
    {
       s_sdl_renderer = SDL_CreateRenderer(s_sdl_program_window, NULL);
       if (s_sdl_renderer == NULL) {
@@ -186,31 +190,173 @@ int32_t try_initialize_nuklear(void) {
    return TRUE;
 }
 
+int32_t try_read_engine_configuration(int arg_count, char* args[], void* engine_configuration) {
+    return TRUE;
+}
+
+
+int32_t try_read_project_configuration(int arg_count, char* args[], void* project_configuration) {
+    return TRUE;
+}
+
+
+int32_t try_allocate_application_memory(size_t const memory_size, void** out_memory) {
+    if (memory_size == 0) {
+        return FALSE;
+    }
+    
+    // this is the only place in the program which should allocate memory
+    *out_memory = allocate_application_memory(memory_size);
+    if (out_memory == NULL) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+int32_t try_initialize_program_lifetime_allocator(void* program_lifetime_memory, size_t const memory_size, MemoryArena_t** out_arena) {
+    if (program_lifetime_memory == NULL) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "Tried to initialize program lifetime allocator, but got ptr to NULL for program_lifetime_memory!");
+        return FALSE;
+    }
+    if (memory_size == 0) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "Tried to initialize program lifetime allocator, but got memory_size of zero!");
+        return FALSE;
+    }
+
+    // all of our memory is allocated now.  in order to manage it, put in a
+    // memory arena aligned to byte 0
+    *out_arena = memory_arena_create_with_memory(program_lifetime_memory, memory_size);
+    return TRUE;
+}
+
+int32_t try_initialize_engine_state_struct(void* memory_base, PFEngineState_t** out_engine_state_struct) {
+    if (memory_base == NULL) {
+        return FALSE;
+    }
+
+    // first allocation from within the memory area holds the engine state.
+    // This struct owns the string internment struct, 
+    *out_engine_state_struct = PUSH_STRUCT(memory_base, PFEngineState_t);
+    if (out_engine_state_struct == NULL) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+int32_t try_initialize_game_lifetime_state_struct(void* memory, MemoryArena_t* allocator,
+    SlainGameLifetimeState_t** out_game_lifetime_state_struct)
+{
+    if (memory == NULL) {
+        return FALSE;
+    }
+
+    if (allocator == NULL) {
+        return FALSE;
+    }
+    
+    // create the lifetime state of the game, which has access to the engine state, but isn't the engine state
+    SlainGameLifetimeState_t* state = PUSH_STRUCT(memory, SlainGameLifetimeState_t);
+    if (state == NULL) {
+        return FALSE;
+    }
+
+    slain_game_lifetime_state_initialize(state);
+    state->program_lifetime_memory_arena = allocator;
+
+    *out_game_lifetime_state_struct = state;
+
+    return TRUE;
+}
+
+
+
+
+
+
 
 
 SDL_AppResult SDL_AppInit(void ** appstate, int argc, char* argv[]) {
+    // -------------------------------------------------------------------------------------------------------
+    // Systems Init
+    // -------------------------------------------------------------------------------------------------------
 
     if (!try_initialize_video_systems()) {
-       return SDL_APP_FAILURE;
+        PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize video systems!");
+        return SDL_APP_FAILURE;
     }
 
     if (!try_initialize_sdl_image()) {
-       return SDL_APP_FAILURE;
+        PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize SDL_Image!");
+        return SDL_APP_FAILURE;
     }
 
     if (!try_initialize_sdl_font()) {
-       return SDL_APP_FAILURE;
+        PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize SDL_Font!");
+        return SDL_APP_FAILURE;
     }
 
     if(!try_initialize_sdl_audio()) {
-       return SDL_APP_FAILURE;
+        PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize SDL_Audio!");
+        return SDL_APP_FAILURE;
     }
 
     if (!try_initialize_nuklear()) {
-       return SDL_APP_FAILURE;
+        PF_LOG_CRITICAL(PF_APPLICATION, "");
+        return SDL_APP_FAILURE;
     }
 
-    
+    // -------------------------------------------------------------------------------------------------------
+    // Configuration Init
+    // -------------------------------------------------------------------------------------------------------
+
+    if (!try_read_engine_configuration(argc, argv, &s_engine_configuration)) {
+        PF_LOG_CRITICAL(PF_APPLICATION, "Could not read engine configuration!");
+        return SDL_APP_FAILURE;
+    }
+
+    if (!try_read_project_configuration(argc, argv, &s_project_configuration)) {
+        PF_LOG_CRITICAL(PF_APPLICATION, "Could not read project configuration!");
+        return SDL_APP_FAILURE;
+    }
+
+
+    // -------------------------------------------------------------------------------------------------------
+    // Application init
+    // -------------------------------------------------------------------------------------------------------
+
+    void* application_memory = NULL;
+    if (!try_allocate_application_memory(s_application_memory_size, &application_memory)) {
+        PF_LOG_CRITICAL(PF_APPLICATION, "Could not allocation application memory!");
+        return SDL_APP_FAILURE;
+    }
+
+
+    if (!try_initialize_program_lifetime_allocator(application_memory,
+        s_application_memory_size, &s_program_lifetime_memory_arena))
+    {
+        PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize program lifetime allocator!");
+        return SDL_APP_FAILURE;
+    }
+
+
+    if (!try_initialize_engine_state_struct(s_program_lifetime_memory_arena, &s_engine_state)) {
+        PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize engine state struct!");
+        return SDL_APP_FAILURE;
+    }
+
+    SlainGameLifetimeState_t* slain_game_state = NULL;
+    if (!try_initialize_game_lifetime_state_struct(s_program_lifetime_memory_arena,
+        s_program_lifetime_memory_arena, &slain_game_state)) {
+        PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize game lifetime state struct!")
+        return SDL_APP_FAILURE;
+    }
+
+
+    // we'll use the game state struct to handle all the calls from outside of the game:
+    // hardware, os, etc
+    *appstate = slain_game_state;
+
+
     char const * splash_image_file_path = "/home/ellie/git/paciFIST/src/splash.bmp";
     s_sdl_surface = SDL_LoadBMP(splash_image_file_path);
     if (s_sdl_surface == NULL) {
@@ -226,33 +372,9 @@ SDL_AppResult SDL_AppInit(void ** appstate, int argc, char* argv[]) {
 
 
 
-   
-    // this is the only place in the program which should allocate memory
-    void* application_memory = allocate_application_memory(s_application_memory_size);
-    if (application_memory == NULL) {
-       // cannot run program without memory allocation, shutting down
-       return SDL_APP_FAILURE;
-    }
 
-    // all of our memory is allocated now.  in order to manage it, put in a
-    // memory arena aligned to byte 0
-    s_program_lifetime_memory_arena = memory_arena_create_with_memory(
-       application_memory, s_application_memory_size);
 
-   // first allocation from within the memory area holds the engine state.
-   // This struct owns the string internment struct, 
-    s_engine_state = PUSH_STRUCT(s_program_lifetime_memory_arena, PFEngineState_t);
 
-    // create the lifetime state of the game, which has access to the engine state, but isn't the engine state
-    LittlestNecromancerGameLifetimeState_t  * ln_game_state = PUSH_STRUCT(s_program_lifetime_memory_arena,
-       LittlestNecromancerGameLifetimeState_t);
-    littlest_necromancer_game_lifetime_state_initialize(ln_game_state);
-
-    ln_game_state->program_lifetime_memory_arena = s_program_lifetime_memory_arena;
-    
-    // we'll use the game state struct to handle all the calls from outside of the game:
-    // hardware, os, etc
-    *appstate = ln_game_state;
 
     return SDL_APP_CONTINUE; 
 }
@@ -264,7 +386,7 @@ SDL_AppResult SDL_AppEvent(void * appstate, SDL_Event * event) {
         return SDL_APP_FAILURE;
     }
 
-    LittlestNecromancerGameLifetimeState_t* ln_game_state = appstate;
+    SlainGameLifetimeState_t* ln_game_state = appstate;
 
     switch (event->type) {
 
