@@ -37,12 +37,22 @@ typedef struct PFResourceManager_t {
 } PFResourceManager_t;
 
 
+
 int32_t pf_resource_manager_initialize(void* memory, PFResourceManager_t* resource_manager);
 
+
 int32_t pf_resource_manager_register_resource_with_path(PString_t const path, int32_t const bAutoLoadResource);
+
+
 int32_t pf_resource_manager_load_resource_with_name(PString_t const resource_name);
+
+
 void* pf_resource_manager_get_resource_with_name(PString_t const resource_name);
+
+
 int32_t pf_resource_manager_unload_resource_with_name(PString_t const resource_name);
+
+
 int32_t pf_resource_manager_unregister_resource_with_name(PString_t const resource_name);
 
 

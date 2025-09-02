@@ -114,6 +114,7 @@ set(ENGINE_LIB_SOURCE_FILES
         
         ${CMAKE_CURRENT_SOURCE_DIR}/rendering/render.h
         resource/PFManagedResource.h
+        resource/PFResourceManager.c
         # type
         # u,v,w,x,y,z 
 )

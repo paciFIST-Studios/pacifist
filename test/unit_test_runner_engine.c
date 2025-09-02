@@ -662,6 +662,13 @@ int main(void) {
     //---------------------//
     ADD_TEST(fn_struct_PFResourceManager_t__is_defined);
     ADD_TEST(fn_struct_PFResourceManager_t__has_expected_size);
+    ADD_TEST(fn_pf_resource_manager_initialize__is_defined);
+    ADD_TEST(fn_pf_resource_manager_register_resource_with_path__is_defined);
+    ADD_TEST(fn_pf_resource_manager_load_resource_with_name__is_defined);
+    ADD_TEST(fn_pf_resource_manager_get_resource_with_name__is_defined);
+    ADD_TEST(fp_pf_resource_manager_unload_resource_with_name__is_defined);
+    ADD_TEST(fn_pf_resource_manager_unreqigster_resource_with_name__is_defined);
+
 
 
 

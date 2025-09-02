@@ -33,12 +33,26 @@ START_TEST(fn_struct_PFResourceManager_t__has_expected_members) {
 END_TEST
 
 // fn pf_resource_manager_initialize -------------------------------------------------------------------------
+
+START_TEST(fn_pf_resource_manager_initialize__is_defined) {
+    int32_t (*fptr)(void*, PFResourceManager_t*) = pf_resource_manager_initialize;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
     // exists
     // sets up members correctly
     // sets up allocator using provided data
     // correct errors for invalid args
 
 // fn pf_resource_manager_register_resource_with_path --------------------------------------------------------
+
+START_TEST(fn_pf_resource_manager_register_resource_with_path__is_defined) {
+    int32_t (*fptr)(PString_t const, int32_t const) = pf_resource_manager_register_resource_with_path;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
     // doesn't work for non-init
     // works for params
     // correct errors for invalid args
@@ -46,8 +60,24 @@ END_TEST
         // file at path is unrecognized type (load as bytes?)
         // invalid args
 
+// fn pf_resource_manager_load_resource_with_name ------------------------------------------------------------
+
+START_TEST(fn_pf_resource_manager_load_resource_with_name__is_defined) {
+    int32_t (*fptr)(PString_t const) = pf_resource_manager_load_resource_with_name;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
 
 // fn pf_resource_manager_get_resource_with_name -------------------------------------------------------------
+
+START_TEST(fn_pf_resource_manager_get_resource_with_name__is_defined) {
+    void* (*fptr)(PString_t const) = pf_resource_manager_get_resource_with_name;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+
     // doesn't work for non-init
     // returns intelligible value if resource isn't there
     // returns resource if it is there
@@ -58,6 +88,13 @@ END_TEST
 
 
 // fn pf_resource_manager_unload_resource_with_name ----------------------------------------------------------
+
+START_TEST(fp_pf_resource_manager_unload_resource_with_name__is_defined) {
+    int32_t (*fptr)(PString_t const) = pf_resource_manager_unload_resource_with_name;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
     // doesn't work for non-init
     // doesn't work if that resource is not loaded
     // doesn't work if that resource is not registered
@@ -65,6 +102,13 @@ END_TEST
 
 
 // fn pf_resource_manager_unregister_resource_with_name ------------------------------------------------------
+
+START_TEST(fn_pf_resource_manager_unreqigster_resource_with_name__is_defined) {
+    int32_t(*fptr)(PString_t const) = pf_resource_manager_unregister_resource_with_name;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
     // doesn't work for non-init
     // doesn't work if the resource is not registered
     // throws error if resource is loaded, and you call unregister
