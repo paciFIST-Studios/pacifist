@@ -1,7 +1,7 @@
 // paciFIST studios. 2025. MIT License
 
-#ifndef LITTLEST_NECROMANCER_H
-#define LITTLEST_NECROMANCER_H
+#ifndef SLAIN_H
+#define SLAIN_H
 
 // stdlib
 // framework
@@ -12,7 +12,7 @@
 
 
 
-typedef struct LittlestNecromancerGameLifetimeState_t {
+typedef struct SlainGameLifetimeState_t {
     PString_t window_title;
 
     MemoryArena_t * program_lifetime_memory_arena;
@@ -24,12 +24,12 @@ typedef struct LittlestNecromancerGameLifetimeState_t {
     void(*pf_handle_key_down)(uint8_t, uint8_t);
     void(*pf_handle_key_up)(uint8_t, uint8_t);
 
-    
-    
-} LittlestNecromancerGameLifetimeState_t;
 
 
-void littlest_necromancer_game_lifetime_state_initialize(LittlestNecromancerGameLifetimeState_t* ln_game_state);
+} SlainGameLifetimeState_t;
+
+
+void slain_game_lifetime_state_initialize(SlainGameLifetimeState_t* slain_game_state);
 
 
 void pf_handle_mouse_movement(float mouse_x, float mouse_y);
@@ -41,4 +41,4 @@ void pf_handle_key_up(uint8_t key, uint8_t modifiers);
 
 
 
-#endif //LITTLEST_NECROMANCER_H
+#endif //SLAIN_H
