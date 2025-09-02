@@ -75,7 +75,7 @@ PFAllocator_MemoryArena_t* pf_memory_arena_create_with_memory(void* base_memory,
  * @param arena - the PFAllocator_MemoryArena_t being used 
  * @param type - the type of struct being stored here
  */
-#define PF_PUSH_STRUCT(arena, type) (type *) memory_arena_push_size(arena, sizeof(type))
+#define PF_PUSH_STRUCT(arena, type) (type *) pf_memory_arena_push_size(arena, sizeof(type))
 
 /**
  * @brief This macro reserves memory in a PFAllocator_MemoryArena_t, and returns a ptr to that memory
@@ -84,7 +84,7 @@ PFAllocator_MemoryArena_t* pf_memory_arena_create_with_memory(void* base_memory,
  * @param count - how many structs should be stored here
  * @param type - the type of struct being stored here
  */
-#define PF_PUSH_ARRAY(arena, count, type) (type *) memory_arena_push_size(arena, (count) * sizeof(type))
+#define PF_PUSH_ARRAY(arena, count, type) (type *) pf_memory_arena_push_size(arena, (count) * sizeof(type))
 
 
 /**

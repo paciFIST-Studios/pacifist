@@ -259,4 +259,48 @@ START_TEST(fn_pf_memory_arena_push_size__writes_correct_error__for_zero_request)
 END_TEST
 
 
-// correct error for 0 memory
+// macro PF_PUSH_STRUCT --------------------------------------------------------------------------------------
+
+START_TEST(fn_macro_PF_PUSH_STRUCT__works) {
+    // the memory arena struct sits inside this memory
+    size_t const memory_size = sizeof(PFAllocator_MemoryArena_t) + 65;
+    void* memory = malloc(memory_size);
+    PFAllocator_MemoryArena_t* arena = pf_memory_arena_create_with_memory(memory, memory_size);
+    ck_assert_ptr_nonnull(arena);
+
+    void* alloc1 = PF_PUSH_STRUCT(arena, PFAllocator_MemoryArena_t);
+    ck_assert_ptr_nonnull(alloc1);
+    
+    void* alloc2 = PF_PUSH_STRUCT(arena, PFAllocator_MemoryArena_t);
+    ck_assert_ptr_nonnull(alloc2);
+
+    PF_SUPPRESS_ERRORS
+    void* alloc3 = PF_PUSH_STRUCT(arena, PFAllocator_MemoryArena_t);
+    ck_assert_ptr_null(alloc3);
+    PF_UNSUPPRESS_ERRORS
+
+    free(memory);
+}
+END_TEST
+
+
+// macro PF_PUSH_ARRAY ---------------------------------------------------------------------------------------
+
+START_TEST(fn_macro_PF_PUSH_ARRAY__works) {
+    // the memory arena struct sits inside this memory
+    size_t const memory_size = sizeof(PFAllocator_MemoryArena_t) + 8;
+    void* memory = malloc(memory_size);
+    PFAllocator_MemoryArena_t* arena = pf_memory_arena_create_with_memory(memory, memory_size);
+    ck_assert_ptr_nonnull(arena);
+
+    void* alloc1 = PF_PUSH_ARRAY(arena, 7, char);
+    ck_assert_ptr_nonnull(alloc1);
+
+    PF_SUPPRESS_ERRORS
+    void* alloc2 = PF_PUSH_ARRAY(arena, 1, char);
+    PF_UNSUPPRESS_ERRORS
+    ck_assert_ptr_null(alloc2);
+    
+    free(memory);
+}
+END_TEST

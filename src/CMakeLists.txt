@@ -89,7 +89,8 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/list/LinkedList.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/HashTable.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/HashTable.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/MemoryArena.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/PFMemoryArena.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/PFMemoryArena.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/PFAllocator.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/tree/RedBlackTree.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/tree/RedBlackTree.c
@@ -111,10 +112,11 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/string/PFStringInternmentSingleton.c
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.h
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.c
-        
+        # resource
+        ${CMAKE_CURRENT_SOURCE_DIR}/resource/PFManagedResource.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/resource/PFResourceManager.c
+        # rendering
         ${CMAKE_CURRENT_SOURCE_DIR}/rendering/render.h
-        resource/PFManagedResource.h
-        resource/PFResourceManager.c
         # type
         # u,v,w,x,y,z 
 )

@@ -415,6 +415,14 @@ int main(void) {
     ADD_TEST(struct_has_correct_members__LinkedListNode_t);
     ADD_TEST(struct_is_of_correct_size__LinkedListNode_t);
 
+
+
+
+    //------------------------------------------------------------------------------------------------------//
+    // PFAllocator_t                                                                                        //
+    //------------------------------------------------------------------------------------------------------//
+
+
     //-------------//
     // MemoryArena //
     //-------------//
@@ -440,21 +448,12 @@ int main(void) {
     ADD_TEST(fn_pf_memory_arena_push_size__writes_correct_error__for_null_ptr_to_arena);
     ADD_TEST(fn_pf_memory_arena_push_size__writes_correct_error__for_not_enough_memory);
     ADD_TEST(fn_pf_memory_arena_push_size__writes_correct_error__for_zero_request);
-    
-    
-    //// fn memory_arena_create_with_allocator
-    //ADD_TEST(fn_memory_arena_create_with_allocator__is_defined);
 
-    //// fn memory_arena_create
-    //ADD_TEST(fn_memory_arena_create__is_defined);
-    //ADD_TEST(fn_memory_arena_create__returns_MemoryArena_t_with_initialized_settings);
+    // macro PF_PUSH_STRUCT 
+    ADD_TEST(fn_macro_PF_PUSH_STRUCT__works);
 
-    // fn memory_arena_destroy
-    //ADD_TEST(fn_memory_arena_destroy__is_defined);
-
-    //------------------------------------------------------------------------------------------------------//
-    // PFAllocator_t                                                                                        //
-    //------------------------------------------------------------------------------------------------------//
+    // macro PF_PUSH_STRUCT
+    ADD_TEST(fn_macro_PF_PUSH_ARRAY__works);
 
 
     //----------------------//
