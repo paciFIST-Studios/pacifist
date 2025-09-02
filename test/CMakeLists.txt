@@ -45,9 +45,14 @@ set(TEST_LIB_SOURCE_FILES
 
         # type_tests
         ${CMAKE_CURRENT_SOURCE_DIR}/type_tests/TypedPtr.test.c
-        memory_tests/PFAllocator.test.c
-        pftest_utilities.h
-        _game/LittlestNecromancer_tests/LNGameMode.test.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/PFAllocator.test.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/pftest_utilities.h
+
+
+        # game projects
+        ${CMAKE_CURRENT_SOURCE_DIR}/_game/slain_tests/SlainGameMode.test.c
+        resource_tests/PFManagedResource.test.c
+        resource_tests/PFResourceManager.test.c
 )
 
 # the run_unit_tests_engine is an executable that you could just run from the

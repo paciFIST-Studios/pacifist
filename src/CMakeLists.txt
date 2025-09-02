@@ -33,9 +33,11 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -pedantic")
 # goes in this list too
 # TODO: Update so we automatically get files, but we need an "allow list" and a "block list", and for something to be included it needs to be on the "allow list" and NOT on the "block list":w
 set(ENGINE_LIB_SOURCE_FILES
-        # _games/littlest_necromancer
-        ${CMAKE_CURRENT_SOURCE_DIR}/_games/LittlestNecromancer/LittlestNecromancer.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/_games/LittlestNecromancer/LNGameMode.h
+        # _games/slain
+        ${CMAKE_CURRENT_SOURCE_DIR}/_games/Slain/Slain.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/_games/Slain/Slain.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/_games/Slain/SlainGameMode.h
+
         # _games/snake
         ${CMAKE_CURRENT_SOURCE_DIR}/_games/snake.h
 
@@ -62,9 +64,14 @@ set(ENGINE_LIB_SOURCE_FILES
         # engine
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/PFEngineState.h
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/PFEngineState.c
-        # f,g,h
-        # imgui
-        # j,k
+        # f
+
+        # gui
+        ${CMAKE_CURRENT_SOURCE_DIR}/gui/PFDebugGui.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/gui/PFGuiState.h
+
+
+        # h, i, j,k
         # log
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log_utility.h
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log.h
@@ -104,9 +111,9 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/string/PFStringInternmentSingleton.c
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.h
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.c
-        gui/PFDebugGui.h
-        gui/PFGuiState.h
-        _games/LittlestNecromancer/LittlestNecromancer.c
+        
+        ${CMAKE_CURRENT_SOURCE_DIR}/rendering/render.h
+        resource/PFManagedResource.h
         # type
         # u,v,w,x,y,z 
 )

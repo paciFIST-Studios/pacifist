@@ -99,6 +99,10 @@ char * global_module;
 // os
 #include "../test/os_tests/os_utility.test.c"
 
+// resource
+#include "../test/resource_tests/PFManagedResource.test.c"
+#include "../test/resource_tests/PFResourceManager.test.c"
+
 // string
 #include "../test/string_tests/PString.test.c"
 #include "../test/string_tests/PFStringInternmentSingleton.test.c"
@@ -108,7 +112,7 @@ char * global_module;
 // Game Tests
 
 // LittlestNecromancer
-#include "../test/_game/LittlestNecromancer_tests/LNGameMode.test.c"
+#include "../test/_game/slain_tests/SlainGameMode.test.c"
 
 
 
@@ -607,7 +611,7 @@ int main(void) {
 
 
     // -------------------------------------------------------------------//
-    // String Test Suite                                                  //
+    // OS Test Suite                                                      //
     // -------------------------------------------------------------------//
     BUILD_SUITE("OS");
 
@@ -637,9 +641,35 @@ int main(void) {
     
     RUN_SUITE(fail_count); 
     // -------------------------------------------------------------------//
-    // End String Test Suite                                              //
+    // End OS Test Suite                                                  //
     // -------------------------------------------------------------------//
 
+    // -------------------------------------------------------------------//
+    // Start Resource Test Suite                                          //
+    // -------------------------------------------------------------------//
+    BUILD_SUITE("Resource");
+
+    //---------------------//
+    // PFManagedResource_t //
+    //---------------------//
+    ADD_TEST(fn_struct_PFManagedResource_t__is_defined);
+    ADD_TEST(fn_struct_PFManagedResource_t__has_expected_size);
+    ADD_TEST(fn_struct_PFManagedResource_t__has_expected_members);
+
+
+    //---------------------//
+    // PFResourceManager_t //
+    //---------------------//
+    ADD_TEST(fn_struct_PFResourceManager_t__is_defined);
+    ADD_TEST(fn_struct_PFResourceManager_t__has_expected_size);
+
+
+
+    
+    RUN_SUITE(fail_count);
+    // -------------------------------------------------------------------//
+    // End Resource Test Suite                                            //
+    // -------------------------------------------------------------------//
     
 
     // -------------------------------------------------------------------//
@@ -766,18 +796,19 @@ int main(void) {
 
     
     // -------------------------------------------------------------------//
-    // Start LittlestNecromancer Test Suite                               //
+    // Start Slain Test Suite                                             //
     // -------------------------------------------------------------------//
 
-    printf("Littlest Necromancer\n\n");
+    printf("Slain\n\n");
     
-    BUILD_SUITE("ELNGameMode_t");
+    BUILD_SUITE("SlainGameMode_t");
 
     //---------------//
     // ELNGameMode_t //
     //---------------//
-
-    ADD_TEST(fn_enum_ELNGameMode_t__is_defined);
+    // ELLIETODO: Rename
+    
+    ADD_TEST(fn_enum_ESlainGameMode_t__is_defined);
     ADD_TEST(fn_enum_ELNGameMode_t__has_expected_number_of_states);
     ADD_TEST(fn_enum_ELNGameMode_t__application_startup_value__is_defined);
     ADD_TEST(fn_enum_ELNGameMode_t__application_main_menu_value__is_defined);
@@ -803,7 +834,7 @@ int main(void) {
     RUN_SUITE(fail_count);
     
     // -------------------------------------------------------------------//
-    // End LittlestNecromancer Test Suite                                 //
+    // End Slain Test Suite                                               //
     // -------------------------------------------------------------------//
 
 
