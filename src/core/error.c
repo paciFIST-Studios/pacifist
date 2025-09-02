@@ -87,7 +87,7 @@ void pf_build_and_set_error_message(char const * message, char const * file, int
     for(size_t i = 0; i < ERROR_BUFFER_SIZE; i++){ error_message[i] = 0; }
     char dt[22];
     get_datetime_string(dt, 22);
-    sprintf(error_message, "%s:  ERROR %s  --  file: %s[%d]", dt, message, file, line);
+    sprintf(error_message, "%s:  ERROR %s  --  file: %s[%d]\n", dt, message, file, line);
     pf_set_error(error_message, strlen(error_message));
 }
 
