@@ -55,7 +55,7 @@ typedef struct PFAllocator_MemoryArena_t {
  * @param buffer 
  * @param total_bytes 
  */
-void pf_memory_arena_set_bytes_to_zero(void* buffer, size_t const total_bytes);
+void pf_allocator_memory_arena_set_bytes_to_zero(void* buffer, size_t const total_bytes);
 
 
 /**
@@ -66,7 +66,7 @@ void pf_memory_arena_set_bytes_to_zero(void* buffer, size_t const total_bytes);
  * @return 
  */
 __attribute__((unused))
-PFAllocator_MemoryArena_t* pf_memory_arena_create_with_memory(void* base_memory, size_t const total_size);
+PFAllocator_MemoryArena_t* pf_allocator_memory_arena_create_with_memory(void* base_memory, size_t const total_size);
 
 
 /**
@@ -75,7 +75,7 @@ PFAllocator_MemoryArena_t* pf_memory_arena_create_with_memory(void* base_memory,
  * @param arena - the PFAllocator_MemoryArena_t being used 
  * @param type - the type of struct being stored here
  */
-#define PF_PUSH_STRUCT(arena, type) (type *) pf_memory_arena_push_size(arena, sizeof(type))
+#define PF_PUSH_STRUCT(arena, type) (type *) pf_allocator_memory_arena_push_size(arena, sizeof(type))
 
 /**
  * @brief This macro reserves memory in a PFAllocator_MemoryArena_t, and returns a ptr to that memory
@@ -84,7 +84,7 @@ PFAllocator_MemoryArena_t* pf_memory_arena_create_with_memory(void* base_memory,
  * @param count - how many structs should be stored here
  * @param type - the type of struct being stored here
  */
-#define PF_PUSH_ARRAY(arena, count, type) (type *) pf_memory_arena_push_size(arena, (count) * sizeof(type))
+#define PF_PUSH_ARRAY(arena, count, type) (type *) pf_allocator_memory_arena_push_size(arena, (count) * sizeof(type))
 
 
 /**
@@ -95,7 +95,7 @@ PFAllocator_MemoryArena_t* pf_memory_arena_create_with_memory(void* base_memory,
  * @return 
  */
 __attribute__((unused))
-void * pf_memory_arena_push_size(PFAllocator_MemoryArena_t* arena, size_t const size_requested);
+void * pf_allocator_memory_arena_push_size(PFAllocator_MemoryArena_t* arena, size_t const size_requested);
 
 
 #endif //MEMORY_ARENA_H

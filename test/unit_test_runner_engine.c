@@ -518,16 +518,14 @@ int main(void) {
     ADD_TEST(struct_PFAllocator_FreeList_t__has_expected_members);
 
     // fn pf_allocator_free_list_initialize
-    ADD_TEST(fn_pf_allocator_free_list_initialize__is_defined);
-    ADD_TEST(fn_pf_allocator_free_list_initialize__returns_correct_error_code__for_null_free_list_param);
-    ADD_TEST(fn_pf_allocator_free_list_initialize__sets_correct_error_message__for_null_free_list_param);
-    ADD_TEST(fn_pf_allocator_free_list_initialize__returns_correct_error_code__for_null_base_memory_param);
-    ADD_TEST(fn_pf_allocator_free_list_initialize__sets_correct_error_message__for_null_base_memory_param);
-    ADD_TEST(fn_pf_allocator_free_list_initialize__returns_correct_error_code__for_zero_size_param);
-    ADD_TEST(fn_pf_allocator_free_list_initialize__sets_correct_error_message__for_zero_size_param);
-    ADD_TEST(fn_pf_allocator_free_list_initialize__sets_pf_memory_functions__when_used);
-    ADD_TEST(fn_pf_allocator_free_list_initialize__sets_memory_values_correctly);
-    ADD_TEST(fn_pf_allocator_free_list_initialize__after_initialization_allocator_memory_fns_are_usable);
+    ADD_TEST(fn_pf_allocator_free_list_create_with_memory__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_create_with_memory__returns_correct_error_code__for_null_base_memory_param);
+    ADD_TEST(fn_pf_allocator_free_list_create_with_memory__sets_correct_error_message__for_null_base_memory_param);
+    ADD_TEST(fn_pf_allocator_free_list_create_with_memory__returns_correct_error_code__for_zero_size_param);
+    ADD_TEST(fn_pf_allocator_free_list_create_with_memory__sets_correct_error_message__for_zero_size_param);
+    ADD_TEST(fn_pf_allocator_free_list_create_with_memory__sets_pf_memory_functions__when_used);
+    ADD_TEST(fn_pf_allocator_free_list_create_with_memory__sets_memory_values_correctly);
+    ADD_TEST(fn_pf_allocator_free_list_create_with_memory__after_initialization_allocator_memory_fns_are_usable);
     
     // fn pf_allocator_free_list_free_all
     ADD_TEST(fn_pf_allocator_free_list_free_all__is_defined);
@@ -666,6 +664,15 @@ int main(void) {
     ADD_TEST(fn_struct_PFManagedResource_t__has_expected_members);
 
 
+
+    //---------------------------//
+    // PFResourceManagerConfig_t //
+    //---------------------------//
+    ADD_TEST(fn_struct_PFResourceManagerConfiguration_t__is_defined);
+    ADD_TEST(fn_struct_PFResourceManagerConfiguration_t__has_expected_size);
+    ADD_TEST(fn_struct_PFResourceManagerConfiguration_t__has_expected_members);
+    
+
     //---------------------//
     // PFResourceManager_t //
     //---------------------//
@@ -673,7 +680,7 @@ int main(void) {
     ADD_TEST(fn_struct_PFResourceManager_t__has_expected_size);
 
     // pf_resource_manager_initialize
-    ADD_TEST(fn_pf_resource_manager_initialize__is_defined);
+    ADD_TEST(fn_pf_resource_manager_create_with_memory__is_defined);
     //ADD_TEST(fn_pf_resource_manager_initialize__initializes_resource_manager_allocator_when_called);
 
     // pf_resource_manager_register_resource_with_path

@@ -123,19 +123,17 @@ int32_t pf_allocator_free_list_node_set_padding(PFAllocator_FreeListNode_t* node
 }
 
 
-int32_t pf_allocator_free_list_initialize(PFAllocator_FreeList_t* pf_free_list, void* base_memory, size_t const size) {
-    if (pf_free_list == NULL) {
-        PF_LOG_CRITICAL(PF_ALLOCATOR, "Cannot initialize PFAllocator_FreeList_t without valid ptr to free list allocator!");
-        return PFEC_ERROR_NULL_PTR;
-    }
+PFAllocator_FreeList_t* pf_allocator_free_list_create_with_memory(void* base_memory, size_t const size) {
     if (base_memory == NULL) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Cannot initialize PFAllocator_FreeList_t without valid base_memory ptr!")
-        return PFEC_ERROR_NULL_PTR;
+        return NULL;
     }
     if (size == 0) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Cannot initialize PFAllocator_FreeList_t to zero size!");
-        return PFEC_ERROR_INVALID_LENGTH;
+        return NULL;
     }
+
+    PFAllocator_FreeList_t* pf_free_list = base_memory;
 
     // set the memory usage fns
     pf_free_list->pf_malloc = &pf_allocator_free_list_malloc;
@@ -182,7 +180,7 @@ int32_t pf_allocator_free_list_initialize(PFAllocator_FreeList_t* pf_free_list, 
     first_node->metadata = assignable_memory_size - sizeof(PFAllocator_FreeListNode_t);
     first_node->next = NULL;
     pf_free_list->head = first_node;
-    return PFEC_NO_ERROR;
+    return pf_free_list;
 }
 
 
@@ -213,48 +211,20 @@ int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list) {
         return PFEC_ERROR_NULL_PTR;
     }
 
-    return pf_allocator_free_list_initialize(
-        pf_free_list,
-        pf_free_list->base_memory,
-        pf_free_list->base_memory_size);
-    
-    //// does the free-list struct live inside the memory it manages?
-    //int32_t const bFreeListIsInBaseMemory = pf_free_list == pf_free_list->base_memory;
+    void* memory = pf_free_list->base_memory;
+    size_t const size = pf_free_list->base_memory_size;
 
-    //// we're not overwriting the beginning of the allocation, b/c this is where
-    //// the free list struct itself lives
-    //void* assignable_memory_start = NULL;
-    //size_t assignable_memory_size = 0;
+    // zero out all of this memory, entirely
+    for (size_t i = 0; i < size; i++) {
+        size_t const offset = (size_t)memory + i;
+        uint8_t* mem = (void*)offset;
+        *mem = 0;
+    }
 
-    //if (bFreeListIsInBaseMemory) {
-    //    // if the free list lives in its own base memory, then all of the work it does
-    //    // has to skip over the memory occupied by the struct itself.  In that case,
-    //    // both the usable memory and the assignable memory, are smaller than the
-    //    // base memory.
-    //    size_t const pf_free_list_size = sizeof(PFAllocator_FreeList_t);
-    //    assignable_memory_start = (void*)((uint64_t)pf_free_list->base_memory + pf_free_list_size);
-    //    assignable_memory_size = pf_free_list->base_memory_size - pf_free_list_size;
-    //} else {
-    //    // if the free list lives outside of its own base memory, then all of the
-    //    // memory it owns is assignable, and we can just operate on the entire thing
-    //    assignable_memory_start = pf_free_list->base_memory;
-    //    assignable_memory_size = pf_free_list->base_memory_size;
-    //}
+    // re-create on the same memory
+    pf_free_list = pf_allocator_free_list_create_with_memory(memory, size);
 
-    //// zero out the whole thing immediately, and hope it crashes, if anyone is still using it
-    //for (size_t i = 0; i < assignable_memory_size; i++) {
-    //    uintptr_t* ptr = (void*)((uint64_t)assignable_memory_start + i);
-    //    *ptr = 0;
-    //}
-
-    //// memory is now fresh, so just start rebuilding
-    //pf_free_list->used_memory = 0;
-    //PFAllocator_FreeListNode_t* first_node = assignable_memory_start;
-    //first_node->block_size = assignable_memory_size - sizeof(PFAllocator_FreeListNode_t);
-    //first_node->next = NULL;
-    //pf_free_list->head = first_node;
-
-    //return PFEC_NO_ERROR;
+    return PFEC_NO_ERROR;
 }
 
 int32_t pf_allocator_is_power_of_two(size_t const size) {
