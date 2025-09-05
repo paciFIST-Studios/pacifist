@@ -1,7 +1,7 @@
 // paciFIST studios. 2025. MIT License
 
-#ifndef PF_ALLOCATOR_H
-#define PF_ALLOCATOR_H
+#ifndef PF_ALLOCATOR_FREE_LIST_H
+#define PF_ALLOCATOR_FREE_LIST_H
 
 // stdlib
 #include <stddef.h>
@@ -10,33 +10,22 @@
 // engine
 
 
-#define USE_PROVIDED_MEMORY 1
-#define USE_FREE_LIST_IMPLEMENTATION 1
 
 
 
 /**
- * PFAllocator is meant to be a general purpose allocator, which
- * seems to replace the normal calls to malloc, realloc, and free
- * While acting similarly to those fns, PFAllocator has several
- * specific features which set it apart:
+ * PFAllocator_FreeList is meant to be a general purpose allocator,
+ * which replaces use of malloc, realloc, and free.
+ * 
+ * While acting similarly to those fns, PFAllocator_FreeList_t
+ * has several specific features which set it apart:
  *
- *    1. it uses memory for the application arena
+ *    1. it only uses memory it is provided
  *    2. it supports memory compaction
- *    3. it allows access to memory via handles, not pointers
- *        a. the handles can return pointers
- *    4. it uses specific instrumentation, to deliver detailed
+ *    3. it uses specific instrumentation, to deliver detailed
  *        information about existing allocations
- *    5. (GC?)
  *
- * it probably won't be a perfect match, but I'm going to try to have
- * these fns work the same
- * 
- * 
- * 
  * https://www.gingerbill.org/series/memory-allocation-strategies/ 
- * 
- * 
  * 
  */
 
@@ -101,22 +90,81 @@ typedef struct PFAllocator_FreeListNode_t {
     size_t metadata;
 } PFAllocator_FreeListNode_t;
 
+/**
+ * @brief Returns TRUE(1) if the supplied node's metadata marks it as allocated
+ *
+ * @param node 
+ * @return 
+ */
 int32_t pf_allocator_free_list_node_is_allocated(PFAllocator_FreeListNode_t const * node);
 
+/**
+ * @brief Sets the supplied node's metadata to indicate this node IS allocated
+ *
+ * @param node 
+ */
 void pf_allocator_free_list_node_set_is_allocated(PFAllocator_FreeListNode_t* node);
 
+/**
+ * @brief Sets the supplied node's metadata to indicate this node is NOT allocated
+ *
+ * @param node 
+ */
 void pf_allocator_free_list_node_set_is_not_allocated(PFAllocator_FreeListNode_t* node);
 
+/**
+ * @brief Returns the size of this node's memory block, according to its metadata
+ *
+ * @param node 
+ * @return 
+ */
 size_t pf_allocator_free_list_node_get_block_size(PFAllocator_FreeListNode_t const * node);
 
-int32_t pf_allocator_free_list_node_set_block_size(PFAllocator_FreeListNode_t * node, size_t const block_size);
+/**
+ * @brief Sets the size of this node's memory block, and stores the value in the node's metadata
+ *
+ * @param node 
+ * @param block_size 
+ * @return 
+ */
+int32_t pf_allocator_free_list_node_set_block_size(PFAllocator_FreeListNode_t * node, size_t block_size);
 
+
+/**
+ * @brief Gets the amount of padding between the node struct, and the data to which it points
+ *
+ * @param node 
+ * @return 
+ */
 size_t pf_allocator_free_list_node_get_padding(PFAllocator_FreeListNode_t const * node);
 
-int32_t pf_allocator_free_list_node_set_padding(PFAllocator_FreeListNode_t* node, size_t const padding);
+
+/**
+ * @brief Sets the amount of padidng between the node struct, and the data to which it points
+ *
+ * @param node 
+ * @param padding 
+ * @return 
+ */
+int32_t pf_allocator_free_list_node_set_padding(PFAllocator_FreeListNode_t* node, size_t padding);
 
 
-
+/**
+ * @brief This struct organizes the FreeList allocator, and makes available fns needed to use it
+ *
+ * @property    void*   base_memory         - ptr to all memory managed by this allocator,
+ *                                            Note: the allocator itself lives at this address
+ * @property    size_t  base_memory_size    - size of all memory managed by allocator
+ * @property    size_t  used_memory         - size of remaining memory available for allocation
+ *
+ * @property    PFAllocator_FreeListNode_t* head    - head of linked list, containing the allocations =
+ * @property    EAllocationPolicy_FreeList  policy  - first available, or best-match
+ *
+ * @property    void*(*pf_malloc)(size_t size)
+ * @property    void*(*pf_realloc)(void* ptr, size_t size)
+ * @property    void (*pf_free)(void* ptr)
+ * 
+ */
 typedef struct PFAllocator_FreeList_t {
     void * base_memory;
     size_t base_memory_size;
@@ -125,43 +173,105 @@ typedef struct PFAllocator_FreeList_t {
     PFAllocator_FreeListNode_t* head;
     EAllocationPolicy_FreeList policy;
 
-    void* (*pf_malloc)(size_t const size);
-    void* (*pf_realloc)(void* ptr, size_t const size);
-    void  (*pf_free)(void* ptr);
-    
+    void* (*pf_malloc)( struct PFAllocator_FreeList_t* allocator, size_t size);
+    void* (*pf_realloc)(struct PFAllocator_FreeList_t* allocator, void* ptr, size_t size);
+    void  (*pf_free)(   struct PFAllocator_FreeList_t* allocator, void* ptr);
+
 } PFAllocator_FreeList_t;
 
-
+/**
+ * @brief Creates and initializes the allocator, placing it at the base of this memory.
+ * @note Once created, the allocator assumes it controls all of the memory it was created with
+ *
+ * @param base_memory 
+ * @param size 
+ * @return 
+ */
 PFAllocator_FreeList_t* pf_allocator_free_list_create_with_memory(void* base_memory, size_t const size);
 
+/**
+ * @brief - zeroes out all memory managed by this allocator, and resets the allocator to a fresh state 
+ *
+ * @param pf_free_list 
+ * @return 
+ */
 int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list);
 
-int32_t pf_allocator_is_power_of_two(size_t const size);
+/**
+ * @brief Returns TRUE(1), if the size provided is a power of two
+ *
+ * @param size 
+ * @return 
+ */
+int32_t pf_allocator_is_power_of_two(size_t size);
 
+/**
+ * @brief
+ *
+ * @param ptr 
+ * @param alignment 
+ * @param header_size 
+ * @return 
+ */
+size_t pf_allocator_free_list_calculate_padding_and_header(uintptr_t ptr, uintptr_t alignment, size_t header_size);
 
-size_t pf_allocator_free_list_calculate_padding_and_header(uintptr_t const ptr, uintptr_t const alignment, size_t const header_size);
-
+/**
+ * @brief Searches the PFAllocator_FreeList_t for an empty memory block, and takes the first available
+ *
+ * @param free_list 
+ * @param requested_size 
+ * @param alignment 
+ * @param out_padding 
+ * @param out_previous_node 
+ * @return 
+ */
 PFAllocator_FreeListNode_t* pf_allocator_free_list_find_first(
     PFAllocator_FreeList_t const * free_list,
-    size_t const requested_size,
-    size_t const alignment,
+    size_t requested_size,
+    size_t alignment,
     size_t*  out_padding,
     PFAllocator_FreeListNode_t** out_previous_node);
 
+/**
+ * @brief Searches all available memory blocks in a PFAllocator_FreeList_t, and takes the best fit 
+ *
+ * @param free_list 
+ * @param requested_size 
+ * @param alignment 
+ * @param out_padding 
+ * @param out_previous_node 
+ * @return 
+ */
 PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     PFAllocator_FreeList_t const * free_list,
-    size_t const requested_size,
-    size_t const alignment,
+    size_t requested_size,
+    size_t alignment,
     size_t * out_padding,
     PFAllocator_FreeListNode_t** out_previous_node);
 
+/**
+ * @brief a Malloc fn which uses the PFAllocator_FreeList_t 
+ * 
+ * @param size 
+ * @return 
+ */
+void* pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t size);
 
+/**
+ * @brief a Realloc fn which uses the PFAllocator_FreeList_t
+ *
+ * @param ptr 
+ * @param size 
+ * @return 
+ */
+void* pf_allocator_free_list_realloc(PFAllocator_FreeList_t* allocator, void* ptr, size_t size);
 
-void* pf_allocator_free_list_malloc(size_t const size);
-
-void* pf_allocator_free_list_realloc(void* ptr, size_t const size);
-
-void pf_allocator_free_list_free(void* ptr);
+/**
+ * @brief a Free fn which uses the PFAllocator_FreeList_t
+ *
+ * @param ptr 
+ */
+void pf_allocator_free_list_free(PFAllocator_FreeList_t* allocator, void* ptr);
 
 
 
@@ -229,4 +339,4 @@ void* pf_provided_memory_red_black_tree_allocator(size_t const size);
 //int32_t pf_allocator_initialize(void * base_memory, size_t const size);
 
 
-#endif //PF_ALLOCATOR_H
+#endif //PF_ALLOCATOR_FREE_LIST_H

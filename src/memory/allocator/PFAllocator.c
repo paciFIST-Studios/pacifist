@@ -133,51 +133,29 @@ PFAllocator_FreeList_t* pf_allocator_free_list_create_with_memory(void* base_mem
         return NULL;
     }
 
-    PFAllocator_FreeList_t* pf_free_list = base_memory;
+    // this should already be zeroed out, but let's not assume
+    for (size_t i = 0; i < size; i++) {
+        uintptr_t* ptr = (void*)((uint64_t)base_memory + i);
+        *ptr = 0;
+    }
+
+    PFAllocator_FreeList_t* pf_free_list = (PFAllocator_FreeList_t*)base_memory;
+
+    pf_free_list->base_memory = base_memory;
+    pf_free_list->base_memory_size = size;
 
     // set the memory usage fns
     pf_free_list->pf_malloc = &pf_allocator_free_list_malloc;
     pf_free_list->pf_realloc = &pf_allocator_free_list_realloc;
     pf_free_list->pf_free = &pf_allocator_free_list_free;
 
-    pf_free_list->base_memory = base_memory;
-    pf_free_list->base_memory_size = size;
-
-
-
-    // does the free-list struct live inside the memory it manages?
-    int32_t const bFreeListIsInBaseMemory = pf_free_list == pf_free_list->base_memory;
-
-    // we're not overwriting the beginning of the allocation, b/c this is where
-    // the free list struct itself lives
-    void* assignable_memory_start = NULL;
-    size_t assignable_memory_size = 0;
-
-    if (bFreeListIsInBaseMemory) {
-        // if the free list lives in its own base memory, then all of the work it does
-        // has to skip over the memory occupied by the struct itself.  In that case,
-        // both the usable memory and the assignable memory, are smaller than the
-        // base memory.
-        size_t const pf_free_list_size = sizeof(PFAllocator_FreeList_t);
-        assignable_memory_start = (void*)((uint64_t)pf_free_list->base_memory + pf_free_list_size);
-        assignable_memory_size = pf_free_list->base_memory_size - pf_free_list_size;
-    } else {
-        // if the free list lives outside of its own base memory, then all of the
-        // memory it owns is assignable, and we can just operate on the entire thing
-        assignable_memory_start = pf_free_list->base_memory;
-        assignable_memory_size = pf_free_list->base_memory_size;
-    }
-
-    // this should already be zeroed out, but let's not assume
-    for (size_t i = 0; i < assignable_memory_size; i++) {
-        uintptr_t* ptr = (void*)((uint64_t)assignable_memory_start + i);
-        *ptr = 0;
-    }
-
-    // memory is now fresh, so just start rebuilding
-    pf_free_list->used_memory = 0;
-    PFAllocator_FreeListNode_t* first_node = assignable_memory_start;
-    first_node->metadata = assignable_memory_size - sizeof(PFAllocator_FreeListNode_t);
+    // available memory starts just after the end of this allocator
+    void* available_memory = (void*)((size_t)base_memory + sizeof(PFAllocator_FreeList_t));
+    
+    // some of the memory is used to hold the allocator struct itself
+    pf_free_list->used_memory = sizeof(PFAllocator_FreeList_t);
+    PFAllocator_FreeListNode_t* first_node = available_memory;
+    first_node->metadata = pf_free_list->base_memory_size - sizeof(PFAllocator_FreeListNode_t);
     first_node->next = NULL;
     pf_free_list->head = first_node;
     return pf_free_list;
@@ -348,16 +326,67 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     return best_node;
 }
 
-void * pf_allocator_free_list_malloc(size_t const size) {
-    return malloc(size);
+void * pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t const size) {
+    if (allocator == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Cannot allocate with null ptr to allocator!");
+        return NULL;
+    }
+
+    if (size == 0) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Cannot allocate 0-bytes!");
+        return NULL;
+    }
+
+    if (allocator->base_memory == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t is in a bad state! Ptr to base memory was NULL!");
+        // NOTE: if the pf_allocator_create_with_memory fn in unchanged, this should(TM) be impossible, b/c
+        // the allocator itself sits at the base of the base memory, and we shouldn't(TM) have gotten a ptr
+        // to it, if the base memory was actually null.
+        return NULL;
+    }
+
+    size_t const available_memory = allocator->base_memory_size - allocator->used_memory;
+    size_t const required_memory = size + sizeof(PFAllocator_FreeListAllocationHeader_t);
+    if (available_memory < required_memory) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "");
+        return NULL;
+    }
+
+    if (available_memory == required_memory) {
+        PF_LOG_WARNING(PF_ALLOCATOR, "PFAllocator_FreeList_t just gave out its last byte of memory! Continuing program");
+    }
+
+    //uint32_t use_best_fit_policy = allocator->policy == EAPFL_POLICY_FIND_BEST;
+
+    // if best fit
+        // scan free list nodes
+            // look for unallocated node
+            // record node which is closest-in-size to required_memory, or over
+            // break for perfect match
+        // alloc new node in matching memory block
+            // store data
+            // insert node into free list
+
+    // if find first
+        // scan free list nodes
+            // look for unallocated node
+            // if one is found that's big enough
+            // break
+        // alloc new node in memory block
+            // store data
+            // insert node into free list
+
+    // return result
+    
+    
+    return NULL;
 }
 
-void * pf_allocator_free_list_realloc(void *ptr, size_t const size) {
-    return realloc(ptr, size);
+void * pf_allocator_free_list_realloc(PFAllocator_FreeList_t* allocator, void *ptr, size_t const size) {
+    return NULL;
 }
 
-void pf_allocator_free_list_free(void *ptr) {
-    free(ptr);
+void pf_allocator_free_list_free(PFAllocator_FreeList_t* allocator, void *ptr) {
 }
 
 

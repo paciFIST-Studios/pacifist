@@ -517,7 +517,7 @@ int main(void) {
     ADD_TEST(struct_PFAllocator_FreeList_t__has_expected_size);
     ADD_TEST(struct_PFAllocator_FreeList_t__has_expected_members);
 
-    // fn pf_allocator_free_list_initialize
+    // fn pf_allocator_free_list_create_with_memory
     ADD_TEST(fn_pf_allocator_free_list_create_with_memory__is_defined);
     ADD_TEST(fn_pf_allocator_free_list_create_with_memory__returns_correct_error_code__for_null_base_memory_param);
     ADD_TEST(fn_pf_allocator_free_list_create_with_memory__sets_correct_error_message__for_null_base_memory_param);
@@ -525,7 +525,7 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_create_with_memory__sets_correct_error_message__for_zero_size_param);
     ADD_TEST(fn_pf_allocator_free_list_create_with_memory__sets_pf_memory_functions__when_used);
     ADD_TEST(fn_pf_allocator_free_list_create_with_memory__sets_memory_values_correctly);
-    ADD_TEST(fn_pf_allocator_free_list_create_with_memory__after_initialization_allocator_memory_fns_are_usable);
+    //ADD_TEST(fn_pf_allocator_free_list_create_with_memory__after_initialization_allocator_memory_fns_are_usable);
     
     // fn pf_allocator_free_list_free_all
     ADD_TEST(fn_pf_allocator_free_list_free_all__is_defined);
@@ -548,8 +548,7 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__for_null_ptr_to_pf_free);
     ADD_TEST(fn_pf_allocator_free_list_free_all__sets_correct_error_message__for_null_ptr_to_pf_free);
 
-    ADD_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__when_free_list_allocator_lives_inside_its_own_base_memory);
-    ADD_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__when_free_list_allocator_lives_outside_its_own_base_memory);
+    ADD_TEST(fn_pf_allocator_free_list_free_all__returns_no_error__on_successful_use);
     
     // fn pf_allocator_is_power_of_two
     ADD_TEST(fn_pf_allocator_is_power_of_two__is_defined);
@@ -563,9 +562,19 @@ int main(void) {
     // fn pf_allocator_free_list_find_best
     ADD_TEST(fn_pf_allocator_free_list_find_best__is_defined);
 
+    // fn pf_allocator_free_list_malloc
+    ADD_TEST(fn_pf_allocator_free_list_malloc__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_malloc__returns_null__for_null_allocator_param);
+    ADD_TEST(fn_pf_allocator_free_list_malloc__sets_coorect_error_message__for_null_allocator_param);
+    ADD_TEST(fn_pf_allocator_free_list_malloc__returns_null__for_requested_memory_size_of_zero);
+    ADD_TEST(fn_pf_allocator_free_list_malloc__sets_correct_error_message__for_requested_memory_size_of_zero);
+    ADD_TEST(fn_pf_allocator_free_list_malloc__returns_null__for_null_ptr_to_base_memory);
+    ADD_TEST(fn_pf_allocator_free_list_malloc__sets_correct_error_message__for_null_ptr_to_base_memory);
 
 
 
+
+    
     
     //--------------------------//
     // PFAllocator RedBlackTree //

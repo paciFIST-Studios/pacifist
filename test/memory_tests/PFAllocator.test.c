@@ -444,9 +444,9 @@ START_TEST(fn_pf_allocator_free_list_create_with_memory__sets_memory_values_corr
     PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, size);
     ck_assert_ptr_nonnull(allocator);
 
-    ck_assert_ptr_eq(allocator->base_memory, memory);
+    ck_assert_ptr_eq(allocator->base_memory, &memory);
     ck_assert_int_eq(allocator->base_memory_size, size);
-    ck_assert_int_eq(allocator->used_memory, 0);
+    ck_assert_int_eq(allocator->used_memory, sizeof(PFAllocator_FreeList_t));
 }
 END_TEST
 
@@ -458,12 +458,12 @@ START_TEST(fn_pf_allocator_free_list_create_with_memory__after_initialization_al
 
     size_t const allocated_size = 128;
     size_t const allocated_resize = 256;
-    char* allocated_memory = allocator->pf_malloc(allocated_size);
+    char* allocated_memory = allocator->pf_malloc(allocator, allocated_size);
     ck_assert_ptr_nonnull(allocated_memory);
-    char* reallocated_memory = allocator->pf_realloc(allocated_memory, allocated_resize);
+    char* reallocated_memory = allocator->pf_realloc(allocator, allocated_memory, allocated_resize);
     allocated_memory = NULL;
     ck_assert_ptr_nonnull(reallocated_memory);
-    allocator->pf_free(reallocated_memory);
+    allocator->pf_free(allocator, reallocated_memory);
     reallocated_memory = NULL;
 }
 END_TEST
@@ -613,24 +613,14 @@ START_TEST(fn_pf_allocator_free_list_free_all__sets_correct_error_message__for_n
 }
 END_TEST
 
-START_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__when_free_list_allocator_lives_inside_its_own_base_memory) {
+START_TEST(fn_pf_allocator_free_list_free_all__returns_no_error__on_successful_use) {
     size_t const size = 128;
     uint8_t memory[size];
     PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, size);
     ck_assert_ptr_nonnull(allocator);
     ck_assert_int_eq(pf_allocator_free_list_free_all(allocator), PFEC_NO_ERROR);
     // 128 - 64 (allocator) - 16 (node header) = 48
-    ck_assert_int_eq(allocator->head->metadata, 48);
-}
-END_TEST
-
-START_TEST(fn_pf_allocator_free_list_free_all__returns_correct_error_code__when_free_list_allocator_lives_outside_its_own_base_memory) {
-    size_t const size = 128;
-    char memory[size];
-    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, size);
-    ck_assert_int_eq(pf_allocator_free_list_free_all(allocator), PFEC_NO_ERROR);
-    // 128 - 16 (node header) = 112
-    ck_assert_int_eq(allocator->head->metadata, 48);
+    ck_assert_int_eq(allocator->head->metadata, 112);
 }
 END_TEST
 
@@ -678,6 +668,101 @@ START_TEST(fn_pf_allocator_free_list_find_best__is_defined) {
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
+
+// fn pf_allocator_free_list_malloc --------------------------------------------------------------------------
+
+START_TEST(fn_pf_allocator_free_list_malloc__is_defined) {
+    void*(*fptr)(PFAllocator_FreeList_t*, size_t const) = pf_allocator_free_list_malloc;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_malloc__returns_null__for_null_allocator_param) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_malloc(NULL, 1));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_malloc__sets_coorect_error_message__for_null_allocator_param) {
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_malloc(NULL, 1));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Cannot allocate with null ptr to allocator!";
+    ck_assert_in_error_buffer(expected);
+}
+
+START_TEST(fn_pf_allocator_free_list_malloc__returns_null__for_requested_memory_size_of_zero) {
+    size_t const size = 128;
+    char memory[size];
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, size);
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_malloc(allocator, 0));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_malloc__sets_correct_error_message__for_requested_memory_size_of_zero) {
+    size_t const size = 128;
+    char memory[size];
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, size);
+
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_malloc(allocator, 0));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Cannot allocate 0-bytes!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_malloc__returns_null__for_null_ptr_to_base_memory) {
+    size_t const size = 128;
+    char memory[size];
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, size);
+    allocator->base_memory = NULL;
+
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_malloc(allocator, 32));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_malloc__sets_correct_error_message__for_null_ptr_to_base_memory) {
+    size_t const size = 128;
+    char memory[size];
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, size);
+    allocator->base_memory = NULL;
+
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_malloc(allocator, 32));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "PFAllocator_FreeList_t is in a bad state! Ptr to base memory was NULL!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+
+
+// PFAllocator_FreeList_t general usage tests ----------------------------------------------------------------
+
+START_TEST(fn_PFAllocator_FreeList_t__correctly_creates_nodes__during_usage) {
+    size_t const size = 128;
+    char memory[size];
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, size);
+
+    void* alloc1 = allocator->pf_malloc(allocator, 32);
+    
+}
+END_TEST
+
+
+
 
 
 // -----------------------------------------------------------------------------------------------------------
