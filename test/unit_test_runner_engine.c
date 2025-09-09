@@ -464,10 +464,10 @@ int main(void) {
     ADD_TEST(enum_EAllocationPolicy_FreeList__is_defined);
     ADD_TEST(enum_EAllocationPolicy_FreeList__has_expected_values);
 
-    // PFAllocator_FreeListAllocationHeader_t
-    ADD_TEST(struct_PFAllocator_FreeListAllocationHeader_t__is_defined);
-    ADD_TEST(struct_PFAllocator_FreeListAllocationHeader_t__has_expected_size);
-    ADD_TEST(struct_PFAllocator_FreeListAllocationHeader_t__has_expected_members);
+    //// PFAllocator_FreeListAllocationHeader_t
+    //ADD_TEST(struct_PFAllocator_FreeListAllocationHeader_t__is_defined);
+    //ADD_TEST(struct_PFAllocator_FreeListAllocationHeader_t__has_expected_size);
+    //ADD_TEST(struct_PFAllocator_FreeListAllocationHeader_t__has_expected_members);
 
     // PFAllocator_FreeListNode_t
     ADD_TEST(struct_PFAllocator_FreeListNode_t__is_defined);
@@ -523,10 +523,12 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_create_with_memory__sets_correct_error_message__for_null_base_memory_param);
     ADD_TEST(fn_pf_allocator_free_list_create_with_memory__returns_correct_error_code__for_zero_size_param);
     ADD_TEST(fn_pf_allocator_free_list_create_with_memory__sets_correct_error_message__for_zero_size_param);
+    ADD_TEST(fn_pf_allocator_free_list_create_with_memory__returns_null__for_80byte_size_param);
+    ADD_TEST(fn_pf_allocator_free_list_create_with_memory__sets_correct_error_message__for_80byte_size_param);
     ADD_TEST(fn_pf_allocator_free_list_create_with_memory__sets_pf_memory_functions__when_used);
     ADD_TEST(fn_pf_allocator_free_list_create_with_memory__sets_memory_values_correctly);
     //ADD_TEST(fn_pf_allocator_free_list_create_with_memory__after_initialization_allocator_memory_fns_are_usable);
-    
+
     // fn pf_allocator_free_list_free_all
     ADD_TEST(fn_pf_allocator_free_list_free_all__is_defined);
 
@@ -553,6 +555,13 @@ int main(void) {
     // fn pf_allocator_is_power_of_two
     ADD_TEST(fn_pf_allocator_is_power_of_two__is_defined);
 
+    // fn pf_allocator_free_list_get_allocated_memory
+    ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__is_defined);
+
+    // fn pf_allocator_free_list_get_memory_overhead
+    ADD_TEST(fn_pf_allocator_free_list_get_memory_overhead_size__is_defined);
+
+    
     // fn pf_allocator_free_list_calculate_padding_and_header
     ADD_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__is_defined);
 
@@ -570,9 +579,13 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_malloc__sets_correct_error_message__for_requested_memory_size_of_zero);
     ADD_TEST(fn_pf_allocator_free_list_malloc__returns_null__for_null_ptr_to_base_memory);
     ADD_TEST(fn_pf_allocator_free_list_malloc__sets_correct_error_message__for_null_ptr_to_base_memory);
+    ADD_TEST(fn_pf_allocator_free_list_malloc__returns_null__if_it_cannot_fulfill_memory_request);
+    ADD_TEST(fn_pf_allocator_free_list_malloc__sets_correct_error_message__if_it_cannot_fulfill_memmory_request);
+    ADD_TEST(fn_pf_allocator_free_list_malloc__returns_memory__if_it_gives_out_the_last_byte_during_request);
 
 
-
+    // PFAllocator_FreeList_t general usage tests
+    ADD_TEST(fn_PFAllocator_FreeList_t__correctly_creates_nodes__during_usage);
 
     
     

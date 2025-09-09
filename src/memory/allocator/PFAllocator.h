@@ -56,15 +56,15 @@
 // free-list implementation of a PFAllocator -----------------------------------------------------------------
 
 typedef enum EAllocationPolicy_FreeList {
-    EAPFL_POLICY_FIND_FIRST = 0,
-    EAPFL_POLICY_FIND_BEST
+    EAPFL_POLICY_FIND_BEST = 0,
+    EAPFL_POLICY_FIND_FIRST
 } EAllocationPolicy_FreeList;
 
-typedef struct PFAllocator_FreeListAllocationHeader_t {
-    struct PFAllocator_FreeListAllocationHeader_t* next;
-    size_t const block_size;
-    size_t const padding;
-} PFAllocator_FreeListAllocationHeader_t;
+//typedef struct PFAllocator_FreeListAllocationHeader_t {
+//    struct PFAllocator_FreeListAllocationHeader_t* next;
+//    size_t const block_size;
+//    size_t const padding;
+//} PFAllocator_FreeListAllocationHeader_t;
 
 typedef struct PFAllocator_FreeListNode_t {
     struct PFAllocator_FreeListNode_t* next;
@@ -155,7 +155,8 @@ int32_t pf_allocator_free_list_node_set_padding(PFAllocator_FreeListNode_t* node
  * @property    void*   base_memory         - ptr to all memory managed by this allocator,
  *                                            Note: the allocator itself lives at this address
  * @property    size_t  base_memory_size    - size of all memory managed by allocator
- * @property    size_t  used_memory         - size of remaining memory available for allocation
+ * @property    size_t  free_memory         - size of remaining memory available for allocation
+ *                                            (some of this will be used to adminstrate the allocation)
  *
  * @property    PFAllocator_FreeListNode_t* head    - head of linked list, containing the allocations =
  * @property    EAllocationPolicy_FreeList  policy  - first available, or best-match
@@ -168,7 +169,7 @@ int32_t pf_allocator_free_list_node_set_padding(PFAllocator_FreeListNode_t* node
 typedef struct PFAllocator_FreeList_t {
     void * base_memory;
     size_t base_memory_size;
-    size_t used_memory;
+    size_t free_memory;
 
     PFAllocator_FreeListNode_t* head;
     EAllocationPolicy_FreeList policy;
@@ -204,6 +205,23 @@ int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list);
  * @return 
  */
 int32_t pf_allocator_is_power_of_two(size_t size);
+
+/**
+ * @brief returns a count of how many bytes have been given out to users
+ *
+ * @param pf_free_list 
+ * @return 
+ */
+int32_t pf_allocator_free_list_get_allocated_memory_size(PFAllocator_FreeList_t* pf_free_list);
+
+/**
+ * @brief returns a count of how much memory is used by the allocator itself
+ * @note: ie: the PFAllocator_FreeList_t struct, and a PFAllocator_FreeListNode_t for each allocation
+ *
+ * @param pf_free_list 
+ * @return 
+ */
+int32_t pf_allocator_free_list_get_memory_overhead_size(PFAllocator_FreeList_t* pf_free_list);
 
 /**
  * @brief
