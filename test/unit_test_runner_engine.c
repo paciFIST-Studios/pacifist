@@ -557,9 +557,17 @@ int main(void) {
 
     // fn pf_allocator_free_list_get_allocated_memory
     ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__is_defined);
-
+    ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__returns_correct_error_code__for_null_ptr_to_free_list);
+    ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__sets_correct_error_message__for_null_ptr_to_free_list);
+    ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__returns_correct_error_code__for_invalid_head_ptr_in_free_list);
+    ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__sets_correct_error_message__for_invalid_head_ptr_in_free_list);
+    
     // fn pf_allocator_free_list_get_memory_overhead
     ADD_TEST(fn_pf_allocator_free_list_get_memory_overhead_size__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_get_memory_overhead_size__returns_correct_error_code__for_null_ptr_to_free_list);
+    ADD_TEST(fn_pf_allocator_free_list_get_memory_overhead_size__sets_correct_error_message__for_null_ptr_to_free_list);
+    ADD_TEST(fn_pf_allocator_free_list_get_memory_overhead_size__returns_correct_error_code__for_invalid_head_ptr_in_free_list);
+    ADD_TEST(fn_pf_allocator_free_list_get_memory_overhead_size__sets_correct_error_message__for_invalid_head_ptr_in_free_list);
 
     
     // fn pf_allocator_free_list_calculate_padding_and_header

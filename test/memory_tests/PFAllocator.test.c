@@ -661,16 +661,92 @@ END_TEST
 
 // fn pf_allocator_free_list_get_allocated_memory ------------------------------------------------------------
 START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__is_defined) {
-    int32_t (*fptr)(PFAllocator_FreeList_t*) = pf_allocator_free_list_get_allocated_memory_size;
+    size_t(*fptr)(PFAllocator_FreeList_t const *) = pf_allocator_free_list_get_allocated_memory_size;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__returns_correct_error_code__for_null_ptr_to_free_list) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_get_allocated_memory_size(NULL));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__sets_correct_error_message__for_null_ptr_to_free_list) {
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR,  pf_allocator_free_list_get_allocated_memory_size(NULL));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "PFAllocator_FreeList_t pointer is unexpectedly null!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__returns_correct_error_code__for_invalid_head_ptr_in_free_list) {
+    PF_SUPPRESS_ERRORS
+    PFAllocator_FreeList_t const fl = {0};
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_get_allocated_memory_size(&fl));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__sets_correct_error_message__for_invalid_head_ptr_in_free_list) {
+    PF_SUPPRESS_ERRORS
+    PFAllocator_FreeList_t const fl = {0};
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_get_allocated_memory_size(&fl));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "PFAllocator_FreeList_t->head is unexpectedly null!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+
+
+// fn pf_allocator_free_list_get_memory_overhead -------------------------------------------------------------
+START_TEST(fn_pf_allocator_free_list_get_memory_overhead_size__is_defined) {
+    size_t(*fptr)(PFAllocator_FreeList_t const *) = pf_allocator_free_list_get_memory_overhead_size;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
 
-// fn pf_allocator_free_list_get_memory_overhead -------------------------------------------------------------
-START_TEST(fn_pf_allocator_free_list_get_memory_overhead_size__is_defined) {
-    int32_t (*fptr)(PFAllocator_FreeList_t*) = pf_allocator_free_list_get_memory_overhead_size;
-    ck_assert_ptr_nonnull(fptr);
+START_TEST(fn_pf_allocator_free_list_get_memory_overhead_size__returns_correct_error_code__for_null_ptr_to_free_list) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_get_memory_overhead_size(NULL));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_get_memory_overhead_size__sets_correct_error_message__for_null_ptr_to_free_list) {
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR,  pf_allocator_free_list_get_memory_overhead_size(NULL));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "PFAllocator_FreeList_t pointer is unexpectedly null!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_get_memory_overhead_size__returns_correct_error_code__for_invalid_head_ptr_in_free_list) {
+    PF_SUPPRESS_ERRORS
+    PFAllocator_FreeList_t const fl = {0};
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_get_memory_overhead_size(&fl));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_get_memory_overhead_size__sets_correct_error_message__for_invalid_head_ptr_in_free_list) {
+    PF_SUPPRESS_ERRORS
+    PFAllocator_FreeList_t const fl = {0};
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_get_memory_overhead_size(&fl));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "PFAllocator_FreeList_t->head is unexpectedly null!";
+    ck_assert_in_error_buffer(expected);
 }
 END_TEST
 

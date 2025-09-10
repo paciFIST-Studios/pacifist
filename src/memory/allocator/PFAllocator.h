@@ -212,7 +212,7 @@ int32_t pf_allocator_is_power_of_two(size_t size);
  * @param pf_free_list 
  * @return 
  */
-int32_t pf_allocator_free_list_get_allocated_memory_size(PFAllocator_FreeList_t* pf_free_list);
+size_t pf_allocator_free_list_get_allocated_memory_size(PFAllocator_FreeList_t const * pf_free_list);
 
 /**
  * @brief returns a count of how much memory is used by the allocator itself
@@ -221,7 +221,7 @@ int32_t pf_allocator_free_list_get_allocated_memory_size(PFAllocator_FreeList_t*
  * @param pf_free_list 
  * @return 
  */
-int32_t pf_allocator_free_list_get_memory_overhead_size(PFAllocator_FreeList_t* pf_free_list);
+size_t pf_allocator_free_list_get_memory_overhead_size(PFAllocator_FreeList_t const * pf_free_list);
 
 /**
  * @brief

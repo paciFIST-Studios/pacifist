@@ -221,12 +221,42 @@ int32_t pf_allocator_is_power_of_two(size_t const size) {
     return (size & (size - 1)) == 0;
 }
 
-int32_t pf_allocator_free_list_get_allocated_memory_size(PFAllocator_FreeList_t* free_list) {
-    return 0;
+size_t pf_allocator_free_list_get_allocated_memory_size(PFAllocator_FreeList_t const * free_list) {
+    if (free_list == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t pointer is unexpectedly null!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+    if (free_list->head == NULL){
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t->head is unexpectedly null!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+
+    size_t accumulator = 0;
+    PFAllocator_FreeListNode_t const * node = free_list->head;
+    while (node != NULL) {
+        accumulator += pf_allocator_free_list_node_get_block_size(node);
+        node = node->next;
+    }
+    return accumulator;
 }
 
-int32_t pf_allocator_free_list_get_memory_overhead_size(PFAllocator_FreeList_t* free_list) {
-    return 0;
+size_t pf_allocator_free_list_get_memory_overhead_size(PFAllocator_FreeList_t const * free_list) {
+    if (free_list == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t pointer is unexpectedly null!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+    if (free_list->head == NULL){
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t->head is unexpectedly null!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+
+    size_t accumulator = sizeof(PFAllocator_FreeList_t);
+    PFAllocator_FreeListNode_t const * node = free_list->head;
+    while (node != NULL) {
+        accumulator += sizeof(PFAllocator_FreeListNode_t);
+        node = node->next;
+    }
+    return accumulator;
 }
 
 
@@ -377,6 +407,7 @@ void * pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t c
         PF_LOG_WARNING(PF_ALLOCATOR, "PFAllocator_FreeList_t just gave out its last byte of memory! Continuing program.");
     }
 
+    // find best fit node
     if (allocator->policy == EAPFL_POLICY_FIND_BEST) {
         PFAllocator_FreeListNode_t* node = pf_allocator_free_list_find_best(allocator, size, 16, NULL, NULL);
         size_t const padding = pf_allocator_free_list_node_get_padding(node);
@@ -386,29 +417,12 @@ void * pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t c
         return allocated_memory;
     }
 
-    
-    // if best fit
-        // scan free list nodes
-            // look for unallocated node
-            // record node which is closest-in-size to required_memory, or over
-            // break for perfect match
-        // alloc new node in matching memory block
-            // store data
-            // insert node into free list
-
-    // if find first
-        // scan free list nodes
-            // look for unallocated node
-            // if one is found that's big enough
-            // break
-        // alloc new node in memory block
-            // store data
-            // insert node into free list
-
-    // return result
-    
-    
-    return NULL;
+    // find first fit node
+    PFAllocator_FreeListNode_t* node = pf_allocator_free_list_find_first(allocator, size, 16, NULL, NULL);
+    size_t const padding = pf_allocator_free_list_node_get_padding(node);
+    size_t const memory_start = (size_t)node + padding;
+    void* allocated_memory = (void*) memory_start;
+    return allocated_memory;
 }
 
 void * pf_allocator_free_list_realloc(PFAllocator_FreeList_t* allocator, void *ptr, size_t const size) {
