@@ -659,7 +659,46 @@ START_TEST(fn_pf_allocator_is_power_of_two__is_defined) {
 }
 END_TEST
 
-// fn pf_allocator_free_list_get_allocated_memory ------------------------------------------------------------
+// fn pf_allocator_should_bisect_memory ----------------------------------------------------------------------
+
+START_TEST(fn_pf_allocator_should_bisect_memory__is_defined) {
+    int32_t(*fptr)(size_t const, size_t const, size_t*) = &pf_allocator_should_bisect_memory;
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_should_bisect_memory__returns_false__if_block_size_smaller_than_required_size) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(FALSE, pf_allocator_should_bisect_memory(1, 2, NULL));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_should_bisect_memory__sets_correct_error_message__if_block_size_is_smaller_than_required_size) {
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(FALSE, pf_allocator_should_bisect_memory(1, 2, NULL));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Got request to analyze block which is smaller than required size!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_should_bisect_memory__returns_false__if_block_size_equals_required_size) {
+    ck_assert_int_eq(FALSE, pf_allocator_should_bisect_memory(2, 2, NULL));
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_should_bisect_memory__returns_false__if_block_size_is_bigger_than_request_but_too_small_for_an_additional_block) {
+    size_t const MINIMUM_NODE_ALLOC_MEMORY = 256;
+    size_t const block_size = MINIMUM_NODE_ALLOC_MEMORY + sizeof(PFAllocator_FreeListNode_t);
+    ck_assert_int_eq(FALSE, pf_allocator_should_bisect_memory(block_size, 1, NULL));
+}
+END_TEST
+
+
+
+// fn pf_allocator_free_list_get_allocated_memory_size -------------------------------------------------------
 START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__is_defined) {
     size_t(*fptr)(PFAllocator_FreeList_t const *) = pf_allocator_free_list_get_allocated_memory_size;
     ck_assert_ptr_nonnull(fptr);
@@ -700,6 +739,21 @@ START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__sets_correct_err
 
     char const * expected = "PFAllocator_FreeList_t->head is unexpectedly null!";
     ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+// successfully counts allocated memory in different situations
+START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__general_testing_fn) {
+    size_t const size = 512;
+    char memory[size];
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, size);
+
+    size_t val = pf_allocator_free_list_get_allocated_memory_size(allocator);
+
+    
+
+
+    
 }
 END_TEST
 
@@ -750,6 +804,8 @@ START_TEST(fn_pf_allocator_free_list_get_memory_overhead_size__sets_correct_erro
 }
 END_TEST
 
+
+// successfully counts overhead memory in different situations
 
 
 // fn pf_allocator_free_list_calculate_padding_and_header ----------------------------------------------------
@@ -908,12 +964,18 @@ END_TEST
 // PFAllocator_FreeList_t general usage tests ----------------------------------------------------------------
 
 START_TEST(fn_PFAllocator_FreeList_t__correctly_creates_nodes__during_usage) {
-    size_t const size = 128;
+    size_t const size = 512;
     char memory[size];
     PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, size);
 
-    void* alloc1 = allocator->pf_malloc(allocator, 32);
-    
+    size_t const alloc1_size_request = 32;
+    void* alloc1 = allocator->pf_malloc(allocator, alloc1_size_request);
+    ck_assert_ptr_nonnull(alloc1);
+
+    //size_t const alloc1_base_offset = (size_t)alloc1 - sizeof(PFAllocator_FreeListNode_t);
+    //PFAllocator_FreeListNode_t const * alloc1_base = (void*)alloc1 + alloc1_base_offset;
+    //size_t const alloc1_metadata_size = pf_allocator_free_list_node_get_block_size(alloc1_base);
+    //ck_assert_int_eq(32, alloc1_metadata_size);
 }
 END_TEST
 

@@ -207,6 +207,17 @@ int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list);
 int32_t pf_allocator_is_power_of_two(size_t size);
 
 /**
+ * @brief Returns TRUE(1), if the memory block should be split, otherwise false
+ * @note if this fn returns true, it will also provide the offset, at which the block should be split
+ *
+ * @param block_size
+ * @param required_size
+ * @param out_cut_at_offset 
+ * @return 
+ */
+int32_t pf_allocator_should_bisect_memory(size_t block_size, size_t required_size, size_t* out_cut_at_offset);
+
+/**
  * @brief returns a count of how many bytes have been given out to users
  *
  * @param pf_free_list 

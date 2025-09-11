@@ -555,12 +555,20 @@ int main(void) {
     // fn pf_allocator_is_power_of_two
     ADD_TEST(fn_pf_allocator_is_power_of_two__is_defined);
 
+    // fn pf_allocator_should_bisect_memory
+    ADD_TEST(fn_pf_allocator_should_bisect_memory__is_defined);
+    ADD_TEST(fn_pf_allocator_should_bisect_memory__returns_false__if_block_size_smaller_than_required_size);
+    ADD_TEST(fn_pf_allocator_should_bisect_memory__sets_correct_error_message__if_block_size_is_smaller_than_required_size);
+    ADD_TEST(fn_pf_allocator_should_bisect_memory__returns_false__if_block_size_equals_required_size);
+    ADD_TEST(fn_pf_allocator_should_bisect_memory__returns_false__if_block_size_is_bigger_than_request_but_too_small_for_an_additional_block);
+    
     // fn pf_allocator_free_list_get_allocated_memory
     ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__is_defined);
     ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__returns_correct_error_code__for_null_ptr_to_free_list);
     ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__sets_correct_error_message__for_null_ptr_to_free_list);
     ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__returns_correct_error_code__for_invalid_head_ptr_in_free_list);
     ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__sets_correct_error_message__for_invalid_head_ptr_in_free_list);
+    ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__general_testing_fn);
     
     // fn pf_allocator_free_list_get_memory_overhead
     ADD_TEST(fn_pf_allocator_free_list_get_memory_overhead_size__is_defined);

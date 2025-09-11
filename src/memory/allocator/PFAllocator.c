@@ -14,6 +14,8 @@
 
 // Defines
 #define BITS_PER_BYTE 8
+// smallest amount of memory a PFAllocator_FreeListNode_t can allocate
+#define MINIMUM_NODE_ALLOC_MEMORY 256
 
 #define FREE_LIST_32BIT_MAX_BLOCK_SIZE 0x7FFFFFF
 #define FREE_LIST_64BIT_MAX_BLOCK_SIZE 0x7FFFFFFFFFFFFFF
@@ -153,14 +155,18 @@ PFAllocator_FreeList_t* pf_allocator_free_list_create_with_memory(void* base_mem
     pf_free_list->policy = EAPFL_POLICY_FIND_BEST;
     
     // available memory starts just after the end of this allocator
-    void* available_memory = (void*)((size_t)base_memory + sizeof(PFAllocator_FreeList_t));
-    
+    size_t const allocator_available_memory_offset = (size_t)base_memory + sizeof(PFAllocator_FreeList_t);
+    void* allocator_available_memory_base = (void*)(allocator_available_memory_offset );
+
 
     // set up the first node
-    PFAllocator_FreeListNode_t* first_node = available_memory;
-    // the first node contains all of the memory remaining to the allocator
-    size_t const first_node_block_size = sizeof(PFAllocator_FreeList_t) - sizeof(PFAllocator_FreeListNode_t);
+    PFAllocator_FreeListNode_t* first_node = allocator_available_memory_base;
+    // data can be allocated, starting at the end of this node
+    size_t const first_node_data_start_offset = allocator_available_memory_offset + sizeof(PFAllocator_FreeListNode_t);
+    // the first created node contains all of the memory remaining to the allocator
+    size_t const first_node_block_size = ((size_t)base_memory+size) - first_node_data_start_offset;
     pf_allocator_free_list_node_set_block_size(first_node, first_node_block_size);
+    // the user allocates this memory, not us, so we're setting it to not-allocated
     pf_allocator_free_list_node_set_is_not_allocated(first_node);
 
     // some of the memory is used to hold the allocator struct itself
@@ -204,11 +210,7 @@ int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list) {
     size_t const size = pf_free_list->base_memory_size;
 
     // zero out all of this memory, entirely
-    for (size_t i = 0; i < size; i++) {
-        size_t const offset = (size_t)memory + i;
-        uint8_t* mem = (void*)offset;
-        *mem = 0;
-    }
+    memset(memory, 0, size);
 
     // re-create on the same memory
     pf_free_list = pf_allocator_free_list_create_with_memory(memory, size);
@@ -219,6 +221,32 @@ int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list) {
 int32_t pf_allocator_is_power_of_two(size_t const size) {
     // we're not checking against zero, b/c size_t can't be negative
     return (size & (size - 1)) == 0;
+}
+
+int32_t pf_allocator_should_bisect_memory(
+    size_t const block_size,
+    size_t const required_size,
+    size_t *out_cut_at_offset)
+{
+    // block size cannot fulfill request
+    if (block_size < required_size){
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Got request to analyze block which is smaller than required size!");
+        return FALSE;
+    }
+    // block size exactly fulfills request
+    if (block_size == required_size) {
+        return FALSE;
+    }
+    // block size is bigger than request, but too small for an additional block
+    if (block_size <= required_size + (sizeof(PFAllocator_FreeListNode_t) + MINIMUM_NODE_ALLOC_MEMORY)) {
+        return FALSE;
+    }
+    // block is big enough to get split in two
+
+    // make sure the first one, is just big enough to hold the required size, and round up
+    // to the next 16 bytes if it's not a perfect fit.  Set this as the cut_at_offset number
+
+    return TRUE;
 }
 
 size_t pf_allocator_free_list_get_allocated_memory_size(PFAllocator_FreeList_t const * free_list) {
@@ -346,23 +374,24 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     PFAllocator_FreeListNode_t* prev_node = NULL;
     PFAllocator_FreeListNode_t* best_node = NULL;
 
-    size_t padding = 0;
+    size_t header_offset = 0;
 
     while (node != NULL) {
         size_t const header_size = sizeof(PFAllocator_FreeListNode_t);
  
-        padding = pf_allocator_free_list_calculate_padding_and_header(
+        header_offset = pf_allocator_free_list_calculate_padding_and_header(
             (uintptr_t)node,
             (uintptr_t)alignment,
             header_size);
 
-        size_t const req_size = requested_size + padding;
+        size_t const req_size = requested_size + header_offset;
         // technically, we are losing part of the information where diff_space would be
         // negative.  However, in this case, required_size would be greater than the
         // block size, so we are still checking against that in the first logical
         // clause here
-        size_t const diff_space = node->metadata - req_size;
-        if (node->metadata >= req_size && (diff_space < smallest_diff_space)) {
+        size_t const node_size = pf_allocator_free_list_node_get_block_size(node);
+        size_t const diff_space = node_size - req_size;
+        if (node_size >= req_size && (diff_space < smallest_diff_space)) {
             best_node = node;
             smallest_diff_space = diff_space;
         }
@@ -371,7 +400,7 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
         node = node->next;
     }
 
-    if (out_padding){ *out_padding = padding;}
+    if (out_padding){ *out_padding = header_offset;}
     if (out_previous_node){ *out_previous_node = prev_node; }
 
     return best_node;
@@ -412,6 +441,17 @@ void * pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t c
         PFAllocator_FreeListNode_t* node = pf_allocator_free_list_find_best(allocator, size, 16, NULL, NULL);
         size_t const padding = pf_allocator_free_list_node_get_padding(node);
 
+
+        size_t bisect_at_offset = 0;
+        size_t const block_size = pf_allocator_free_list_node_get_block_size(node);
+        if (pf_allocator_should_bisect_memory(block_size, required_memory, &bisect_at_offset)){
+            
+        }
+        
+        // we have found the correct node, cut the node down to the requested amount, based on 16 byte chunks
+        // if there is extra memory, make a new node, give that node the extra memory, and put that node at the
+        // end of the linked list
+        
         size_t const memory_start = (size_t)node + padding;
         void* allocated_memory = (void*)memory_start;
         return allocated_memory;
