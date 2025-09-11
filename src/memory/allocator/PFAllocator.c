@@ -226,8 +226,7 @@ int32_t pf_allocator_is_power_of_two(size_t const size) {
 int32_t pf_allocator_should_bisect_memory(
     size_t const block_size,
     size_t const required_size,
-    size_t *out_cut_at_offset)
-{
+    size_t *out_cut_at_offset) {
     // block size cannot fulfill request
     if (block_size < required_size){
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Got request to analyze block which is smaller than required size!");
@@ -238,13 +237,17 @@ int32_t pf_allocator_should_bisect_memory(
         return FALSE;
     }
     // block size is bigger than request, but too small for an additional block
-    if (block_size <= required_size + (sizeof(PFAllocator_FreeListNode_t) + MINIMUM_NODE_ALLOC_MEMORY)) {
+    if (block_size < required_size + (sizeof(PFAllocator_FreeListNode_t) + MINIMUM_NODE_ALLOC_MEMORY)) {
         return FALSE;
     }
     // block is big enough to get split in two
-
-    // make sure the first one, is just big enough to hold the required size, and round up
-    // to the next 16 bytes if it's not a perfect fit.  Set this as the cut_at_offset number
+    if (out_cut_at_offset != NULL){
+        if (required_size % 16 == 0) {
+            *out_cut_at_offset = required_size;
+        } else {
+            *out_cut_at_offset = required_size - (required_size%16) + 16;
+        }
+    }
 
     return TRUE;
 }

@@ -561,6 +561,8 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_should_bisect_memory__sets_correct_error_message__if_block_size_is_smaller_than_required_size);
     ADD_TEST(fn_pf_allocator_should_bisect_memory__returns_false__if_block_size_equals_required_size);
     ADD_TEST(fn_pf_allocator_should_bisect_memory__returns_false__if_block_size_is_bigger_than_request_but_too_small_for_an_additional_block);
+    ADD_TEST(fn_pf_allocator_should_bisect_memory__returns_true__if_the_block_size_is_big_enough);
+    ADD_TEST(fn_pf_allocator_should_bisect_memory__outputs_correct_value__for_cut_at_offset_param);
     
     // fn pf_allocator_free_list_get_allocated_memory
     ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__is_defined);

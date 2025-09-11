@@ -696,6 +696,53 @@ START_TEST(fn_pf_allocator_should_bisect_memory__returns_false__if_block_size_is
 }
 END_TEST
 
+START_TEST(fn_pf_allocator_should_bisect_memory__returns_true__if_the_block_size_is_big_enough) {
+    ck_assert_int_eq(TRUE, pf_allocator_should_bisect_memory(512, 128, NULL));
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_should_bisect_memory__outputs_correct_value__for_cut_at_offset_param) {
+    size_t const MINIMUM_NODE_ALLOC_MEMORY = 256;
+    size_t const min_block_size = sizeof(PFAllocator_FreeListNode_t) + MINIMUM_NODE_ALLOC_MEMORY;
+
+    // there is not enough room for another block, so memory should not be bisected
+    size_t cut_at_offset = 0;
+    size_t block_size = min_block_size + 63;
+    size_t required_size = 64;
+    ck_assert_int_eq(FALSE, pf_allocator_should_bisect_memory(block_size, required_size, &cut_at_offset));
+    ck_assert_int_eq(cut_at_offset, 0);
+
+    // there is exactly enough room for 1 more block, so the memory should be cut, and
+    // the cut should happen the next byte after this allocation
+    cut_at_offset = 0;
+    block_size = min_block_size + 64;
+    required_size = 64;
+    ck_assert_int_eq(TRUE, pf_allocator_should_bisect_memory(block_size, required_size, &cut_at_offset));
+    ck_assert_int_eq(cut_at_offset, required_size);
+
+    // there is plenty of room, so the memory should be cut, and the cut rounds up
+    // to the next closest 16 bytes.
+    block_size = 4096;
+    for (size_t i = 1; i < 16; i++) {
+        required_size = 64 + i;
+        ck_assert_int_eq(TRUE, pf_allocator_should_bisect_memory(block_size, required_size, &cut_at_offset));
+        ck_assert_int_eq(cut_at_offset, 80);
+    }
+
+    // there is plenty of room, so the memory should be cut, but the allocation is
+    // naturally 16 byte aligned
+    required_size = 64;
+    ck_assert_int_eq(TRUE, pf_allocator_should_bisect_memory(block_size, required_size, &cut_at_offset));
+    ck_assert_int_eq(cut_at_offset, required_size);
+    required_size = 80;
+    ck_assert_int_eq(TRUE, pf_allocator_should_bisect_memory(block_size, required_size, &cut_at_offset));
+    ck_assert_int_eq(cut_at_offset, required_size);
+    required_size = 96;
+    ck_assert_int_eq(TRUE, pf_allocator_should_bisect_memory(block_size, required_size, &cut_at_offset));
+    ck_assert_int_eq(cut_at_offset, required_size);
+}
+END_TEST
+
 
 
 // fn pf_allocator_free_list_get_allocated_memory_size -------------------------------------------------------
