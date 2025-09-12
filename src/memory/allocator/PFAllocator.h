@@ -114,6 +114,7 @@ void pf_allocator_free_list_node_set_is_not_allocated(PFAllocator_FreeListNode_t
 
 /**
  * @brief Returns the size of this node's memory block, according to its metadata
+ * @note: the node block size is the allocation size, plus sizeof(PFAllocator_FreeListNode_t)
  *
  * @param node 
  * @return 
@@ -129,6 +130,13 @@ size_t pf_allocator_free_list_node_get_block_size(PFAllocator_FreeListNode_t con
  */
 int32_t pf_allocator_free_list_node_set_block_size(PFAllocator_FreeListNode_t * node, size_t block_size);
 
+/**
+ * @brief Returns the amount of memory this node has allocated (or can allocate) to a caller
+ * 
+ * @param node 
+ * @return 
+ */
+size_t pf_allocator_free_list_node_get_allocation_size(PFAllocator_FreeListNode_t const * node);
 
 /**
  * @brief Gets the amount of padding between the node struct, and the data to which it points

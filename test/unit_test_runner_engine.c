@@ -506,6 +506,13 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_node_set_block_size__sets_correct_error_message__for_too_large_block_size);
     ADD_TEST(fn_pf_allocator_free_list_node_set_block_size__sets_block_size_correctly_and_does_not_disturb_other_bits__when_called);
 
+    // fn pf_allocator_free_list_node_get_allocation_size
+    ADD_TEST(fn_pf_allocator_free_list_node_get_allocation_size__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_node_get_allocation_size__returns_correct_error_code__for_null_ptr_to_node);
+    ADD_TEST(fn_pf_allocator_free_list_node_get_allocation_size__sets_correct_error_message__for_null_ptr_to_node);
+    ADD_TEST(fn_pf_allocator_free_list_node_get_allocation_size__returns_correct_value__for_allocation);
+
+    
     //// fn pf_allocator_free_list_node_get_padding
     ADD_TEST(fn_pf_allocator_free_list_node_get_padding_is_defined);
     ADD_TEST(fn_pf_allocator_free_list_node_get_padding__returns_correct_error_code__for_null_ptr_to_node);

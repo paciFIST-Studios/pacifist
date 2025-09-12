@@ -307,6 +307,47 @@ START_TEST(fn_pf_allocator_free_list_node_set_block_size__sets_block_size_correc
 }
 END_TEST
 
+// fn pf_allocator_free_list_node_get_allocation_size --------------------------------------------------------
+START_TEST(fn_pf_allocator_free_list_node_get_allocation_size__is_defined) {
+    size_t(*fptr)(PFAllocator_FreeListNode_t const *) = pf_allocator_free_list_node_get_allocation_size;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_get_allocation_size__returns_correct_error_code__for_null_ptr_to_node) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_node_get_allocation_size(NULL));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_get_allocation_size__sets_correct_error_message__for_null_ptr_to_node) {
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_node_get_allocation_size(NULL));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Null ptr to PFAllocator_FreeListNode_t!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_node_get_allocation_size__returns_correct_value__for_allocation) {
+    size_t const size = 512;
+    char memory[size];
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, size);
+    ck_assert_ptr_nonnull(allocator);
+    ck_assert_ptr_nonnull(allocator->head);
+
+    size_t const node1_block_size = pf_allocator_free_list_node_get_block_size(allocator->head);
+    size_t const expected_node1_block_size = size - sizeof(PFAllocator_FreeList_t) - sizeof(PFAllocator_FreeListNode_t);
+    ck_assert_int_eq(node1_block_size, expected_node1_block_size);
+
+    size_t const node1_alloc_size = pf_allocator_free_list_node_get_allocation_size(allocator->head);
+    // the second node here, equates to the first byte after the full size of the first node
+    size_t const expected_node1_alloc_size = size - sizeof(PFAllocator_FreeList_t) - (sizeof(PFAllocator_FreeListNode_t) * 2);
+    ck_assert_int_eq(node1_alloc_size , expected_node1_alloc_size);
+}
 
 
 // fn pf_allocator_free_list_node_get_padding ----------------------------------------------------------------
@@ -793,13 +834,20 @@ END_TEST
 START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__general_testing_fn) {
     size_t const size = 512;
     char memory[size];
-    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, size);
+    PFAllocator_FreeList_t * allocator = pf_allocator_free_list_create_with_memory(memory, size);
 
-    size_t val = pf_allocator_free_list_get_allocated_memory_size(allocator);
+    size_t const minimum_allocator_overhead = sizeof(PFAllocator_FreeList_t) + sizeof(PFAllocator_FreeListNode_t);
+    size_t const first_node_available_memory = pf_allocator_free_list_get_allocated_memory_size(allocator);
+    size_t const expected_size = size - minimum_allocator_overhead;
+    ck_assert_int_eq(expected_size, first_node_available_memory);
 
-    
-
-
+    size_t const alloc1_size = 128;
+    void* alloc1 = pf_allocator_free_list_malloc(allocator, alloc1_size);
+    ck_assert_ptr_nonnull(alloc1);
+    size_t const alloc1_node_offset = (size_t)alloc1 - sizeof(PFAllocator_FreeListNode_t);
+    PFAllocator_FreeListNode_t const * alloc1_node = (void*)alloc1_node_offset;
+    size_t const alloc1_node_block_size = pf_allocator_free_list_node_get_block_size(alloc1_node);
+    ck_assert_int_eq(alloc1_node_block_size, alloc1_size+sizeof(PFAllocator_FreeListNode_t));
     
 }
 END_TEST

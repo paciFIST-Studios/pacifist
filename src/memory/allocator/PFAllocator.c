@@ -14,6 +14,8 @@
 
 // Defines
 #define BITS_PER_BYTE 8
+// by default, we try to align all memory use to this N-byte boundary
+#define MEMORY_ALIGNMENT_SIZE 16
 // smallest amount of memory a PFAllocator_FreeListNode_t can allocate
 #define MINIMUM_NODE_ALLOC_MEMORY 256
 
@@ -87,7 +89,14 @@ int32_t pf_allocator_free_list_node_set_block_size(PFAllocator_FreeListNode_t * 
     }
 
     if (block_size < FREE_LIST_NODE_METADATA__MASK_BLOCK_SIZE) {
+        size_t const padding = pf_allocator_free_list_node_get_padding(node);
+        size_t const is_allocated = node->metadata & FREE_LIST_NODE_METADATA__MASK_IS_ALLOCATED;
+
+        node->metadata = 0;
+
         node->metadata |= (block_size & FREE_LIST_NODE_METADATA__MASK_BLOCK_SIZE);
+        node->metadata |= is_allocated;
+        pf_allocator_free_list_node_set_padding(node, padding);
         return PFEC_NO_ERROR;
     }
 
@@ -99,6 +108,16 @@ int32_t pf_allocator_free_list_node_set_block_size(PFAllocator_FreeListNode_t * 
 
     PF_LOG_CRITICAL(PF_ALLOCATOR, error_message);
     return PFEC_ERROR_OUT_OF_BOUNDS_MEMORY_USE; 
+}
+
+size_t pf_allocator_free_list_node_get_allocation_size(PFAllocator_FreeListNode_t const *node) {
+    if (node == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Null ptr to PFAllocator_FreeListNode_t!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+    
+    size_t const block_size = pf_allocator_free_list_node_get_block_size(node);
+    return block_size - sizeof(PFAllocator_FreeListNode_t); 
 }
 
 size_t pf_allocator_free_list_node_get_padding(PFAllocator_FreeListNode_t const * node) {
@@ -242,10 +261,10 @@ int32_t pf_allocator_should_bisect_memory(
     }
     // block is big enough to get split in two
     if (out_cut_at_offset != NULL){
-        if (required_size % 16 == 0) {
+        if (required_size % MEMORY_ALIGNMENT_SIZE == 0) {
             *out_cut_at_offset = required_size;
         } else {
-            *out_cut_at_offset = required_size - (required_size%16) + 16;
+            *out_cut_at_offset = required_size - (required_size % MEMORY_ALIGNMENT_SIZE) + MEMORY_ALIGNMENT_SIZE;
         }
     }
 
@@ -448,7 +467,14 @@ void * pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t c
         size_t bisect_at_offset = 0;
         size_t const block_size = pf_allocator_free_list_node_get_block_size(node);
         if (pf_allocator_should_bisect_memory(block_size, required_memory, &bisect_at_offset)){
+            size_t const next_node_offset = (size_t)node + padding + bisect_at_offset;
+            PFAllocator_FreeListNode_t* next_node = (void*)next_node_offset;
             
+            node->next = next_node;
+            pf_allocator_free_list_node_set_block_size(node, bisect_at_offset);
+
+            size_t const node_data_offset = (size_t)node + padding + sizeof(PFAllocator_FreeListNode_t);
+            return (void*)node_data_offset;
         }
         
         // we have found the correct node, cut the node down to the requested amount, based on 16 byte chunks
