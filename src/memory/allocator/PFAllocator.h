@@ -157,6 +157,8 @@ size_t pf_allocator_free_list_node_get_padding(PFAllocator_FreeListNode_t const 
 int32_t pf_allocator_free_list_node_set_padding(PFAllocator_FreeListNode_t* node, size_t padding);
 
 
+
+
 /**
  * @brief This struct organizes the FreeList allocator, and makes available fns needed to use it
  *
@@ -205,6 +207,18 @@ PFAllocator_FreeList_t* pf_allocator_free_list_create_with_memory(void* base_mem
  * @return 
  */
 int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list);
+
+
+/**
+ * @brief returns the Nth node in the allocator, according to the supplied index
+ *
+ * @param allocator 
+ * @param idx 
+ * @return 
+ */
+void* pf_allocator_free_list_node_get_node_by_index(PFAllocator_FreeList_t* allocator, size_t idx);
+
+
 
 /**
  * @brief Returns TRUE(1), if the size provided is a power of two

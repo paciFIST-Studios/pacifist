@@ -558,6 +558,14 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_free_all__sets_correct_error_message__for_null_ptr_to_pf_free);
 
     ADD_TEST(fn_pf_allocator_free_list_free_all__returns_no_error__on_successful_use);
+
+    // fn pf_allocator_free_list_get_node_by_index
+    ADD_TEST(fn_pf_allocator_free_list_get_node_by_index__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_get_node_by_index__returns_null__for_null_allocator_param);
+    ADD_TEST(fn_pf_allocator_free_list_get_node_by_index__sets_correct_error_message__for_null_allocator_param);
+    ADD_TEST(fn_pf_allocator_free_list_get_node_by_index__returns_head_node__for_zero_index);
+    ADD_TEST(fn_pf_allocator_fn_list_get_node_by_index__returns_null__for_out_of_range_index);
+
     
     // fn pf_allocator_is_power_of_two
     ADD_TEST(fn_pf_allocator_is_power_of_two__is_defined);

@@ -43,6 +43,8 @@
 #define FREE_LIST_NODE_METADATA__MASK_PADDING FREE_LIST_NODE_METADATA_32BIT_MASK_PADDING
 #endif
 
+
+
 // -----------------------------------------------------------------------------------------------------------
 // PFAllocator_FreeList_t
 // -----------------------------------------------------------------------------------------------------------
@@ -235,6 +237,31 @@ int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list) {
     pf_free_list = pf_allocator_free_list_create_with_memory(memory, size);
 
     return PFEC_NO_ERROR;
+}
+
+void * pf_allocator_free_list_node_get_node_by_index(PFAllocator_FreeList_t* allocator, size_t idx) {
+    if (allocator == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t pointer is unexpectedly null!");
+        return NULL;
+    }
+
+    if (idx == 0) {
+        return allocator->head;
+    }
+
+    size_t node_index = 0;
+
+    PFAllocator_FreeListNode_t* node = allocator->head;
+    while (node->next != NULL) {
+        node = node->next;
+        node_index += 1;
+
+        if (node_index == idx) {
+            return node;
+        }
+    }
+    
+    return NULL;
 }
 
 int32_t pf_allocator_is_power_of_two(size_t const size) {
@@ -469,11 +496,14 @@ void * pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t c
         if (pf_allocator_should_bisect_memory(block_size, required_memory, &bisect_at_offset)){
             size_t const next_node_offset = (size_t)node + padding + bisect_at_offset;
             PFAllocator_FreeListNode_t* next_node = (void*)next_node_offset;
-            
             node->next = next_node;
-            pf_allocator_free_list_node_set_block_size(node, bisect_at_offset);
 
             size_t const node_data_offset = (size_t)node + padding + sizeof(PFAllocator_FreeListNode_t);
+
+            size_t const next_node_block_size = block_size - bisect_at_offset - sizeof(PFAllocator_FreeListNode_t);
+            pf_allocator_free_list_node_set_block_size(next_node, next_node_block_size);
+            pf_allocator_free_list_node_set_block_size(node, bisect_at_offset);
+
             return (void*)node_data_offset;
         }
         
