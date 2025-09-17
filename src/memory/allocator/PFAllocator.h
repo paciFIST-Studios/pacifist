@@ -216,7 +216,7 @@ int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list);
  * @param idx 
  * @return 
  */
-void* pf_allocator_free_list_node_get_node_by_index(PFAllocator_FreeList_t* allocator, size_t idx);
+void* pf_allocator_free_list_node_get_node_by_index(PFAllocator_FreeList_t const * allocator, size_t idx);
 
 
 
@@ -245,7 +245,7 @@ int32_t pf_allocator_should_bisect_memory(size_t block_size, size_t required_siz
  * @param pf_free_list 
  * @return 
  */
-size_t pf_allocator_free_list_get_allocated_memory_size(PFAllocator_FreeList_t const * pf_free_list);
+size_t pf_allocator_free_list_get_allocator_available_memory_size(PFAllocator_FreeList_t * pf_free_list);
 
 /**
  * @brief returns a count of how much memory is used by the allocator itself
@@ -303,10 +303,10 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
 /**
  * @brief a Malloc fn which uses the PFAllocator_FreeList_t 
  * 
- * @param size 
+ * @param requested_size 
  * @return 
  */
-void* pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t size);
+void* pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t requested_size);
 
 /**
  * @brief a Realloc fn which uses the PFAllocator_FreeList_t

@@ -580,12 +580,12 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_should_bisect_memory__outputs_correct_value__for_cut_at_offset_param);
     
     // fn pf_allocator_free_list_get_allocated_memory
-    ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__is_defined);
-    ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__returns_correct_error_code__for_null_ptr_to_free_list);
-    ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__sets_correct_error_message__for_null_ptr_to_free_list);
-    ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__returns_correct_error_code__for_invalid_head_ptr_in_free_list);
-    ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__sets_correct_error_message__for_invalid_head_ptr_in_free_list);
-    ADD_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__general_testing_fn);
+    ADD_TEST(fn_pf_allocator_free_list_get_allocator_available_memory_size__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_get_allocatr_available_memory_size__returns_correct_error_code__for_null_ptr_to_free_list);
+    ADD_TEST(fn_pf_allocator_free_list_get_allocator_available_memory_size__sets_correct_error_message__for_null_ptr_to_free_list);
+    ADD_TEST(fn_pf_allocator_free_list_get_allocator_available_memory_size__returns_correct_error_code__for_invalid_head_ptr_in_free_list);
+    ADD_TEST(fn_pf_allocator_free_list_get_allocator_available_memory_size__sets_correct_error_message__for_invalid_head_ptr_in_free_list);
+    ADD_TEST(fn_pf_allocator_free_list_get_allocator_available_memory_size__general_testing_fn);
     
     // fn pf_allocator_free_list_get_memory_overhead
     ADD_TEST(fn_pf_allocator_free_list_get_memory_overhead_size__is_defined);

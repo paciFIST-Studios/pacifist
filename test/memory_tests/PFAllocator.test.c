@@ -694,7 +694,7 @@ END_TEST
 // fn pf_allocator_free_list_get_node_by_index ---------------------------------------------------------------
 
 START_TEST(fn_pf_allocator_free_list_get_node_by_index__is_defined) {
-    void*(*fptr)(PFAllocator_FreeList_t*, size_t) = &pf_allocator_free_list_node_get_node_by_index;
+    void*(*fptr)(PFAllocator_FreeList_t const *, size_t) = &pf_allocator_free_list_node_get_node_by_index;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
@@ -834,24 +834,24 @@ END_TEST
 
 
 
-// fn pf_allocator_free_list_get_allocated_memory_size -------------------------------------------------------
-START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__is_defined) {
-    size_t(*fptr)(PFAllocator_FreeList_t const *) = pf_allocator_free_list_get_allocated_memory_size;
+// fn pf_allocator_free_list_get_allocator_available_memory_size ---------------------------------------------
+START_TEST(fn_pf_allocator_free_list_get_allocator_available_memory_size__is_defined) {
+    size_t(*fptr)(PFAllocator_FreeList_t *) = pf_allocator_free_list_get_allocator_available_memory_size;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
-START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__returns_correct_error_code__for_null_ptr_to_free_list) {
+START_TEST(fn_pf_allocator_free_list_get_allocatr_available_memory_size__returns_correct_error_code__for_null_ptr_to_free_list) {
     PF_SUPPRESS_ERRORS
-    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_get_allocated_memory_size(NULL));
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_get_allocator_available_memory_size(NULL));
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
 
-START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__sets_correct_error_message__for_null_ptr_to_free_list) {
+START_TEST(fn_pf_allocator_free_list_get_allocator_available_memory_size__sets_correct_error_message__for_null_ptr_to_free_list) {
     pf_clear_error();
     PF_SUPPRESS_ERRORS
-    ck_assert_int_eq(PFEC_ERROR_NULL_PTR,  pf_allocator_free_list_get_allocated_memory_size(NULL));
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR,  pf_allocator_free_list_get_allocator_available_memory_size(NULL));
     PF_UNSUPPRESS_ERRORS
 
     char const * expected = "PFAllocator_FreeList_t pointer is unexpectedly null!";
@@ -859,18 +859,18 @@ START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__sets_correct_err
 }
 END_TEST
 
-START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__returns_correct_error_code__for_invalid_head_ptr_in_free_list) {
+START_TEST(fn_pf_allocator_free_list_get_allocator_available_memory_size__returns_correct_error_code__for_invalid_head_ptr_in_free_list) {
     PF_SUPPRESS_ERRORS
-    PFAllocator_FreeList_t const fl = {0};
-    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_get_allocated_memory_size(&fl));
+    PFAllocator_FreeList_t fl = {0};
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_get_allocator_available_memory_size(&fl));
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
 
-START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__sets_correct_error_message__for_invalid_head_ptr_in_free_list) {
+START_TEST(fn_pf_allocator_free_list_get_allocator_available_memory_size__sets_correct_error_message__for_invalid_head_ptr_in_free_list) {
     PF_SUPPRESS_ERRORS
-    PFAllocator_FreeList_t const fl = {0};
-    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_get_allocated_memory_size(&fl));
+    PFAllocator_FreeList_t fl = {0};
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_get_allocator_available_memory_size(&fl));
     PF_UNSUPPRESS_ERRORS
 
     char const * expected = "PFAllocator_FreeList_t->head is unexpectedly null!";
@@ -879,7 +879,7 @@ START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__sets_correct_err
 END_TEST
 
 // successfully counts allocated memory in different situations
-START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__general_testing_fn) {
+START_TEST(fn_pf_allocator_free_list_get_allocator_available_memory_size__general_testing_fn) {
     // set up an allocator with enough memory to actually test it out
     size_t const size = 4096;
     void* memory = malloc(size);
@@ -887,10 +887,10 @@ START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__general_testing_
 
     // test the first node which is created when the allocator is created
     size_t const minimum_allocator_overhead = sizeof(PFAllocator_FreeList_t) + sizeof(PFAllocator_FreeListNode_t);
-    size_t const expected_first_node_available_memory = pf_allocator_free_list_get_allocated_memory_size(allocator);
+    size_t const expected_first_node_available_memory = size - minimum_allocator_overhead;
     // After being created, the first node contains all of the memory owned by the allocator,
     // except for: memory of the allocator struct itself, and memory of the first node struct itself.
-    size_t const measured_first_node_available_memory = size - minimum_allocator_overhead;
+    size_t const measured_first_node_available_memory = pf_allocator_free_list_get_allocator_available_memory_size(allocator);
     ck_assert_int_eq(measured_first_node_available_memory, expected_first_node_available_memory);
 
     // test an allocation.  The first allocation sets the first node, to be the alloc size,
@@ -898,19 +898,25 @@ START_TEST(fn_pf_allocator_free_list_get_allocated_memory_size__general_testing_
     size_t const alloc1_size = 128;
     void* alloc1 = pf_allocator_free_list_malloc(allocator, alloc1_size);
     ck_assert_ptr_nonnull(alloc1);
-    
+
+    // does the first allocation have a node living in the -32 bytes preceding the address returned by malloc?
     PFAllocator_FreeListNode_t const * alloc1_node = (void*)((size_t)alloc1 - sizeof(PFAllocator_FreeListNode_t));
     size_t const alloc1_node_block_size = pf_allocator_free_list_node_get_block_size(alloc1_node);
     ck_assert_int_eq(alloc1_node_block_size, alloc1_size+sizeof(PFAllocator_FreeListNode_t));
 
-    size_t const remaining_memory = allocator->base_memory_size - allocator->free_memory;
-    
-
-    
-    ck_assert_ptr_nonnull(alloc1_node->next);
+    // after the fist allocation, do we have the amount of leftover memory we expect?
+    size_t const expected_first_allocation_available_memory = measured_first_node_available_memory - alloc1_size;
+    size_t const measured_first_allocation_available_memory = pf_allocator_free_list_get_allocator_available_memory_size(allocator);
+    ck_assert_int_eq(expected_first_allocation_available_memory, measured_first_allocation_available_memory);
     size_t const expected_second_node_block_size = size - 208;
     size_t const measured_second_node_block_size = pf_allocator_free_list_node_get_block_size(alloc1_node->next);
     ck_assert_int_eq(expected_second_node_block_size, measured_second_node_block_size);
+
+    
+    // does the use of malloc also create a next node, if there's still memory available?
+    ck_assert_ptr_nonnull(alloc1_node->next);
+
+    
     
 
     
