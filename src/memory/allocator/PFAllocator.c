@@ -50,7 +50,7 @@
 // -----------------------------------------------------------------------------------------------------------
 
 
-int32_t pf_allocator_free_list_node_is_allocated(PFAllocator_FreeListNode_t const * node) {
+int32_t pf_allocator_free_list_node_get_is_allocated(PFAllocator_FreeListNode_t const * node) {
     if (node == NULL) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Null ptr to PFAllocator_FreeListNode_t!");
         return PFEC_ERROR_NULL_PTR;
@@ -316,23 +316,28 @@ size_t pf_allocator_free_list_get_allocator_available_memory_size(PFAllocator_Fr
     size_t used_memory_count = sizeof(PFAllocator_FreeList_t);
     PFAllocator_FreeListNode_t const * node = free_list->head;
     while (node != NULL) {
-        int32_t const isAllocated = pf_allocator_free_list_node_is_allocated(node);
+        int32_t const isAllocated = pf_allocator_free_list_node_get_is_allocated(node);
 
         // if a node is "allocated", then a user is using that memory, and it's not available
         if (isAllocated) {
             used_memory_count += pf_allocator_free_list_node_get_block_size(node);
-        // if a node is not allocated, then only the memory of the node itself is unavailable
+            // if a node is not allocated, then only the memory of the node itself is unavailable
         } else {
-           used_memory_count += sizeof(PFAllocator_FreeListNode_t);
+            used_memory_count += sizeof(PFAllocator_FreeListNode_t);
         }
 
         node = node->next;
     }
 
     size_t const calculated_free_memory = base_memory_size - used_memory_count;
-    PF_ASSERT_MESSAGE((free_list->free_memory == calculated_free_memory),
-        "ERROR! PFAllocator_FreeList_t has lost track of some memory!");
 
+    // This error message helps diagnose the lost memory issue
+    {
+        char message[256] = {0};
+        sprintf(message, "PFAllocator_FreeList_t has lost track of some memory!\n\tAllocator.CalculatedFreeMemory=%d\n\tAllocator.FreeMemory=%d\n\tAllocator.OwnedMemory=%d\n\tAllocator.UsedMemory=%d\n",
+            (uint32_t)calculated_free_memory, (uint32_t)free_list->free_memory, (uint32_t)base_memory_size, (uint32_t)used_memory_count);
+        PF_ASSERT_MESSAGE((free_list->free_memory == calculated_free_memory), message);
+    }
     free_list->free_memory = calculated_free_memory;
 
     return free_list->free_memory;
@@ -481,13 +486,10 @@ void * pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t c
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Cannot allocate with null ptr to allocator!");
         return NULL;
     }
-
     if (requested_size == 0) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Cannot allocate 0-bytes!");
         return NULL;
     }
-
-
     if (allocator->base_memory == NULL) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t is in a bad state! Ptr to base memory was NULL!");
         // NOTE: if the pf_allocator_create_with_memory fn in unchanged, this should(TM) be impossible, b/c
@@ -502,69 +504,92 @@ void * pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t c
         PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t does not have enough memory to fulfill this memory request!");
         return NULL;
     }
-
     if (available_memory == required_memory) {
         PF_LOG_WARNING(PF_ALLOCATOR, "PFAllocator_FreeList_t just gave out its last byte of memory! Continuing program.");
     }
 
-    // find best fit node
+    PFAllocator_FreeListNode_t* alloc_owning_node = NULL;
+    size_t alloc_owning_node_padding;
+
+    // get the node we will allocate from, depending on our lookup policy
     if (allocator->policy == EAPFL_POLICY_FIND_BEST) {
-        // the node from which the allocation should come
-        PFAllocator_FreeListNode_t* node = pf_allocator_free_list_find_best(allocator, requested_size, 16, NULL, NULL);
-        pf_allocator_free_list_node_set_is_allocated(node);
- 
-        size_t const padding = pf_allocator_free_list_node_get_padding(node);
-
-
-        size_t bisect_at_offset = 0;
-        size_t const block_size = pf_allocator_free_list_node_get_block_size(node);
-
-        if (pf_allocator_should_bisect_memory(block_size, required_memory, &bisect_at_offset)){
-            // We're bisecting the memory.  This means:
-            //  1. All the memory in this node, will be cut into two portions: portion_A & portion_B
-            //  2. portion_A, is resized to be the requested size
-            //      a. portion_A stays with the current node
-            //  3. portion_b, is used to make a new node
-            //      a. creating this new node means decreasing free memory by the size of 1 node
-            //      b. the new node manages all of portion_b's memory
-
-            // create a new node, which will life 1 byte past the requested alloc
-            size_t const next_node_offset = (size_t)node + padding + bisect_at_offset;
-            PFAllocator_FreeListNode_t* next_node = (void*)next_node_offset;
-            node->next = next_node;
-
-            // reset the sizes of the next node, and the current node, to distribute the memory correctly
-            size_t const next_node_block_size = block_size - bisect_at_offset - sizeof(PFAllocator_FreeListNode_t);
-            pf_allocator_free_list_node_set_block_size(next_node, next_node_block_size);
-            pf_allocator_free_list_node_set_block_size(node, bisect_at_offset);
-
-            // decrease the free_memory size to account for the new node
-            allocator->free_memory -= sizeof(PFAllocator_FreeListNode_t);
-
-            // calculate the position in this node's data where the alloc actually begins,
-            // and return that address, so the user just has memory they can use
-            size_t const node_data_offset = (size_t)node + padding + sizeof(PFAllocator_FreeListNode_t);
-            return (void*)node_data_offset;
-        }
-        
-        // we have found the correct node, cut the node down to the requested amount, based on 16 byte chunks
-        // if there is extra memory, make a new node, give that node the extra memory, and put that node at the
-        // end of the linked list
-        
-        size_t const memory_start = (size_t)node + padding;
-        void* allocated_memory = (void*)memory_start;
-        return allocated_memory;
+        alloc_owning_node = pf_allocator_free_list_find_best(allocator, requested_size, 16, &alloc_owning_node_padding, NULL);
+    } else {
+        alloc_owning_node = pf_allocator_free_list_find_first(allocator, requested_size, 16, &alloc_owning_node_padding, NULL);
     }
 
-    // find first fit node -----------------------------------------------------------------------------------
+    if (alloc_owning_node == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Could not find a free node for allocation!");
+        return NULL;
+    }
+    if (pf_allocator_free_list_node_get_is_allocated(alloc_owning_node)) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Tried to allocate memory from a node which is already allocated!");
+        return NULL;
+    }
 
-    PFAllocator_FreeListNode_t* node = pf_allocator_free_list_find_first(allocator, requested_size, 16, NULL, NULL);
-    // set node as allocated
-    pf_allocator_free_list_node_set_is_allocated(node);
-    size_t const padding = pf_allocator_free_list_node_get_padding(node);
-    size_t const memory_start = (size_t)node + padding;
-    void* allocated_memory = (void*) memory_start;
-    return allocated_memory;
+    // this is the address we'll return to the user, which represents the beginning of the
+    // memory they've requested, and they just have to only use the amount they requested
+    size_t const alloc_owning_node_user_memory_start = (size_t)alloc_owning_node
+                                                        + alloc_owning_node_padding
+                                                        + sizeof(PFAllocator_FreeListNode_t);
+
+    // we since we're using some/all of this memory, set the node as allocated
+    pf_allocator_free_list_node_set_is_allocated(alloc_owning_node);
+    // this memory is now claimed
+    allocator->free_memory -= requested_size;
+    
+    // There is a question of how much memory this gives the user.  Let's measure how much that is,
+    // and if we should cut it up, and create a new node to manage it, we will
+    size_t const alloc_owning_node_pre_bisect_block_size = pf_allocator_free_list_node_get_block_size(alloc_owning_node);
+
+    size_t bisect_at_offset = 0;
+    if (pf_allocator_should_bisect_memory(alloc_owning_node_pre_bisect_block_size, required_memory, &bisect_at_offset)){
+        // We're bisecting the memory.  This means:
+        //  1. All the memory in this node, will be cut into two portions: portion_A & portion_B
+        //  2. portion_A, is resized to be the requested size
+        //      a. portion_A stays with the current node
+        //  3. portion_b, is used to make a new node
+        //      a. creating this new node means decreasing free memory by the size of 1 node
+        //      b. the new node manages all of portion_b's memory
+
+        // create a new node, which will live 1 byte past the requested alloc
+        size_t const next_node_offset = (size_t)alloc_owning_node + alloc_owning_node_padding + bisect_at_offset;
+        PFAllocator_FreeListNode_t* next_node = (void*)next_node_offset;
+        alloc_owning_node->next = next_node;
+
+        // decrease the free_memory size to account for the new node.  the memory it manages
+        // is still available to allocate, so don't decrease by the whole block size
+        allocator->free_memory -= sizeof(PFAllocator_FreeListNode_t);
+
+
+        // reset the sizes of the next node, and the current node, to distribute the memory correctly
+        size_t const current_node_block_size = requested_size + sizeof(PFAllocator_FreeListNode_t);
+        // ok, so this is complicated for me.  Don't touch this math, it's correct.
+        //
+        //  When we're doing the 1st allocation, we have an allocator and a node, and the node
+        //  owns all the memory we could allocate.  When we measure the alloc_owning...block_size,
+        //  that block size includes the size of the node itself, and the bisect_at_offset also
+        //  includes the memory which will hold its node, so we mix in the size of a node directly,
+        //  we'll end up counting it twice
+        size_t const next_node_block_size = alloc_owning_node_pre_bisect_block_size - bisect_at_offset;
+
+        // This assertion prints a helpful debugging message if it fails
+        // 20250917 EBarrett: I'm just going to leave it in, until this thing is battle tested
+        {
+            char assert_message[196] = {0};
+            sprintf(assert_message, "Warning! PFAllocator_FreeList_t has lost track of some memory!\n\tCurrentNode.NewBlockSize=%d\n\tNextNode.NewBlockSize=%d\n\tCurrentNode.OldBlockSize=%d\n\tMissingSize=%d\n",
+                (int32_t)current_node_block_size, (int32_t)next_node_block_size, (int32_t)alloc_owning_node_pre_bisect_block_size, (int32_t)(alloc_owning_node_pre_bisect_block_size - current_node_block_size - next_node_block_size));
+            PF_ASSERT_MESSAGE((current_node_block_size + next_node_block_size == alloc_owning_node_pre_bisect_block_size),
+                assert_message);
+        }
+
+        // update the block sizes
+        pf_allocator_free_list_node_set_block_size(next_node, next_node_block_size);
+        pf_allocator_free_list_node_set_block_size(alloc_owning_node, bisect_at_offset);
+
+    }
+
+    return (void*)alloc_owning_node_user_memory_start;
 }
 
 void * pf_allocator_free_list_realloc(PFAllocator_FreeList_t* allocator, void *ptr, size_t const size) {

@@ -96,7 +96,7 @@ typedef struct PFAllocator_FreeListNode_t {
  * @param node 
  * @return 
  */
-int32_t pf_allocator_free_list_node_is_allocated(PFAllocator_FreeListNode_t const * node);
+int32_t pf_allocator_free_list_node_get_is_allocated(PFAllocator_FreeListNode_t const * node);
 
 /**
  * @brief Sets the supplied node's metadata to indicate this node IS allocated
