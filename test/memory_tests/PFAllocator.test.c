@@ -901,7 +901,7 @@ START_TEST(fn_pf_allocator_free_list_get_allocator_available_memory_size__genera
     void* alloc0 = pf_allocator_free_list_malloc(allocator, alloc0_size);
     ck_assert_ptr_nonnull(alloc0);
 
-    // does the first allocation have a node living in the -32 bytes preceding the address returned by malloc?
+    // is the allocation's block size equal to the request size + sizeof(node)?
     PFAllocator_FreeListNode_t const * alloc0_node = pf_allocator_free_list_node_get_node_by_index(allocator, 0);
     size_t const alloc0_node_block_size = pf_allocator_free_list_node_get_block_size(alloc0_node);
     ck_assert_int_eq(alloc0_node_block_size, alloc0_size+sizeof(PFAllocator_FreeListNode_t));
@@ -917,14 +917,8 @@ START_TEST(fn_pf_allocator_free_list_get_allocator_available_memory_size__genera
     size_t const measured_second_node_block_size = pf_allocator_free_list_node_get_block_size(alloc0_node->next);
     ck_assert_int_eq(expected_second_node_block_size, measured_second_node_block_size);
 
-
-    // does the use of malloc also create a next node, if there's still memory available?
-
+    // todo: maybe more allocations?
     
-    
-
-    
-
     free(memory);
 }
 END_TEST

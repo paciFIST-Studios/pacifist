@@ -60,12 +60,6 @@ typedef enum EAllocationPolicy_FreeList {
     EAPFL_POLICY_FIND_FIRST
 } EAllocationPolicy_FreeList;
 
-//typedef struct PFAllocator_FreeListAllocationHeader_t {
-//    struct PFAllocator_FreeListAllocationHeader_t* next;
-//    size_t const block_size;
-//    size_t const padding;
-//} PFAllocator_FreeListAllocationHeader_t;
-
 typedef struct PFAllocator_FreeListNode_t {
     struct PFAllocator_FreeListNode_t* next;
     // the top 5 bits are used for metadata:
@@ -237,7 +231,7 @@ int32_t pf_allocator_is_power_of_two(size_t size);
  * @param out_cut_at_offset 
  * @return 
  */
-int32_t pf_allocator_should_bisect_memory(size_t block_size, size_t required_size, size_t* out_cut_at_offset);
+int32_t pf_allocator_should_bisect_memory(size_t block_size, size_t required_size, uintptr_t* out_cut_at_offset);
 
 /**
  * @brief returns a count of how many bytes have been given out to users
@@ -280,7 +274,7 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_first(
     PFAllocator_FreeList_t const * free_list,
     size_t requested_size,
     size_t alignment,
-    size_t*  out_padding,
+    uintptr_t*  out_padding,
     PFAllocator_FreeListNode_t** out_previous_node);
 
 /**
@@ -297,12 +291,13 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     PFAllocator_FreeList_t const * free_list,
     size_t requested_size,
     size_t alignment,
-    size_t * out_padding,
+    uintptr_t* out_padding,
     PFAllocator_FreeListNode_t** out_previous_node);
 
 /**
  * @brief a Malloc fn which uses the PFAllocator_FreeList_t 
- * 
+ *
+ * @param allocator
  * @param requested_size 
  * @return 
  */
@@ -311,6 +306,7 @@ void* pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t re
 /**
  * @brief a Realloc fn which uses the PFAllocator_FreeList_t
  *
+ * @param allocator
  * @param ptr 
  * @param size 
  * @return 
@@ -320,6 +316,7 @@ void* pf_allocator_free_list_realloc(PFAllocator_FreeList_t* allocator, void* pt
 /**
  * @brief a Free fn which uses the PFAllocator_FreeList_t
  *
+ * @param allocator
  * @param ptr 
  */
 void pf_allocator_free_list_free(PFAllocator_FreeList_t* allocator, void* ptr);
