@@ -340,12 +340,12 @@ START_TEST(fn_pf_allocator_free_list_node_get_allocation_size__returns_correct_v
     ck_assert_ptr_nonnull(allocator->head);
 
     size_t const node1_block_size = pf_allocator_free_list_node_get_block_size(allocator->head);
-    size_t const expected_node1_block_size = size - sizeof(PFAllocator_FreeList_t) - sizeof(PFAllocator_FreeListNode_t);
+    // the first node contains everything except for the allocator
+    size_t const expected_node1_block_size = size - sizeof(PFAllocator_FreeList_t);
     ck_assert_int_eq(node1_block_size, expected_node1_block_size);
 
     size_t const node1_alloc_size = pf_allocator_free_list_node_get_allocation_size(allocator->head);
-    // the second node here, equates to the first byte after the full size of the first node
-    size_t const expected_node1_alloc_size = size - sizeof(PFAllocator_FreeList_t) - (sizeof(PFAllocator_FreeListNode_t) * 2);
+    size_t const expected_node1_alloc_size = size - sizeof(PFAllocator_FreeList_t) - sizeof(PFAllocator_FreeListNode_t);
     ck_assert_int_eq(node1_alloc_size , expected_node1_alloc_size);
 }
 
@@ -686,8 +686,10 @@ START_TEST(fn_pf_allocator_free_list_free_all__returns_no_error__on_successful_u
     PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, size);
     ck_assert_ptr_nonnull(allocator);
     ck_assert_int_eq(pf_allocator_free_list_free_all(allocator), PFEC_NO_ERROR);
-    // 128 - 64 (allocator) - 16 (node header) = 48
-    ck_assert_int_eq(allocator->head->metadata, 48);
+    size_t const measured_node_block_size = pf_allocator_free_list_node_get_block_size(allocator->head);
+    // block-size here includes the node, but not the allocator
+    size_t const calculated_node_block_size = size - sizeof(PFAllocator_FreeList_t); 
+    ck_assert_int_eq(measured_node_block_size, calculated_node_block_size);
 }
 END_TEST
 

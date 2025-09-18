@@ -146,55 +146,48 @@ int32_t pf_allocator_free_list_node_set_padding(PFAllocator_FreeListNode_t* node
 }
 
 
-PFAllocator_FreeList_t* pf_allocator_free_list_create_with_memory(void* base_memory, size_t const size) {
+PFAllocator_FreeList_t* pf_allocator_free_list_create_with_memory(void* base_memory, size_t const base_memory_size) {
     if (base_memory == NULL) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Cannot initialize PFAllocator_FreeList_t without valid base_memory ptr!")
         return NULL;
     }
-    if (size == 0) {
+    if (base_memory_size == 0) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Cannot initialize PFAllocator_FreeList_t to zero size!");
         return NULL;
     }
-    if (size <= 80) {
+    if (base_memory_size <= 80) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Cannot initialize PFAllocator_FreeList_t with fewer than 80 bytes!  Suggest 4096 minimum.");
         return NULL;
     }
 
     // this should already be zeroed out, but let's not assume
-    memset(base_memory, 0, size);
+    memset(base_memory, 0, base_memory_size);
 
+    // create & initialize the allocator
     PFAllocator_FreeList_t* pf_free_list = (PFAllocator_FreeList_t*)base_memory;
-
     pf_free_list->base_memory = base_memory;
-    pf_free_list->base_memory_size = size;
-
+    pf_free_list->base_memory_size = base_memory_size;
     // set the memory usage fns
     pf_free_list->pf_malloc = &pf_allocator_free_list_malloc;
     pf_free_list->pf_realloc = &pf_allocator_free_list_realloc;
     pf_free_list->pf_free = &pf_allocator_free_list_free;
-
+    // set the default policy
     pf_free_list->policy = EAPFL_POLICY_FIND_BEST;
     
-    // available memory starts just after the end of this allocator
-    size_t const allocator_available_memory_offset = (size_t)base_memory + sizeof(PFAllocator_FreeList_t);
-    void* allocator_available_memory_base = (void*)(allocator_available_memory_offset );
-
-
-    // set up the first node
-    PFAllocator_FreeListNode_t* first_node = allocator_available_memory_base;
-    // data can be allocated, starting at the end of this node
-    size_t const first_node_data_start_offset = allocator_available_memory_offset + sizeof(PFAllocator_FreeListNode_t);
-    // the first created node contains all of the memory remaining to the allocator
-    // which is:
-    //      80 = sizeof(allocator) + sizeof(node)
-    //      total - sizeof(allocator) - sizeof(node)
-    size_t const first_node_block_size = ((size_t)base_memory+size) - first_node_data_start_offset;
+    // creating & initialize the "first" node
+    size_t const first_node_memory_offset = (size_t)base_memory + sizeof(PFAllocator_FreeList_t);
+    void* first_node_node_memory = (void*)(first_node_memory_offset );
+    PFAllocator_FreeListNode_t* first_node = first_node_node_memory;
+    // the memory block in the first node, is everything except for the allocator itself
+    size_t const first_node_block_size = base_memory_size - sizeof(PFAllocator_FreeList_t);
     pf_allocator_free_list_node_set_block_size(first_node, first_node_block_size);
     // the user allocates this memory, not us, so we're setting it to not-allocated
     pf_allocator_free_list_node_set_is_not_allocated(first_node);
 
-    // some of the memory is used to hold the allocator struct itself
-    pf_free_list->free_memory = first_node_block_size;
+    // update the free_memory count, so we know how much free memory there is.  At this point,
+    // we've spent memory on storing the allocator, and on storing the first node, but otherwise,
+    // we should have everything left over from the base memory
+    pf_free_list->free_memory = base_memory_size - sizeof(PFAllocator_FreeList_t) - sizeof(PFAllocator_FreeListNode_t);
 
     // set up the list itself
     first_node->next = NULL;

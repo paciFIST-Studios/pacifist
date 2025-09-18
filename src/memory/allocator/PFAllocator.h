@@ -195,10 +195,10 @@ typedef struct PFAllocator_FreeList_t {
  * @note Once created, the allocator assumes it controls all of the memory it was created with
  *
  * @param base_memory 
- * @param size 
+ * @param base_memory_size 
  * @return 
  */
-PFAllocator_FreeList_t* pf_allocator_free_list_create_with_memory(void* base_memory, size_t const size);
+PFAllocator_FreeList_t* pf_allocator_free_list_create_with_memory(void* base_memory, size_t const base_memory_size);
 
 /**
  * @brief - zeroes out all memory managed by this allocator, and resets the allocator to a fresh state 
