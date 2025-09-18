@@ -2,6 +2,7 @@
 
 // stdlib
 #include <stdlib.h>
+#include <stdio.h>
 #include <sys/mman.h>
 // framework
 
@@ -36,7 +37,7 @@
 #include "core/error.h"
 #include "engine/PFEngineState.h"
 #include "log/log.h"
-#include "memory/allocator/MemoryArena.h"
+#include "memory/allocator/PFMemoryArena.h"
 // game
 #include "_games/Slain/Slain.h"
 
@@ -59,7 +60,7 @@ static SDL_Texture* s_sdl_texture = NULL;
 
 
 static size_t const s_application_memory_size = Mebibytes(64);
-static MemoryArena_t* s_program_lifetime_memory_arena = NULL;
+static PFAllocator_MemoryArena_t* s_program_lifetime_memory_arena = NULL;
 
 static size_t s_engine_configuration = 0;
 __attribute__((unused))
@@ -213,7 +214,7 @@ int32_t try_allocate_application_memory(size_t const memory_size, void** out_mem
     return TRUE;
 }
 
-int32_t try_initialize_program_lifetime_allocator(void* program_lifetime_memory, size_t const memory_size, MemoryArena_t** out_arena) {
+int32_t try_initialize_program_lifetime_allocator(void* program_lifetime_memory, size_t const memory_size, PFAllocator_MemoryArena_t** out_arena) {
     if (program_lifetime_memory == NULL) {
         PF_LOG_CRITICAL(PF_INITIALIZATION, "Tried to initialize program lifetime allocator, but got ptr to NULL for program_lifetime_memory!");
         return FALSE;
@@ -225,7 +226,7 @@ int32_t try_initialize_program_lifetime_allocator(void* program_lifetime_memory,
 
     // all of our memory is allocated now.  in order to manage it, put in a
     // memory arena aligned to byte 0
-    *out_arena = memory_arena_create_with_memory(program_lifetime_memory, memory_size);
+    *out_arena = pf_allocator_memory_arena_create_with_memory(program_lifetime_memory, memory_size);
     return TRUE;
 }
 
@@ -236,14 +237,14 @@ int32_t try_initialize_engine_state_struct(void* memory_base, PFEngineState_t** 
 
     // first allocation from within the memory area holds the engine state.
     // This struct owns the string internment struct, 
-    *out_engine_state_struct = PUSH_STRUCT(memory_base, PFEngineState_t);
+    *out_engine_state_struct = PF_PUSH_STRUCT(memory_base, PFEngineState_t);
     if (out_engine_state_struct == NULL) {
         return FALSE;
     }
     return TRUE;
 }
 
-int32_t try_initialize_game_lifetime_state_struct(void* memory, MemoryArena_t* allocator,
+int32_t try_initialize_game_lifetime_state_struct(void* memory, PFAllocator_MemoryArena_t* allocator,
     SlainGameLifetimeState_t** out_game_lifetime_state_struct)
 {
     if (memory == NULL) {
@@ -255,7 +256,7 @@ int32_t try_initialize_game_lifetime_state_struct(void* memory, MemoryArena_t* a
     }
     
     // create the lifetime state of the game, which has access to the engine state, but isn't the engine state
-    SlainGameLifetimeState_t* state = PUSH_STRUCT(memory, SlainGameLifetimeState_t);
+    SlainGameLifetimeState_t* state = PF_PUSH_STRUCT(memory, SlainGameLifetimeState_t);
     if (state == NULL) {
         return FALSE;
     }
