@@ -13,8 +13,8 @@
 // framework
 #include <SDL3/SDL_log.h>
 // engine
-#include "../core/define.h"
-#include "../core/error.h"
+#include "core/define.h"
+#include "core/error.h"
 
 
 

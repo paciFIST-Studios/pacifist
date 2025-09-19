@@ -2,11 +2,31 @@
 
 // include
 #include <check.h>
-#include "../../src/resource/PFResourceManager.h"
+#include "resource/PFResourceManager.h"
 
 // stdlib
 // framework
 // engine
+#include "core/define.h"
+
+// struct PFResourceManagerConfiguration_t -------------------------------------------------------------------
+
+START_TEST(fn_struct_PFResourceManagerConfiguration_t__is_defined) {
+    PFResourceManagerConfiguration_t const config = {0};
+    ck_assert_ptr_nonnull(&config);
+}
+END_TEST
+
+START_TEST(fn_struct_PFResourceManagerConfiguration_t__has_expected_size) {
+    ck_assert_int_eq(sizeof(PFResourceManagerConfiguration_t), 24);
+}
+END_TEST
+
+START_TEST(fn_struct_PFResourceManagerConfiguration_t__has_expected_members) {
+    PFResourceManagerConfiguration_t const config = {0};
+    ck_assert_ptr_nonnull(&config.total_managed_resource_count);
+}
+END_TEST
 
 // struct PFResourceManager_t --------------------------------------------------------------------------------
 
@@ -17,7 +37,7 @@ START_TEST(fn_struct_PFResourceManager_t__is_defined) {
 END_TEST
 
 START_TEST(fn_struct_PFResourceManager_t__has_expected_size) {
-    ck_assert_int_eq(sizeof(PFResourceManager_t), 40);
+    ck_assert_int_eq(sizeof(PFResourceManager_t), 64);
 }
 END_TEST
 
@@ -34,13 +54,42 @@ END_TEST
 
 // fn pf_resource_manager_initialize -------------------------------------------------------------------------
 
-START_TEST(fn_pf_resource_manager_initialize__is_defined) {
-    int32_t (*fptr)(void*, PFResourceManager_t*) = pf_resource_manager_initialize;
+START_TEST(fn_pf_resource_manager_create_with_memory__is_defined) {
+    PFResourceManager_t* (*fptr)(void*, size_t const, PFResourceManagerConfiguration_t const) = pf_resource_manager_create_with_memory;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
-    // exists
+
+START_TEST(fn_pf_resource_manager_create_with_memory__returns_null__for_null_base_memory_ptr) {
+    PFResourceManagerConfiguration_t const cfg = {0};
+    ck_assert_ptr_null(pf_resource_manager_create_with_memory(NULL, 0,  cfg));
+}
+END_TEST
+
+
+START_TEST(fn_pf_resource_manager_create_with_memory__also_creates_resource_manager_allocator__when_called) {
+    size_t const memory_size = 4096;
+    void* test_memory = malloc(memory_size);
+    memset(test_memory, 0, memory_size);
+
+    PFResourceManagerConfiguration_t const cfg = { .total_managed_resource_count = 32 };
+    PFResourceManager_t* resource_manager = pf_resource_manager_create_with_memory(test_memory, memory_size, cfg);
+    ck_assert_ptr_nonnull(resource_manager);
+    
+    // free_list_allocator
+    ck_assert_ptr_nonnull(resource_manager->dynamic_allocator->base_memory);
+    ck_assert_int_eq(memory_size-sizeof(PFResourceManager_t), resource_manager->dynamic_allocator->base_memory_size);
+    ck_assert_int_eq(0, resource_manager->dynamic_allocator->free_memory);
+    ck_assert_ptr_nonnull(resource_manager->dynamic_allocator->head);
+    ck_assert_ptr_nonnull(resource_manager->dynamic_allocator->pf_malloc);
+    ck_assert_ptr_nonnull(resource_manager->dynamic_allocator->pf_realloc);
+    ck_assert_ptr_nonnull(resource_manager->dynamic_allocator->pf_free);
+
+    free(test_memory);
+}
+END_TEST
+
     // sets up members correctly
     // sets up allocator using provided data
     // correct errors for invalid args
@@ -103,7 +152,7 @@ END_TEST
 
 // fn pf_resource_manager_unregister_resource_with_name ------------------------------------------------------
 
-START_TEST(fn_pf_resource_manager_unreqigster_resource_with_name__is_defined) {
+START_TEST(fn_pf_resource_manager_unregister_resource_with_name__is_defined) {
     int32_t(*fptr)(PString_t const) = pf_resource_manager_unregister_resource_with_name;
     ck_assert_ptr_nonnull(fptr);
 }

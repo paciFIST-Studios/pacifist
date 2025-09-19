@@ -7,8 +7,8 @@
 #include <stdlib.h>
 // framework
 // engine
-#include "../core/common.h"
-#include "../core/error.h"
+#include "core/common.h"
+#include "core/error.h"
 // game
 
 

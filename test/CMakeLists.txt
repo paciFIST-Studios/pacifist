@@ -3,7 +3,8 @@
 # NOTE: Check is compiled into an executable, so we actually need it as an include,
 # rather than as just a library
 include_directories(${CMAKE_SOURCE_DIR}/vendor/check/include)
-
+include_directories(${CMAKE_SOURCE_DIR}/vendor)
+include_directories(${CMAKE_SOURCE_DIR}/src)
 
 # NOTE: same problem as noted in the src/CMakeList.  We have to add files manually
 set(TEST_LIB_SOURCE_FILES

@@ -7,7 +7,7 @@
 #include <stdint.h>
 // framework
 // engine
-#include "../core/define.h"
+#include "core/define.h"
 
 static int32_t is_power_of_two(uintptr_t x){
     return (x & (x - 1)) == 0;

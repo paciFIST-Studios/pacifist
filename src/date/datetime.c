@@ -8,10 +8,9 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "../core/error.h"
+#include "core/error.h"
 // framework
 // engine
-#include "../core/error.h"
 
 int32_t get_datetime_string(char * out_buffer, size_t const out_buffer_length) {
     int32_t const required_buffer_len = 22;

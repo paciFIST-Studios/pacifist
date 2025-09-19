@@ -2,7 +2,7 @@
 
 // includes
 #include <check.h>
-#include "../../src/resource/PFManagedResource.h"
+#include "resource/PFManagedResource.h"
 
 // stdlib
 // framework

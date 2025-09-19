@@ -6,8 +6,8 @@
 // stdlib
 // framework
 // engine
-#include "../core/define.h"
-#include "../date/datetime.h"
+#include "core/define.h"
+#include "date/datetime.h"
 
 //static FILE* s_active_log_file;
 

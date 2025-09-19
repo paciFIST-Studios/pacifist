@@ -10,7 +10,7 @@
 #include <SDL3/SDL_log.h>
 // project
 
-#include "../core/common.h"
+#include "core/common.h"
 
 //static  char APPLICATION_STR[] = "Application";
 //static  char ERROR_STR[]    = "Error";

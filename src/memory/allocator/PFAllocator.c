@@ -1,16 +1,16 @@
 // paciFIST studios. 2025. MIT License
 
 // include
-#include "../allocator/PFAllocator.h"
+#include "memory/allocator/PFAllocator.h"
 
 // stdlib
 #include <stdlib.h>
 // framework
 // engine
-#include "../../core/assert.h"
-#include "../../core/debug.h"
-#include "../../core/define.h"
-#include "../../core/error.h"
+#include "core/assert.h"
+#include "core/debug.h"
+#include "core/define.h"
+#include "core/error.h"
 
 // Defines
 #define BITS_PER_BYTE 8

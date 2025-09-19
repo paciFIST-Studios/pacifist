@@ -1,13 +1,13 @@
 // paciFIST studios. 2025. MIT License
 
 // include
-#include "../../memory/allocator/PFMemoryArena.h"
+#include "memory/allocator/PFMemoryArena.h"
 
 // stdlib
 // framework
 // engine
-#include "../../core/assert.h"
-#include "../../core/error.h"
+#include "core/assert.h"
+#include "core/error.h"
 
 
 

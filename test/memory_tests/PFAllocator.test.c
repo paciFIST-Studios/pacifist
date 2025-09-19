@@ -10,9 +10,9 @@
 #include <stdio.h>
 // framework
 // engine
-#include "../../src/core/define.h"
-#include "../../src/core/error.h"
-#include "../../src/string/pstring.h"
+#include "core/define.h"
+#include "core/error.h"
+#include "string/pstring.h"
 
 // -----------------------------------------------------------------------------------------------------------
 // PFAllocator FreeList 

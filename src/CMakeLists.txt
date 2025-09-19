@@ -121,6 +121,11 @@ set(ENGINE_LIB_SOURCE_FILES
         # u,v,w,x,y,z 
 )
 
+include_directories(
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+
 set(ENGINE_LIB_INCLUDE_DIRECTORIES
 )
 

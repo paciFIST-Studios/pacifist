@@ -5,7 +5,7 @@
 // engine
 #include "error.h"
 
-#include "../memory/hash_table/HashTable.h"
+#include "memory/hash_table/HashTable.h"
 // game
 
 // comment out this definition to turn off error suppression, and print errors

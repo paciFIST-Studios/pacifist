@@ -6,8 +6,8 @@
 // stdlib
 // framework
 // engine
-#include "../string/PFStringInternmentSingleton.h"
-#include "../core/error.h"
+#include "string/PFStringInternmentSingleton.h"
+#include "core/error.h"
 
 
 typedef struct PFEngineState_t {

@@ -9,8 +9,8 @@
 #include <string.h>
 // framework
 // engine
-#include "../date/datetime.h"
-#include "../log/log_category.h"
+#include "date/datetime.h"
+#include "log/log_category.h"
 // game
 
 

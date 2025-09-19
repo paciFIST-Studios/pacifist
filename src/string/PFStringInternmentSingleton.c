@@ -7,7 +7,7 @@
 // framework
 // engine
 
-#include "../core/error.h"
+#include "core/error.h"
 
 
 static PString_t error_pstr = { .string = NULL, .length = 0 };

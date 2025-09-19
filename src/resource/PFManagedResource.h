@@ -4,10 +4,10 @@
 #define PF_MANAGED_RESOURCE_H
 
 // stdlib
-#include "stdint.h"
+#include <stdint.h>
 // framework
 // engine
-#include "../project_data_types.h"
+#include "project_data_types.h"
 
 
 typedef struct PFManagedResource_t {

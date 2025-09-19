@@ -738,9 +738,9 @@ int main(void) {
     ADD_TEST(fn_struct_PFResourceManager_t__is_defined);
     ADD_TEST(fn_struct_PFResourceManager_t__has_expected_size);
 
-    // pf_resource_manager_initialize
+    // pf_resource_manager_create_with_memory
     ADD_TEST(fn_pf_resource_manager_create_with_memory__is_defined);
-    //ADD_TEST(fn_pf_resource_manager_initialize__initializes_resource_manager_allocator_when_called);
+    ADD_TEST(fn_pf_resource_manager_create_with_memory__also_creates_resource_manager_allocator__when_called);
 
     // pf_resource_manager_register_resource_with_path
     ADD_TEST(fn_pf_resource_manager_register_resource_with_path__is_defined);
