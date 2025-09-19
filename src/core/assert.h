@@ -27,7 +27,7 @@ static inline void pf_do_assertion_message(char const * message, char const * fn
 }
 
 // Asserts that the condition is true.  If it is not, this message is printed to stderr, along with the function, file, and line 
-#define ASSERT_MESSAGE(expression, message) \
+#define PF_ASSERT_MESSAGE(expression, message) \
 do { if(!expression){ pf_do_assertion_message(message, __func__, __FILE__, __LINE__); } } while(0);
 #else
 
