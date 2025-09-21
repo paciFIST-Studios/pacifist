@@ -30,27 +30,25 @@
  */
 
 
-#define PFSI_MAX_STRINGS 254
+#define PFSLI_MAX_STRINGS 254
 
 // 120250727 - struct is 4096 bytes right now
-typedef struct PFStringInternmentSingleton_t {
+typedef struct PFStringLifetimeInternmentSingleton_t {
     void * usable_memory_base;
     size_t owned_memory_size;
     size_t used_memory_size;
     uint8_t next_unused_idx;
 
-    PString_t strings[PFSI_MAX_STRINGS];
-} PFStringInternmentSingleton_t;
+    PString_t strings[PFSLI_MAX_STRINGS];
+} PFStringLifetimeInternmentSingleton_t;
 
-int32_t pf_string_internment_initialize(
-    PFStringInternmentSingleton_t * string_internment,
-    void * memory_base,
-    size_t const memory_size);
+
+PFStringLifetimeInternmentSingleton_t* pf_string_lifetime_internment_create_with_memory(
+    void* memory_base,
+    size_t memory_size);
 
 
 /**
- * 
- * 
  * NOTE: when copying string over, string_internment will use 1 byte
  *          to add a nul-terminator for the interned string
  * 
@@ -63,10 +61,10 @@ int32_t pf_string_internment_initialize(
  * @param length 
  * @return 
  */
-PString_t pf_string_internment_emplace_cstr(
-    PFStringInternmentSingleton_t * string_internment,
-    char * cstring,
-    size_t const length);
+PString_t pf_string_lifetime_internment_emplace_cstr(
+    PFStringLifetimeInternmentSingleton_t * string_internment,
+    char const * cstring,
+    size_t length);
 
 /**
  * 
@@ -82,9 +80,9 @@ PString_t pf_string_internment_emplace_cstr(
  * @param pstring 
  * @return 
  */
-PString_t pf_string_internment_emplace_pstr(
-    PFStringInternmentSingleton_t * string_internment,
-    PString_t const pstring);
+PString_t pf_string_lifetime_internment_emplace_pstr(
+    PFStringLifetimeInternmentSingleton_t * string_internment,
+    PString_t pstring);
 
 
 #endif //STRING_INTERNMENT_SINGLETON_H

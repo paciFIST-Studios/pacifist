@@ -15,8 +15,8 @@
 
 // Constants -------------------------------------------------------------------------------------------------
 
-START_TEST(constant_PFSI_MAX_STRINGS__is_expected_value) {
-    ck_assert_int_eq(PFSI_MAX_STRINGS, 254);
+START_TEST(constant_PFSLI_MAX_STRINGS__is_expected_value) {
+    ck_assert_int_eq(PFSLI_MAX_STRINGS, 254);
 }
 END_TEST
 
@@ -25,17 +25,17 @@ END_TEST
 // struct PFStringInternmentSingleton_t ----------------------------------------------------------------------
 
 START_TEST(struct_PFStringInternmentSingleton_t__is_defined) {
-    PFStringInternmentSingleton_t const strings = {0};
+    PFStringLifetimeInternmentSingleton_t const strings = {0};
     ck_assert_ptr_nonnull(&strings);
 }
 END_TEST
 
 START_TEST(struct_PFStringInternmentSingleton_t__has_correct_size) {
-    ck_assert_int_eq(sizeof(PFStringInternmentSingleton_t), 4096);
+    ck_assert_int_eq(sizeof(PFStringLifetimeInternmentSingleton_t), 4096);
 }
 
-START_TEST(struct_PFStringInternmentSingleton_t__has_expected_members) {
-    PFStringInternmentSingleton_t const strings = {0};
+START_TEST(struct_PFStringLifetimeInternmentSingleton_t__has_expected_members) {
+    PFStringLifetimeInternmentSingleton_t const strings = {0};
     ck_assert_ptr_null(strings.usable_memory_base);
     ck_assert_int_eq(strings.owned_memory_size, 0);
     ck_assert_int_eq(strings.used_memory_size, 0);
@@ -44,102 +44,122 @@ START_TEST(struct_PFStringInternmentSingleton_t__has_expected_members) {
 }
 END_TEST
 
-// fn pf_string_internment_initialize ------------------------------------------------------------------------
-START_TEST(fn_pf_string_internment_initialize__is_defined) {
-    int32_t(*fptr)(PFStringInternmentSingleton_t *, void *, size_t const) = &pf_string_internment_initialize;
+// fn pf_string_internment_create_with_memory ----------------------------------------------------------------
+START_TEST(fn_pf_string_lifetime_internment_create_with_memory__is_defined) {
+    PFStringLifetimeInternmentSingleton_t*(*fptr)(void *, size_t const) = &pf_string_lifetime_internment_create_with_memory;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
-START_TEST(fn_pf_string_internment_initialize__returns_correct_error_code__for_null_string_internment_param) {
+START_TEST(fn_pf_string_lifetime_internment_create_with_memory__returns_null__for_null_string_internment_param) {
     PF_SUPPRESS_ERRORS
-    int32_t const ret = pf_string_internment_initialize(NULL, NULL, 0);
+    ck_assert_ptr_null(pf_string_lifetime_internment_create_with_memory(NULL, 0));
     PF_UNSUPPRESS_ERRORS
-    ck_assert_int_eq(ret, PFEC_ERROR_NULL_PTR);
 }
 END_TEST
 
-START_TEST(fn_pf_string_internment_initialize__sets_correct_error_message__for_null_string_internment_param) {
+START_TEST(fn_pf_string_lifetime_internment_create_with_memory__sets_correct_error_message__for_null_string_internment_param) {
     pf_clear_error();
     PF_SUPPRESS_ERRORS
-    pf_string_internment_initialize(NULL, NULL, 0);
+    ck_assert_ptr_null(pf_string_lifetime_internment_create_with_memory(NULL, 0));
     PF_UNSUPPRESS_ERRORS
 
-    char const * expected = "Null ptr to PFStringInternmentSingleton";
+    char const * expected = "Null ptr to PFStringLifetimeInternmentSingleton";
     ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
-START_TEST(pf_string_internment_initialize__returns_correct_error_code__for_null_memory_base_param) {
-    PFStringInternmentSingleton_t string_internment = {0};
-
-    pf_clear_error();
+START_TEST(pf_string_lifetime_internment_create_with_memory__returns_null__for_null_memory_base_param) {
     PF_SUPPRESS_ERRORS
-    int32_t const ret = pf_string_internment_initialize(&string_internment, NULL, 0);
+    ck_assert_ptr_null(pf_string_lifetime_internment_create_with_memory(NULL, 0));
     PF_UNSUPPRESS_ERRORS
-    ck_assert_int_eq(ret, PFEC_ERROR_NULL_PTR);
 }
 
-START_TEST(pf_string_internment_initialize__sets_correct_error_message__for_null_memory_base_param) {
-    PFStringInternmentSingleton_t string_internment = {0};
-
+START_TEST(pf_string_lifetime_internment_create_with_memory__sets_correct_error_message__for_null_memory_base_param) {
     pf_clear_error();
     PF_SUPPRESS_ERRORS
-    pf_string_internment_initialize(&string_internment, NULL, 0);
+    ck_assert_ptr_null(pf_string_lifetime_internment_create_with_memory(NULL, 0));
     PF_UNSUPPRESS_ERRORS
 
-    char const * expected = "Null ptr to PFStringInternmentSingleton memory base";
+    char const * expected = "Null ptr to PFStringLifetimeInternmentSingleton memory base";
     ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
-START_TEST(pf_string_internment_initialize__returns_correct_error_code__for_invalid_memory_size) {
-    PFStringInternmentSingleton_t string_internment = {0};
-    void* memory = malloc(128);
+START_TEST(pf_string_lifetime_internment_create_with_memory__returns_correct_error_code__for_invalid_memory_size) {
+    size_t const size = 128;
+    char memory[size];
 
     pf_clear_error();
     PF_SUPPRESS_ERRORS
-    int32_t const ret = pf_string_internment_initialize(&string_internment, memory, 0);
+    ck_assert_ptr_null(pf_string_lifetime_internment_create_with_memory(memory, size));
     PF_UNSUPPRESS_ERRORS
-    ck_assert_int_eq(ret, PFEC_ERROR_INVALID_LENGTH);
+}
+END_TEST
+
+START_TEST(pf_string_lifetime_internment_create_with_memory__sets_correct_error_message__for_invalid_memory_size) {
+    size_t const size = 128;
+    char memory[size];
+    memset(memory, 0, size);
+
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_string_lifetime_internment_create_with_memory(memory, 0));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Invalid memory size for PFStringLifetimeInternmentSingleton";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(pf_string_lifetime_internment_create_with_memory__returns_null__for_too_small_memory_size) {
+    size_t const size = sizeof(PFStringLifetimeInternmentSingleton_t);
+    void* memory = malloc(size);
+
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_string_lifetime_internment_create_with_memory(memory, size));
+    PF_UNSUPPRESS_ERRORS
 
     free(memory);
 }
 END_TEST
 
-START_TEST(pf_string_internment_initialize__sets_correct_error_message__for_invalid_memory_size) {
-    PFStringInternmentSingleton_t string_internment = {0};
-    void* memory = malloc(128);
+START_TEST(pf_string_lifetime_internment_create_with_memory__sets_correct_error_message__for_too_small_memory_size) {
+    size_t const size = sizeof(PFStringLifetimeInternmentSingleton_t);
+    void* memory = malloc(size);
 
-    pf_clear_error();
     PF_SUPPRESS_ERRORS
-    pf_string_internment_initialize(&string_internment, memory, 0);
+    ck_assert_ptr_null(pf_string_lifetime_internment_create_with_memory(memory, size));
     PF_UNSUPPRESS_ERRORS
 
-    char const * expected = "Invalid memory size for PFStringInternmentSingleton";
+    char const * expected = "Memory given to PFStringInternmentSingleton is too small to create singleton!";
     ck_assert_in_error_buffer(expected);
 
     free(memory);
 }
 END_TEST
 
-START_TEST(pf_string_internment_initialize__correctly_initializes_string_internment__for_expected_arguments) {
-    PFStringInternmentSingleton_t string_internment = {0};
 
-    size_t const memory_size = 16 * PFSI_MAX_STRINGS;
+
+START_TEST(pf_string_lifetime_internment_create_with_memory__correctly_initializes_string_internment__for_expected_arguments) {
+    PFStringLifetimeInternmentSingleton_t* string_internment = NULL;
+    size_t const pfsi_size = sizeof(PFStringLifetimeInternmentSingleton_t);
+    
+    size_t const memory_size = pfsi_size * 16;
     void* memory = malloc(memory_size);
 
-    int32_t const ret = pf_string_internment_initialize(&string_internment, memory, memory_size);
-    ck_assert_int_eq(ret, PFEC_NO_ERROR);
+    string_internment = pf_string_lifetime_internment_create_with_memory(memory, memory_size);
+    ck_assert_ptr_nonnull(string_internment);
+    uintptr_t usable_memory_offset = (uintptr_t)memory + pfsi_size;
+    
+    ck_assert_ptr_eq(string_internment->usable_memory_base, (void*)usable_memory_offset);
+    ck_assert_int_eq(string_internment->owned_memory_size, memory_size);
+    ck_assert_int_eq(string_internment->used_memory_size, pfsi_size);
+    ck_assert_int_eq(string_internment->next_unused_idx, 0);
 
-    ck_assert_ptr_eq(string_internment.usable_memory_base, memory);
-    ck_assert_int_eq(string_internment.owned_memory_size, memory_size);
-    ck_assert_int_eq(string_internment.used_memory_size, 0);
-    ck_assert_int_eq(string_internment.next_unused_idx, 0);
-
-    for (size_t i = 0; i < PFSI_MAX_STRINGS; i++) {
-        ck_assert_ptr_null(string_internment.strings[i].string);
-        ck_assert_int_eq(string_internment.strings[i].length, 0);
+    for (size_t i = 0; i < PFSLI_MAX_STRINGS; i++) {
+        ck_assert_ptr_null(string_internment->strings[i].string);
+        ck_assert_int_eq(string_internment->strings[i].length, 0);
     }
 
     free(memory);
@@ -148,107 +168,105 @@ END_TEST
 
 
 // fn pf_string_internment_emplace_cstring -------------------------------------------------------------------
-START_TEST(fn_pf_string_internment_emplace_cstring__is_defined) {
-    PString_t (*fptr)(PFStringInternmentSingleton_t*, char *, size_t const) = &pf_string_internment_emplace_cstr;
+START_TEST(fn_pf_string_lifetime_internment_emplace_cstring__is_defined) {
+    PString_t (*fptr)(PFStringLifetimeInternmentSingleton_t*, char const *, size_t const) = &pf_string_lifetime_internment_emplace_cstr;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
-
-// PFStringInternmentSingleton_t* param
-
-START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for_null_ptr_to_PFStringInternmentSingleton_t) {
+// PFStringLifetimeInternmentSingleton_t*
+START_TEST(fn_pf_string_lifetime_internment_emplace_cstr__returns_correct_error_code__for_null_ptr_to_PFStringLifetimeInternmentSingleton_t) {
     PF_SUPPRESS_ERRORS
-    PString_t const ret = pf_string_internment_emplace_cstr(NULL, NULL, 0);
+    PString_t const ret = pf_string_lifetime_internment_emplace_cstr(NULL, NULL, 0);
     PF_UNSUPPRESS_ERRORS
     ck_assert_ptr_null(ret.string);
     ck_assert_int_eq(ret.length, PFEC_ERROR_NULL_PTR);
 }
 END_TEST
 
-START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for_null_ptr_to_PFStirngInternmentSingleton_t) {
+START_TEST(fn_pf_string_lifetime_internment_emplace_cstr__sets_correct_error_message__for_null_ptr_to_PFStirngLifetimeInternmentSingleton_t) {
     pf_clear_error();
     PF_SUPPRESS_ERRORS
-    pf_string_internment_emplace_cstr(NULL, NULL, 0);
+    pf_string_lifetime_internment_emplace_cstr(NULL, NULL, 0);
     PF_UNSUPPRESS_ERRORS
 
-    char const * expected = "Null ptr to PFStringInternmentSingleton";
+    char const * expected = "Null ptr to PFStringLifetimeInternmentSingleton";
     ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
 
-START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for_null_ptr_to_memory_base_in_PFStringInternmentSingleton_t) {
-    PFStringInternmentSingleton_t string_internment = {0};
+START_TEST(fn_pf_string_lifetime_internment_emplace_cstr__returns_correct_error_code__for_null_ptr_to_memory_base_in_PFStringLifetimeInternmentSingleton_t) {
+    PFStringLifetimeInternmentSingleton_t string_internment = {0};
     PF_SUPPRESS_ERRORS
-    PString_t const ret = pf_string_internment_emplace_cstr(&string_internment, NULL, 0);
+    PString_t const ret = pf_string_lifetime_internment_emplace_cstr(&string_internment, NULL, 0);
     PF_UNSUPPRESS_ERRORS
     ck_assert_ptr_null(ret.string);
     ck_assert_int_eq(ret.length, PFEC_ERROR_NULL_PTR);
 }
 END_TEST
 
-START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for_null_ptr_to_memory_base_in_PFStringInternmentSingleton_t) {
-    PFStringInternmentSingleton_t string_internment = {0};
+START_TEST(fn_pf_string_lifetime_internment_emplace_cstr__sets_correct_error_message__for_null_ptr_to_memory_base_in_PFStringLifetimeInternmentSingleton_t) {
+    PFStringLifetimeInternmentSingleton_t string_internment = {0};
     pf_clear_error();
     PF_SUPPRESS_ERRORS
-    pf_string_internment_emplace_cstr(&string_internment, NULL, 0);
+    pf_string_lifetime_internment_emplace_cstr(&string_internment, NULL, 0);
     PF_UNSUPPRESS_ERRORS
 
-    char const * expected = "Null ptr to PFStringInternmentSingleton usable memory base";
+    char const * expected = "Null ptr to PFStringLifetimeInternmentSingleton usable memory base";
     ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
 
-START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for_invalid_owned_memory_size_in_PFStringInternmentSingleton_t) {
-    PFStringInternmentSingleton_t string_internment = {0};
+START_TEST(fn_pf_string_lifeitme_internment_emplace_cstr__returns_correct_error_code__for_invalid_owned_memory_size_in_PFStringLifetimeInternmentSingleton_t) {
+    PFStringLifetimeInternmentSingleton_t string_internment = {0};
     size_t const size = 32;
     char test_memory[size];
     string_internment.usable_memory_base = test_memory;
     string_internment.owned_memory_size = 0;
     PF_SUPPRESS_ERRORS
-    PString_t const ret = pf_string_internment_emplace_cstr(&string_internment, NULL, 0);
+    PString_t const ret = pf_string_lifetime_internment_emplace_cstr(&string_internment, NULL, 0);
     PF_UNSUPPRESS_ERRORS
     ck_assert_ptr_null(ret.string);
     ck_assert_int_eq(ret.length, PFEC_ERROR_INVALID_LENGTH);
 }
 END_TEST
 
-START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for_invalid_owned_memory_size_in_PFStringInternmentSingleton_t) {
-    PFStringInternmentSingleton_t string_internment = {0};
+START_TEST(fn_pf_string_lifetime_internment_emplace_cstr__sets_correct_error_message__for_invalid_owned_memory_size_in_PFStringLifetimeInternmentSingleton_t) {
+    PFStringLifetimeInternmentSingleton_t string_internment = {0};
     size_t const size = 32;
     char test_memory[size];
     string_internment.usable_memory_base = test_memory;
     string_internment.owned_memory_size = 0;
     pf_clear_error();
     PF_SUPPRESS_ERRORS
-    pf_string_internment_emplace_cstr(&string_internment, NULL, 0);
+    pf_string_lifetime_internment_emplace_cstr(&string_internment, NULL, 0);
     PF_UNSUPPRESS_ERRORS
 
-    char const * expected = "PFStringInternmentSingleton invalid owned memory size";
+    char const * expected = "PFStringLifetimeInternmentSingleton invalid owned memory size";
     ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
 
-START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for_used_memory_size_greather_than_owned_memory_size_PFStringInternmentSingleton_t) {
-    PFStringInternmentSingleton_t string_internment = {0};
+START_TEST(fn_pf_string_lifetime_internment_emplace_cstr__returns_correct_error_code__for_used_memory_size_greather_than_owned_memory_size_PFStringLifetimeInternmentSingleton_t) {
+    PFStringLifetimeInternmentSingleton_t string_internment = {0};
     size_t const size = 32;
     char test_memory[size];
     string_internment.usable_memory_base = test_memory;
     string_internment.owned_memory_size = size;
     string_internment.used_memory_size = size + 1;
     PF_SUPPRESS_ERRORS
-    PString_t const ret = pf_string_internment_emplace_cstr(&string_internment, NULL, 0);
+    PString_t const ret = pf_string_lifetime_internment_emplace_cstr(&string_internment, NULL, 0);
     PF_UNSUPPRESS_ERRORS
     ck_assert_ptr_null(ret.string);
     ck_assert_int_eq(ret.length, PFEC_ERROR_OUT_OF_BOUNDS_MEMORY_USE);
 }
 END_TEST
 
-START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for_used_memory_sie_greater_than_owned_memory_size_in_PFStringInternmentSingleton_t) {
-    PFStringInternmentSingleton_t string_internment = {0};
+START_TEST(fn_pf_string_lifetime_internment_emplace_cstr__sets_correct_error_message__for_used_memory_size_greater_than_owned_memory_size_in_PFStringLifetimeInternmentSingleton_t) {
+    PFStringLifetimeInternmentSingleton_t string_internment = {0};
     size_t const size = 32;
     char test_memory[size];
     string_internment.usable_memory_base = test_memory;
@@ -256,21 +274,20 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     string_internment.used_memory_size = size + 1;
     pf_clear_error();
     PF_SUPPRESS_ERRORS
-    pf_string_internment_emplace_cstr(&string_internment, NULL, 0);
+    pf_string_lifetime_internment_emplace_cstr(&string_internment, NULL, 0);
     PF_UNSUPPRESS_ERRORS
 
-    char const * expected = "PFStringInternmentSingleton is using memory it doesn't own";
+    char const * expected = "PFStringLifetimeInternmentSingleton is using memory it doesn't own";
     ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
 
 // char * cstring param
-
 START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for_null_ptr_to_cstring) {
-    PFStringInternmentSingleton_t string_internment = {0};
+    PFStringLifetimeInternmentSingleton_t string_internment = {0};
     PF_SUPPRESS_ERRORS
-    PString_t const ret = pf_string_internment_emplace_cstr(&string_internment, NULL, 0);
+    PString_t const ret = pf_string_lifetime_internment_emplace_cstr(&string_internment, NULL, 0);
     PF_UNSUPPRESS_ERRORS
     ck_assert_ptr_null(ret.string);
     ck_assert_int_eq(ret.length, PFEC_ERROR_NULL_PTR);
@@ -278,7 +295,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for
 END_TEST
 
 START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for_null_ptr_to_cstring) {
-    PFStringInternmentSingleton_t string_internment = {0};
+    PFStringLifetimeInternmentSingleton_t string_internment = {0};
     size_t const size = 32;
     char test_memory[size];
     string_internment.usable_memory_base = test_memory;
@@ -286,7 +303,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     
     pf_clear_error();
     PF_SUPPRESS_ERRORS
-    pf_string_internment_emplace_cstr(&string_internment, NULL, 0);
+    pf_string_lifetime_internment_emplace_cstr(&string_internment, NULL, 0);
     PF_UNSUPPRESS_ERRORS
 
     char const * expected = "Null ptr to cstring";
@@ -297,14 +314,14 @@ END_TEST
 // size_t const length param
 
 START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for_invalid_length) {
-    PFStringInternmentSingleton_t string_internment = {0};
+    PFStringLifetimeInternmentSingleton_t string_internment = {0};
     size_t const size = 32;
     char test_memory[size];
     string_internment.usable_memory_base = test_memory;
     string_internment.owned_memory_size = size;
     char test_string[] = "test string";
     PF_SUPPRESS_ERRORS
-    PString_t const ret = pf_string_internment_emplace_cstr(&string_internment, test_string, 0);
+    PString_t const ret = pf_string_lifetime_internment_emplace_cstr(&string_internment, test_string, 0);
     PF_UNSUPPRESS_ERRORS
     ck_assert_ptr_null(ret.string);
     ck_assert_int_eq(ret.length, PFEC_ERROR_INVALID_LENGTH);
@@ -312,7 +329,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for
 END_TEST
 
 START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for_invalid_length) {
-    PFStringInternmentSingleton_t string_internment = {0};
+    PFStringLifetimeInternmentSingleton_t string_internment = {0};
     size_t const size = 32;
     char test_memory[size];
     string_internment.usable_memory_base = test_memory;
@@ -321,7 +338,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
 
     pf_clear_error();
     PF_SUPPRESS_ERRORS
-    pf_string_internment_emplace_cstr(&string_internment, test_string, 0);
+    pf_string_lifetime_internment_emplace_cstr(&string_internment, test_string, 0);
     PF_UNSUPPRESS_ERRORS
 
     char const * expected = "Invalid string length";
@@ -333,83 +350,105 @@ END_TEST
 // fn internal checks
 
 START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for_out_of_memory_error) {
-    PFStringInternmentSingleton_t string_internment = {0};
-    size_t const size = 32;
-    char test_memory[size];
-    string_internment.usable_memory_base = test_memory;
-    string_internment.owned_memory_size = size;
-    string_internment.used_memory_size = size;
+    size_t const pfsi_size = sizeof(PFStringLifetimeInternmentSingleton_t);
+    size_t const size = pfsi_size + 1;
+    void* memory = malloc(size);
+
+    PFStringLifetimeInternmentSingleton_t* string_internment = NULL;
+    string_internment = pf_string_lifetime_internment_create_with_memory(memory, size);
+    ck_assert_ptr_nonnull(string_internment);
+    
     char test_string[] = "test string";
     size_t const test_length = pf_strlen(test_string);
     PF_SUPPRESS_ERRORS
-    PString_t const ret = pf_string_internment_emplace_cstr(&string_internment, test_string, test_length);
+    PString_t const ret = pf_string_lifetime_internment_emplace_cstr(string_internment, test_string, test_length);
     PF_UNSUPPRESS_ERRORS
+
     ck_assert_ptr_null(ret.string);
     ck_assert_int_eq(ret.length, PFEC_ERROR_OUT_OF_MEMORY);
+
+    free(memory);
 }
 END_TEST
 
 START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for_out_of_memory_error) {
-    PFStringInternmentSingleton_t string_internment = {0};
-    size_t const size = 32;
-    char test_memory[size];
-    string_internment.usable_memory_base = test_memory;
-    string_internment.owned_memory_size = size;
-    string_internment.used_memory_size = size;
+    size_t const pfsi_size = sizeof(PFStringLifetimeInternmentSingleton_t);
+    size_t const size = pfsi_size + 1;
+    void* memory = malloc(size);
+
+    PFStringLifetimeInternmentSingleton_t* string_internment = NULL;
+    string_internment = pf_string_lifetime_internment_create_with_memory(memory, size);
+    ck_assert_ptr_nonnull(string_internment);
+    
     char test_string[] = "test string";
     size_t const test_length = pf_strlen(test_string);
-
-    pf_clear_error();
     PF_SUPPRESS_ERRORS
-    pf_string_internment_emplace_cstr(&string_internment, test_string, test_length);
+    PString_t const ret = pf_string_lifetime_internment_emplace_cstr(string_internment, test_string, test_length);
     PF_UNSUPPRESS_ERRORS
 
-    char const * expected = "Ran out of memory for PFStringInternmentSingleton";
+    ck_assert_ptr_null(ret.string);
+    ck_assert_int_eq(ret.length, PFEC_ERROR_OUT_OF_MEMORY);
+
+    char const * expected = "Ran out of memory for PFStringLifetimeInternmentSingleton";
     ck_assert_in_error_buffer(expected);
+
+    free(memory);
 }
 END_TEST
 
 
 START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for_out_of_tracking_indices) {
-    PFStringInternmentSingleton_t string_internment = {0};
-    size_t const size = 32;
-    char test_memory[size];
-    string_internment.usable_memory_base = test_memory;
-    string_internment.owned_memory_size = size;
-    string_internment.next_unused_idx = PFSI_MAX_STRINGS;
+    size_t const pfsli_size = sizeof(PFStringLifetimeInternmentSingleton_t);
+    size_t const size = pfsli_size * 2;
+    void* memory = malloc(size);
+
+    PFStringLifetimeInternmentSingleton_t* string_internment = NULL;
+    string_internment = pf_string_lifetime_internment_create_with_memory(memory, size);
+    ck_assert_ptr_nonnull(string_internment);
+    string_internment->next_unused_idx = PFSLI_MAX_STRINGS;
+    
     char test_string[] = "test string";
     size_t const test_length = pf_strlen(test_string);
     PF_SUPPRESS_ERRORS
-    PString_t const ret = pf_string_internment_emplace_cstr(&string_internment, test_string, test_length);
+    PString_t const ret = pf_string_lifetime_internment_emplace_cstr(string_internment, test_string, test_length);
     PF_UNSUPPRESS_ERRORS
+
     ck_assert_ptr_null(ret.string);
     ck_assert_int_eq(ret.length, PFEC_ERROR_OUT_OF_MEMORY);
+
+    free(memory);
 }
 END_TEST
 
 START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for_out_of_tracking_indices) {
-    PFStringInternmentSingleton_t string_internment = {0};
-    size_t const size = 32;
-    char test_memory[size];
-    string_internment.usable_memory_base = test_memory;
-    string_internment.owned_memory_size = size;
-    string_internment.next_unused_idx = PFSI_MAX_STRINGS;
+    size_t const pfsli_size = sizeof(PFStringLifetimeInternmentSingleton_t);
+    size_t const size = pfsli_size * 2;
+    void* memory = malloc(size);
+
+    PFStringLifetimeInternmentSingleton_t* string_internment = NULL;
+    string_internment = pf_string_lifetime_internment_create_with_memory(memory, size);
+    ck_assert_ptr_nonnull(string_internment);
+    string_internment->next_unused_idx = PFSLI_MAX_STRINGS;
+    
     char test_string[] = "test string";
     size_t const test_length = pf_strlen(test_string);
-
-    pf_clear_error();
     PF_SUPPRESS_ERRORS
-    pf_string_internment_emplace_cstr(&string_internment, test_string, test_length);
+    PString_t const ret = pf_string_lifetime_internment_emplace_cstr(string_internment, test_string, test_length);
     PF_UNSUPPRESS_ERRORS
 
-    char const * expected = "Ran out of tracking indices for PFStringInternmentSingleton";
+    ck_assert_ptr_null(ret.string);
+    ck_assert_int_eq(ret.length, PFEC_ERROR_OUT_OF_MEMORY);
+
+    free(memory);
+
+    char const * expected = "Ran out of tracking indices for PFStringLifetimeInternmentSingleton";
     ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
 
 START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_pstr__for_valid_args) {
-    PFStringInternmentSingleton_t string_internment = {0};
+    PFStringLifetimeInternmentSingleton_t string_internment = {0};
     size_t const size = 32;
     char test_memory[size];
     PString_t mem = { .string = test_memory, .length = size };
@@ -418,7 +457,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_pstr__for_valid
     char test_string[] = "test string";
     size_t const test_length = pf_strlen(test_string);
     PF_SUPPRESS_ERRORS
-    PString_t const ret = pf_string_internment_emplace_cstr(&string_internment, test_string, test_length);
+    PString_t const ret = pf_string_lifetime_internment_emplace_cstr(&string_internment, test_string, test_length);
     PF_UNSUPPRESS_ERRORS
     ck_assert_ptr_nonnull(ret.string);
     ck_assert_int_eq(ret.length, test_length);
@@ -427,7 +466,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_pstr__for_valid
 END_TEST
 
 START_TEST(fn_pf_string_internment_emplace_cstr__copies_string_to_memory__for_valid_args) {
-    PFStringInternmentSingleton_t string_internment = {0};
+    PFStringLifetimeInternmentSingleton_t string_internment = {0};
     size_t const size = 32;
     char test_memory[size];
     PString_t mem = { .string = test_memory, .length = size };
@@ -436,7 +475,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__copies_string_to_memory__for_va
     char test_string[] = "test string";
     size_t const test_length = pf_strlen(test_string);
     PF_SUPPRESS_ERRORS
-    PString_t const ret = pf_string_internment_emplace_cstr(&string_internment, test_string, test_length);
+    PString_t const ret = pf_string_lifetime_internment_emplace_cstr(&string_internment, test_string, test_length);
     PF_UNSUPPRESS_ERRORS
     ck_assert_ptr_nonnull(ret.string);
     ck_assert_int_eq(ret.length, test_length);
@@ -452,13 +491,13 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_memory_used_correctly_afte
     PString_t const mem = { .string = test_memory, .length = size };
 
     // setup string internment
-    PFStringInternmentSingleton_t string_internment = {0};
+    PFStringLifetimeInternmentSingleton_t string_internment = {0};
     string_internment.usable_memory_base = test_memory;
     string_internment.owned_memory_size = size;
 
     char test_string1[] = "test string";
     size_t const test_length1 = pf_strlen(test_string1);
-    PString_t const ret1 = pf_string_internment_emplace_cstr(&string_internment, test_string1, test_length1);
+    PString_t const ret1 = pf_string_lifetime_internment_emplace_cstr(&string_internment, test_string1, test_length1);
     // valid return value?
     ck_assert_ptr_nonnull(ret1.string);
     ck_assert_int_eq(ret1.length, test_length1);
@@ -469,7 +508,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_memory_used_correctly_afte
 
     char test_string2[] = "another test string";
     size_t const test_length2 = pf_strlen(test_string2);
-    PString_t const ret2 = pf_string_internment_emplace_cstr(&string_internment, test_string2, test_length2);
+    PString_t const ret2 = pf_string_lifetime_internment_emplace_cstr(&string_internment, test_string2, test_length2);
     // valid return value?
     ck_assert_ptr_nonnull(ret2.string);
     ck_assert_int_eq(ret2.length, test_length2);

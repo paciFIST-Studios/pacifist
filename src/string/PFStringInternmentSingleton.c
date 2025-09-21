@@ -6,73 +6,83 @@
 // stdlib
 // framework
 // engine
-
+#include "core/define.h"
 #include "core/error.h"
 
 
+/**
+ * Returned from pf_string_internment_emplace_cstr, with the error code
+ * set as its length, if any error occurs in that fn.
+ */
 static PString_t error_pstr = { .string = NULL, .length = 0 };
 
 
-int32_t pf_string_internment_initialize(
-    PFStringInternmentSingleton_t * string_internment,
+
+PFStringLifetimeInternmentSingleton_t* pf_string_lifetime_internment_create_with_memory(
     void * memory_base,
     size_t const memory_size)
 {
-    if (string_internment == NULL) {
-        PF_LOG_ERROR(PF_STRING, "Null ptr to PFStringInternmentSingleton");
-        return PFEC_ERROR_NULL_PTR;
-    }
     if (memory_base == NULL) {
-        PF_LOG_ERROR(PF_STRING, "Null ptr to PFStringInternmentSingleton memory base");
-        return PFEC_ERROR_NULL_PTR;
+        PF_LOG_CRITICAL(PF_STRING, "Null ptr to PFStringLifetimeInternmentSingleton memory base");
+        return NULL;
     }
     if (memory_size == 0) {
-        PF_LOG_ERROR(PF_STRING, "Invalid memory size for PFStringInternmentSingleton");
-        return PFEC_ERROR_INVALID_LENGTH;
+        PF_LOG_CRITICAL(PF_STRING, "Invalid memory size for PFStringLifetimeInternmentSingleton");
+        return NULL;
+    }
+    if (memory_size <= sizeof(PFStringLifetimeInternmentSingleton_t)) {
+        PF_LOG_CRITICAL(PF_STRING, "Memory given to PFStringLifetimeInternmentSingleton is too small to create singleton!");
+        return NULL;
     }
 
-    string_internment->usable_memory_base = memory_base;
+    size_t const pfsi_size = sizeof(PFStringLifetimeInternmentSingleton_t);
+
+    PFStringLifetimeInternmentSingleton_t* string_internment = memory_base;
+    uintptr_t const usable_memory = (uintptr_t)memory_base + pfsi_size;
+    string_internment->usable_memory_base = (void*)usable_memory;
+
     string_internment->owned_memory_size = memory_size;
-    string_internment->used_memory_size = 0;
+    string_internment->used_memory_size = pfsi_size;
+
     string_internment->next_unused_idx = 0;
 
-    for (size_t i = 0; i < PFSI_MAX_STRINGS; i++) {
+    for (size_t i = 0; i < PFSLI_MAX_STRINGS; i++) {
         string_internment->strings[i].string = NULL;
         string_internment->strings[i].length = 0;
     }
 
-    return PFEC_NO_ERROR;
+    return string_internment;
 }
 
 
-PString_t pf_string_internment_emplace_cstr(
-    PFStringInternmentSingleton_t * string_internment,
-    char * cstring,
+PString_t pf_string_lifetime_internment_emplace_cstr(
+    PFStringLifetimeInternmentSingleton_t * string_internment,
+    char const * cstring,
     size_t const length)
 {
     // PFStringInternmentSingleton_t* arg
     if (string_internment == NULL) {
-        PF_LOG_ERROR(PF_STRING, "Null ptr to PFStringInternmentSingleton");
+        PF_LOG_ERROR(PF_STRING, "Null ptr to PFStringLifetimeInternmentSingleton");
         error_pstr.length = PFEC_ERROR_NULL_PTR;
         return error_pstr;
     }
     if (string_internment->usable_memory_base == NULL) {
-        PF_LOG_ERROR(PF_STRING, "Null ptr to PFStringInternmentSingleton usable memory base");
+        PF_LOG_ERROR(PF_STRING, "Null ptr to PFStringLifetimeInternmentSingleton usable memory base");
         error_pstr.length = PFEC_ERROR_NULL_PTR;
         return error_pstr;
     }
     if (string_internment->owned_memory_size == 0) {
-        PF_LOG_ERROR(PF_STRING, "PFStringInternmentSingleton invalid owned memory size");
+        PF_LOG_ERROR(PF_STRING, "PFStringLifetimeInternmentSingleton invalid owned memory size");
         error_pstr.length = PFEC_ERROR_INVALID_LENGTH;
         return error_pstr;
     }
     if (string_internment->used_memory_size > string_internment->owned_memory_size) {
-        PF_LOG_CRITICAL(PF_STRING, "PFStringInternmentSingleton is using memory it doesn't own");
+        PF_LOG_CRITICAL(PF_STRING, "PFStringLifetimeInternmentSingleton is using memory it doesn't own");
         error_pstr.length = PFEC_ERROR_OUT_OF_BOUNDS_MEMORY_USE;
         return error_pstr;
     }
 
-    // char * cstr arg
+    // char const * cstr arg
     if (cstring == NULL) {
         PF_LOG_ERROR(PF_STRING, "Null ptr to cstring");
         error_pstr.length = PFEC_ERROR_NULL_PTR;
@@ -87,14 +97,14 @@ PString_t pf_string_internment_emplace_cstr(
 
     size_t const remaining_bytes = string_internment->owned_memory_size - string_internment->used_memory_size;
     if (remaining_bytes <= length) {
-        PF_LOG_CRITICAL(PF_STRING, "Ran out of memory for PFStringInternmentSingleton");
+        PF_LOG_CRITICAL(PF_STRING, "Ran out of memory for PFStringLifetimeInternmentSingleton");
         error_pstr.length = PFEC_ERROR_OUT_OF_MEMORY;
         return error_pstr;
     }
 
     size_t const idx = string_internment->next_unused_idx;
-    if (idx >= PFSI_MAX_STRINGS) {
-        PF_LOG_CRITICAL(PF_STRING, "Ran out of tracking indices for PFStringInternmentSingleton");
+    if (idx >= PFSLI_MAX_STRINGS) {
+        PF_LOG_CRITICAL(PF_STRING, "Ran out of tracking indices for PFStringLifetimeInternmentSingleton");
         error_pstr.length = PFEC_ERROR_OUT_OF_MEMORY;
         return error_pstr;
     }
@@ -119,8 +129,8 @@ PString_t pf_string_internment_emplace_cstr(
 }
 
 
-PString_t pf_string_internment_emplace_pstr(PFStringInternmentSingleton_t * string_internment, PString_t const pstring) {
-    return pf_string_internment_emplace_cstr(string_internment, pstring.string, pstring.length);
+PString_t pf_string_lifetime_internment_emplace_pstr(PFStringLifetimeInternmentSingleton_t * string_internment, PString_t const pstring) {
+    return pf_string_lifetime_internment_emplace_cstr(string_internment, pstring.string, pstring.length);
 }
 
 
