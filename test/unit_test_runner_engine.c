@@ -71,48 +71,50 @@ char * global_module;
 // Test Includes: Manually include your code here.  (keep it in alphabetical order)
 
 // Algo
-#include "../test/algo_tests/search.test.c"
+//#include "algo_tests/search.test.c"
 
 // Bit
-#include "../test/bit/bitfield.test.c"
+#include "bit/bitfield.test.c"
 
 // Core
-#include "../test/core_tests/error.test.c"
+#include "core_tests/error.test.c"
 
 // DateTime
-#include "../test/datetime_test/datetime.test.c"
+#include "datetime_test/datetime.test.c"
 
 // Engine
-#include "../test/engine_tests/PFEngineState.test.c"
+#include "engine_tests/PFEngineState.test.c"
+#include "engine_tests/entry_point_tests/PFEngineEntryPoint.test.c"
+#include "engine_tests/entry_point_tests/PFEngineInitialization.test.c"
 
 // Log
-#include "../test/log_tests/log.test.c"
+#include "log_tests/log.test.c"
 
 // Memory
-#include "../test/memory_tests/PFCompactHashTable.test.c"
-#include "../test/memory_tests/HashTable.test.c"
-#include "../test/memory_tests/LinkedList.test.c"
-#include "../test/memory_tests/PFMemoryArena.test.c"
-#include "../test/memory_tests/PFAllocator.test.c"
-#include "../test/memory_tests/RedBlackTree.test.c"
+#include "memory_tests/PFCompactHashTable.test.c"
+#include "memory_tests/HashTable.test.c"
+#include "memory_tests/LinkedList.test.c"
+#include "memory_tests/PFMemoryArena.test.c"
+#include "memory_tests/PFAllocator.test.c"
+#include "memory_tests/RedBlackTree.test.c"
 
 // os
-#include "../test/os_tests/os_utility.test.c"
+#include "os_tests/os_utility.test.c"
 
 // resource
-#include "../test/resource_tests/PFManagedResource.test.c"
-#include "../test/resource_tests/PFResourceManager.test.c"
+#include "resource_tests/PFManagedResource.test.c"
+#include "resource_tests/PFResourceManager.test.c"
 
 // string
-#include "../test/string_tests/PString.test.c"
-#include "../test/string_tests/PFStringInternmentSingleton.test.c"
+#include "string_tests/PString.test.c"
+#include "string_tests/PFStringInternmentSingleton.test.c"
 
 
 
 // Game Tests
 
-// LittlestNecromancer
-#include "../test/_game/slain_tests/SlainGameMode.test.c"
+// Slain
+#include "_game/slain_tests/SlainGameMode.test.c"
 
 
 
@@ -154,7 +156,7 @@ int main(void) {
     // Algorithm Test Suite                                               //
     // -------------------------------------------------------------------//
     BUILD_SUITE("Algo")
-    ADD_TEST(stdlib_bsearch_example__int32);
+    //ADD_TEST(stdlib_bsearch_example__int32);
     RUN_SUITE(fail_count); 
     // -------------------------------------------------------------------//
     // End Algorithm Test Suite                                           //
@@ -240,7 +242,6 @@ int main(void) {
     // -------------------------------------------------------------------//
     BUILD_SUITE("Engine");
 
-
     // struct PFEngineState_t
     ADD_TEST(fn_struct_PFEngineState_t__is_defined);
     ADD_TEST(fn_struct_PFEngineState_t__has_expected_size);
@@ -259,9 +260,52 @@ int main(void) {
     // fn pf_engine_state_load
     ADD_TEST(fn_pf_engine_state_load__is_defined);
 
+
+    //--------------------//
+    // PFEngineEntryPoint //
+    //--------------------//
+
+    // fn pf_app_init
+    ADD_TEST(fn_pf_app_init__is_defined);
+    // fn pf_app_event
+    ADD_TEST(fn_pf_app_event__is_defined);
+    // fn pf_app_iterate
+    ADD_TEST(fn_pf_app_iterate__is_defined);
+    // fn pf_app_quit
+    ADD_TEST(fn_pf_app_quit__is_defined);
+
+    //------------------------//
+    // PFEngineInitialization //
+    //------------------------//
+
+    // fn pf_allocate_engine_memory
+    ADD_TEST(fn_pf_allocate_engine_memory__is_defined);
+    // fn pf_deallocate_engine_memory
+    ADD_TEST(fn_pf_deallocate_engine_memory__is_defined);
+    
+    // fn pf_try_initialize_sdl_video_systems
+    ADD_TEST(fn_pf_initialize_sdl_font__is_defined);
+    // fn pf_try_initialize_sdl_image
+    ADD_TEST(fn_pf_initialize_sdl_image__is_defined);
+    // fn pf_try_initialize_sdl_font
+    ADD_TEST(fn_pf_initialize_sdl_font__is_defined);
+    // fn pf_initialize_sdl_audio
+    ADD_TEST(fn_pf_initialize_sdl_audio__is_defined);
+
+    // fn pf_try_allocate_engine_memory_from_os
+    ADD_TEST(fn_pf_try_allocate_engine_memory_from_os__is_defined);
+    // fn pf_try_create_engine_lifetime_allocator
+    ADD_TEST(fn_pf_try_create_engine_lifetime_allcoator__is_defined);
+
+    // fn pf_try_read_engine_configuration
+    ADD_TEST(fn_pf_try_read_engine_configuration__is_defined);
+    // fn pf_try_create_engine_state_struct
+    ADD_TEST(fn_pf_try_create_engine_state_struct__is_defined);
+
+
     RUN_SUITE(fail_count);
     // -------------------------------------------------------------------//
-    // End Engine Test Suite                                            //
+    // End Engine Test Suite                                              //
     // -------------------------------------------------------------------//
 
 

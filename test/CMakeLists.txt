@@ -22,6 +22,9 @@ set(TEST_LIB_SOURCE_FILES
         # datetime tests
         ${CMAKE_CURRENT_SOURCE_DIR}/datetime_test/datetime.test.c
 
+        # engine entry point
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine_tests/entry_point_tests/PFEngineEntryPoint.test.c
+
         # engine tests
         ${CMAKE_CURRENT_SOURCE_DIR}/engine_tests/PFEngineState.test.c
 
@@ -40,6 +43,10 @@ set(TEST_LIB_SOURCE_FILES
         # os tests
         ${CMAKE_CURRENT_SOURCE_DIR}/os_tests/os_utility.test.c
 
+        # resource manager
+        ${CMAKE_CURRENT_SOURCE_DIR}/resource_tests/PFManagedResource.test.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/resource_tests/PFResourceManager.test.c
+        
         # string tests
         ${CMAKE_CURRENT_SOURCE_DIR}/string_tests/PString.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/string_tests/PFStringInternmentSingleton.test.c
@@ -52,8 +59,7 @@ set(TEST_LIB_SOURCE_FILES
 
         # game projects
         ${CMAKE_CURRENT_SOURCE_DIR}/_game/slain_tests/SlainGameMode.test.c
-        resource_tests/PFManagedResource.test.c
-        resource_tests/PFResourceManager.test.c
+        engine_tests/entry_point_tests/PFEngineInitialization.test.c
 )
 
 # the run_unit_tests_engine is an executable that you could just run from the

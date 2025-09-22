@@ -64,13 +64,14 @@ set(ENGINE_LIB_SOURCE_FILES
         # engine
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/PFEngineState.h
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/PFEngineState.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine/PFEngineConfiguration.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine/project/PFProjectConfiguration.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/PFEngineEntryPoint.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/PFEngineEntryPoint.c
         # f
-
         # gui
         ${CMAKE_CURRENT_SOURCE_DIR}/gui/PFDebugGui.h
         ${CMAKE_CURRENT_SOURCE_DIR}/gui/PFGuiState.h
-
-
         # h, i, j,k
         # log
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log_utility.h
@@ -99,6 +100,8 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/os/path.h
         ${CMAKE_CURRENT_SOURCE_DIR}/os/os_utility.h
         ${CMAKE_CURRENT_SOURCE_DIR}/os/os_utility.c
+        # parse
+        ${CMAKE_CURRENT_SOURCE_DIR}/parse/parse_utilities.h
         # project data types
         ${CMAKE_CURRENT_SOURCE_DIR}/project_data_types.h
         # q
@@ -117,6 +120,8 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/resource/PFResourceManager.c
         # rendering
         ${CMAKE_CURRENT_SOURCE_DIR}/rendering/render.h
+        engine/entry_point/PFEngineInitialization.h
+        engine/entry_point/PFEngineInitialization.c
         # type
         # u,v,w,x,y,z 
 )
