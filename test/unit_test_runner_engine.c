@@ -284,7 +284,7 @@ int main(void) {
     ADD_TEST(fn_pf_deallocate_engine_memory__is_defined);
     
     // fn pf_try_initialize_sdl_video_systems
-    ADD_TEST(fn_pf_initialize_sdl_font__is_defined);
+    ADD_TEST(fn_pf_initialize_sdl_video_systems__is_defined);
     // fn pf_try_initialize_sdl_image
     ADD_TEST(fn_pf_initialize_sdl_image__is_defined);
     // fn pf_try_initialize_sdl_font
@@ -294,13 +294,32 @@ int main(void) {
 
     // fn pf_try_allocate_engine_memory_from_os
     ADD_TEST(fn_pf_try_allocate_engine_memory_from_os__is_defined);
+    ADD_TEST(fn_pf_try_allocate_engine_memory_from_os__returns_false__for_null_out_memory_param);
+    ADD_TEST(fn_pf_try_allocate_engine_memory_from_os__sets_correct_error_message__for_null_out_memory_param);
+    ADD_TEST(fn_pf_try_allocate_engine_memory_from_os__returns_false__for_zero_memory_size_param);
+    ADD_TEST(fn_pf_try_allocate_engine_memory_from_os__sets_correct_error_message__for_zero_memory_size_param);
+    ADD_TEST(fn_pf_try_allocate_engine_memory_from_os__can_allocate_memory__when_used);
+
     // fn pf_try_create_engine_lifetime_allocator
     ADD_TEST(fn_pf_try_create_engine_lifetime_allcoator__is_defined);
+    ADD_TEST(fn_pf_try_create_engine_lifetime_allocator__returns_false__for_null_ptr_to_lifetime_memory_base);
+    ADD_TEST(fn_pf_try_create_engine_lifetime_allocator__sets_correct_error_message__for_null_ptr_to_lifetime_memory_base);
+    ADD_TEST(fn_pf_try_create_engine_lifetime_allocator__returns_false__for_zero_memory_size);
+    ADD_TEST(fn_pf_try_create_engine_lifetime_allocator__sets_correct_error_message__for_zero_memory_size);
+    ADD_TEST(fn_pf_try_create_engine_lifetime_allocator__returns_false__for_null_out_lifetime_allocator);
+    ADD_TEST(fn_pf_try_create_engine_lifetime_allocator__sets_correct_error_message__for_null_out_lifetime_allocator);
 
-    // fn pf_try_read_engine_configuration
-    ADD_TEST(fn_pf_try_read_engine_configuration__is_defined);
     // fn pf_try_create_engine_state_struct
     ADD_TEST(fn_pf_try_create_engine_state_struct__is_defined);
+    ADD_TEST(fn_pf_try_create_engine_state_struct__returns_false__for_null_memory_base_param);
+    ADD_TEST(fn_pf_try_create_state_struct__sets_correct_error_message__for_null_memory_base_param);
+    ADD_TEST(fn_pf_try_create_engine_state_struct__returns_false__for_out_engine_state_param);
+    ADD_TEST(fn_pf_try_create_state_struct__sets_correct_error_message__for_out_engine_state_param);
+
+
+    
+    // fn pf_try_read_engine_configuration
+    ADD_TEST(fn_pf_try_read_engine_configuration__is_defined);
 
 
     RUN_SUITE(fail_count);
