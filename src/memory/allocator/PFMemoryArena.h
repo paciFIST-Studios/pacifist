@@ -95,7 +95,7 @@ PFAllocator_MemoryArena_t* pf_allocator_memory_arena_create_with_memory(void* ba
  * @return 
  */
 __attribute__((unused))
-void * pf_allocator_memory_arena_push_size(PFAllocator_MemoryArena_t* arena, size_t const size_requested);
+void * pf_allocator_memory_arena_push_size(PFAllocator_MemoryArena_t* arena, size_t size_requested);
 
 
 #endif //MEMORY_ARENA_H
