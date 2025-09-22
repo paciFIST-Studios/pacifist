@@ -272,35 +272,35 @@ int32_t try_read_project_configuration(int arg_count, char* args[], void* projec
 //    return TRUE;
 //}
 
-int32_t try_initialize_engine_lifetime_allocator(void* program_lifetime_memory, size_t const memory_size, PFAllocator_MemoryArena_t** out_arena) {
-    if (program_lifetime_memory == NULL) {
-        PF_LOG_CRITICAL(PF_INITIALIZATION, "Tried to initialize program lifetime allocator, but got ptr to NULL for program_lifetime_memory!");
-        return FALSE;
-    }
-    if (memory_size == 0) {
-        PF_LOG_CRITICAL(PF_INITIALIZATION, "Tried to initialize program lifetime allocator, but got memory_size of zero!");
-        return FALSE;
-    }
+//int32_t try_initialize_engine_lifetime_allocator(void* program_lifetime_memory, size_t const memory_size, PFAllocator_MemoryArena_t** out_arena) {
+//    if (program_lifetime_memory == NULL) {
+//        PF_LOG_CRITICAL(PF_INITIALIZATION, "Tried to initialize program lifetime allocator, but got ptr to NULL for program_lifetime_memory!");
+//        return FALSE;
+//    }
+//    if (memory_size == 0) {
+//        PF_LOG_CRITICAL(PF_INITIALIZATION, "Tried to initialize program lifetime allocator, but got memory_size of zero!");
+//        return FALSE;
+//    }
+//
+//    // all of our memory is allocated now.  in order to manage it, put in a
+//    // memory arena aligned to byte 0
+//    *out_arena = pf_allocator_memory_arena_create_with_memory(program_lifetime_memory, memory_size);
+//    return TRUE;
+//}
 
-    // all of our memory is allocated now.  in order to manage it, put in a
-    // memory arena aligned to byte 0
-    *out_arena = pf_allocator_memory_arena_create_with_memory(program_lifetime_memory, memory_size);
-    return TRUE;
-}
-
-int32_t try_initialize_engine_state_struct(void* memory_base, PFEngineState_t** out_engine_state_struct) {
-    if (memory_base == NULL) {
-        return FALSE;
-    }
-
-    // first allocation from within the memory area holds the engine state.
-    // This struct owns the string internment struct, 
-    *out_engine_state_struct = PF_PUSH_STRUCT(memory_base, PFEngineState_t);
-    if (out_engine_state_struct == NULL) {
-        return FALSE;
-    }
-    return TRUE;
-}
+//int32_t try_initialize_engine_state_struct(void* memory_base, PFEngineState_t** out_engine_state_struct) {
+//    if (memory_base == NULL) {
+//        return FALSE;
+//    }
+//
+//    // first allocation from within the memory area holds the engine state.
+//    // This struct owns the string internment struct, 
+//    *out_engine_state_struct = PF_PUSH_STRUCT(memory_base, PFEngineState_t);
+//    if (out_engine_state_struct == NULL) {
+//        return FALSE;
+//    }
+//    return TRUE;
+//}
 
 int32_t try_initialize_game_lifetime_state_struct(void* memory, PFAllocator_MemoryArena_t* allocator,
     SlainGameLifetimeState_t** out_game_lifetime_state_struct)
@@ -413,8 +413,6 @@ SDL_AppResult SDL_AppEvent(void * appstate, SDL_Event * event) {
 SDL_AppResult SDL_AppIterate(void * appstate) {
     return pf_app_iterate(appstate);
 
-    //SDL_Log("Hey girl! love youu!");
-   //SDL_Log("You're doing your best!");
 
    SDL_RenderClear(s_sdl_renderer);
    SDL_FRect destination_rect;
