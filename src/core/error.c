@@ -16,34 +16,50 @@
 #define ERROR_BUFFER_SIZE 4096
 
 
-
+// set to TRUE(1) if suppressed, FALSE(0) if not suppressed
 static int32_t s_errors_are_suppressed = 0;
 
-
+// This error buffer is meant to hold only one error at a time,
+// but this is enough for the tests, which create specific
+// circumstances in order to induce errors, and check to make sure
+// they're written out correctly
 static char s_error_buffer[ERROR_BUFFER_SIZE];
 
-
-size_t pf_get_error_buffer_size() {
+/**
+ * @brief returns the size of the error buffer, in bytes
+ *
+ * @return 
+ */
+size_t pf_get_error_buffer_size(void) {
     return ERROR_BUFFER_SIZE;
 }
 
-
-char* pf_get_error() {
+/**
+ * @brief returns a pointer to the start of the error buffer 
+ *
+ * @return 
+ */
+char* pf_get_error(void) {
     if (s_errors_are_suppressed) {
         return NULL;
     }
-        
+
     return s_error_buffer;
 }
 
-
+/**
+ * @brief places a message in the error buffer
+ *
+ * @param message 
+ * @param message_len 
+ */
 void pf_set_error(char const * message, size_t const message_len) {
     if (message == NULL) {
         return;
     }
 
     pf_clear_error();
-    
+
     for (size_t i = 0; i < message_len; i++) {
         if(i >= ERROR_BUFFER_SIZE){
             return;
@@ -54,27 +70,42 @@ void pf_set_error(char const * message, size_t const message_len) {
 }
 
 
-void pf_clear_error() {
+/**
+ *  @brief zeroes out the error buffer
+ */
+void pf_clear_error(void) {
     for (size_t i = 0; i < ERROR_BUFFER_SIZE; i++) {
         s_error_buffer[i] = 0;
     }
 }
 
 
-
-void pf_set_error_suppressed() {
+/**
+ * @brief if errors are suppress, they'll still be written to the
+ * error buffer, but you won't be able to access them, until errors
+ * are no longer suppressed
+ */
+void pf_set_error_suppressed(void) {
 #ifdef ERROR_SUPPRESSION_ALLOWED
     s_errors_are_suppressed = TRUE;
 #endif
 }
 
-void pf_set_error_not_suppressed() {
+/**
+ * @brief sets errors to not-suppressed
+ */
+void pf_set_error_not_suppressed(void) {
 #ifdef ERROR_SUPPRESSION_ALLOWED
     s_errors_are_suppressed = FALSE;
 #endif
 }
 
-int32_t pf_get_is_error_suppressed() {
+/**
+ * @brief returns TRUE(1) if errors are suppressed now, otherwise FALSE(0)
+ * 
+ * @return 
+ */
+int32_t pf_get_is_error_suppressed(void) {
 #ifdef ERROR_SUPPRESSION_ALLOWED
     return s_errors_are_suppressed;
 #else
@@ -82,6 +113,14 @@ int32_t pf_get_is_error_suppressed() {
 #endif
 }
 
+/**
+ * @brief takes an error message, adds additional debug information,
+ * and puts it in the error buffer
+ *
+ * @param message 
+ * @param file 
+ * @param line 
+ */
 void pf_build_and_set_error_message(char const * message, char const * file, int32_t const line) {
     char error_message[ERROR_BUFFER_SIZE];
     for(size_t i = 0; i < ERROR_BUFFER_SIZE; i++){ error_message[i] = 0; }
