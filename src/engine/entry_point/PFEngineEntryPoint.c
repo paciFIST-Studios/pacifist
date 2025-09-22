@@ -21,10 +21,10 @@
 //------------------------------------------------------------------------------------------------------------
 
 //static SDL_Window* s_sdl_program_window = NULL;
-static SDL_Renderer* s_sdl_renderer = NULL;
+//static SDL_Renderer* s_sdl_renderer = NULL;
 
-static SDL_Surface* s_sdl_surface = NULL;
-static SDL_Texture* s_sdl_texture = NULL;
+//static SDL_Surface* s_sdl_surface = NULL;
+//static SDL_Texture* s_sdl_texture = NULL;
 
 static size_t const s_engine_memory_size = Mebibytes(64);
 
@@ -131,18 +131,18 @@ SDL_AppResult pf_app_init(void **appstate, int argc, char *argv[]) {
     //*appstate = slain_game_state;
 
 
-    char const * splash_image_file_path = "/home/ellie/git/paciFIST/src/splash.bmp";
-    s_sdl_surface = SDL_LoadBMP(splash_image_file_path);
-    if (s_sdl_surface == NULL) {
-       printf("Could not load splash image! %s\n", splash_image_file_path);
-    }
+    //char const * splash_image_file_path = "/home/ellie/git/paciFIST/src/splash.bmp";
+    //s_sdl_surface = SDL_LoadBMP(splash_image_file_path);
+    //if (s_sdl_surface == NULL) {
+    //   printf("Could not load splash image! %s\n", splash_image_file_path);
+    //}
 
-    s_sdl_texture = SDL_CreateTextureFromSurface(s_sdl_renderer, s_sdl_surface);
-    if (s_sdl_texture == NULL) {
-       printf("Could not create sdl texture from surface!\n");
-    }
-    SDL_DestroySurface(s_sdl_surface);
-    s_sdl_surface = NULL;
+    //s_sdl_texture = SDL_CreateTextureFromSurface(s_sdl_renderer, s_sdl_surface);
+    //if (s_sdl_texture == NULL) {
+    //   printf("Could not create sdl texture from surface!\n");
+    //}
+    //SDL_DestroySurface(s_sdl_surface);
+    //s_sdl_surface = NULL;
 
     return SDL_APP_CONTINUE;
 }

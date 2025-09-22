@@ -36,8 +36,13 @@
 #include "core/define.h"
 #include "core/error.h"
 #include "engine/PFEngineState.h"
+#include "engine/PFEngineConfiguration.h"
+#include "engine/project/PFProjectConfiguration.h"
+#include "engine/entry_point/PFEngineEntryPoint.h"
 #include "log/log.h"
 #include "memory/allocator/PFMemoryArena.h"
+#include "string/pstring.h"
+#include "parse/parse_utilities.h"
 // game
 #include "_games/Slain/Slain.h"
 
@@ -45,10 +50,6 @@
  *          and no longer uses the int main fn entry point.
  *
  */
-#define WINDOW_RES_X 1280
-#define WINDOW_RES_Y 720
-#define WINDOW_CENTER_X 640
-#define WINDOW_CENTER_y 360
 
 static SDL_Window* s_sdl_program_window = NULL;
 static SDL_Renderer* s_sdl_renderer = NULL;
@@ -59,14 +60,13 @@ static SDL_Texture* s_sdl_texture = NULL;
 
 
 
-static size_t const s_application_memory_size = Mebibytes(64);
-static PFAllocator_MemoryArena_t* s_program_lifetime_memory_arena = NULL;
+//static size_t const s_engine_memory_size = Mebibytes(64);
+//static PFAllocator_MemoryArena_t* s_engine_lifetime_memory_arena = NULL;
 
-static size_t s_engine_configuration = 0;
-__attribute__((unused))
-static PFEngineState_t * s_engine_state = NULL;
+//static PFEngineConfiguration_t* s_engine_configuration = NULL;
+//static PFEngineState_t* s_engine_state = NULL;
 
-static size_t s_project_configuration = 0;
+//static PFProjectConfiguration_t* s_project_configuration = NULL;
 
 // TODO: set up cppcheck (installed plugin), cscout, and GCC static analysis, analyzer(goblint)
 // TODO: set up doxygen, to run in all cmake configs
@@ -81,100 +81,109 @@ static size_t s_project_configuration = 0;
 //}
 
 
-void * allocate_application_memory(size_t const game_total_memory_allocation) {
-   void * memory = NULL;
-
-//#if __linux__
-//   // see man mmap for more details
-//   // this is used in conjunction with MAP_HUGETLB,
-//   // to generate larger page sizes, which will hopefully
-//   // provide better cache coherency for the game
-//   #define MAP_HUGE_2MB (21 << MAP_HUGE_SHIFT)
-//   #define MAP_HUGE_16MB (24 << MAP_HUGE_SHIFT)
+//void * allocate_application_memory(size_t const game_total_memory_allocation) {
+//   void * memory = NULL;
+//
+////#if __linux__
+////   // see man mmap for more details
+////   // this is used in conjunction with MAP_HUGETLB,
+////   // to generate larger page sizes, which will hopefully
+////   // provide better cache coherency for the game
+////   #define MAP_HUGE_2MB (21 << MAP_HUGE_SHIFT)
+////   #define MAP_HUGE_16MB (24 << MAP_HUGE_SHIFT)
+////   
+////   // set to null so the compiler can pick wherever it likes
+////   void* game_base_memory_address = (void*)Gibibytes(6);
+////   
+////   memory = mmap(
+////      game_base_memory_address,
+////      game_total_memory_allocation,
+////      PROT_READ | PROT_WRITE,
+////      MAP_ANONYMOUS | MAP_PRIVATE | MAP_HUGETLB | MAP_HUGE_16MB,
+////      -1,
+////      0
+////      );
+////#else
+////   void * memory = malloc(game_total_memory_allocation);
+////#endif
+//
+//   memory = malloc(game_total_memory_allocation);
+//   if (memory == NULL) {
+//      // error could not map memory for game, need to quit
+//      return NULL;
+//   }
 //   
-//   // set to null so the compiler can pick wherever it likes
-//   void* game_base_memory_address = (void*)Gibibytes(6);
-//   
-//   memory = mmap(
-//      game_base_memory_address,
-//      game_total_memory_allocation,
-//      PROT_READ | PROT_WRITE,
-//      MAP_ANONYMOUS | MAP_PRIVATE | MAP_HUGETLB | MAP_HUGE_16MB,
-//      -1,
-//      0
-//      );
-//#else
-//   void * memory = malloc(game_total_memory_allocation);
-//#endif
-
-   memory = malloc(game_total_memory_allocation);
-   if (memory == NULL) {
-      // error could not map memory for game, need to quit
-      return NULL;
-   }
-   
-   return memory;
-}
+//   return memory;
+//}
 
 
-void deallocate_application_memory(void* memory, size_t const size) {
-//#if __linux__ 
-//   // This is the ONLY place memory should be unmapped or freed from
-//   munmap(memory, size);
-//#else
+//void deallocate_application_memory(void* memory, size_t const size) {
+////#if __linux__ 
+////   // This is the ONLY place memory should be unmapped or freed from
+////   munmap(memory, size);
+////#else
+////   free(memory);
+////#endif
 //   free(memory);
-//#endif
-   free(memory);
-}
+//}
 
 
-int32_t try_initialize_video_systems(void) {
+/**
+ * @note: startup arg: `-return_false=try_initialize_video_systems`
+ *
+ *
+ * @param arg_count 
+ * @param args 
+ * @return 
+ */
+//int32_t try_initialize_video_systems(int arg_count, char* args[]) {
+//    PF_DEBUG_PARSE_FOR_RETURN_FALSE(arg_count, args, "try_initialize_video_systems");
+//
+//   // initialize SDL video system
+//   if (SDL_Init(SDL_INIT_VIDEO) == FALSE) {
+//      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize SDL!",
+//         SDL_GetError(), NULL);
+//      return FALSE;
+//   }
+//
+//
+//   // create and initialize main window
+//   {
+//      SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+//      s_sdl_program_window = SDL_CreateWindow("paciFIST Studios", WINDOW_RES_X, WINDOW_RES_Y, windowFlags);
+//      if (s_sdl_program_window== NULL) {
+//         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize main window!", SDL_GetError(), NULL);
+//         return FALSE;
+//      }
+//
+//   }
+//
+//   // create and initialize software renderer
+//   {
+//      s_sdl_renderer = SDL_CreateRenderer(s_sdl_program_window, NULL);
+//      if (s_sdl_renderer == NULL) {
+//         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize renderer!", SDL_GetError(), NULL);
+//         SDL_DestroyWindow(s_sdl_program_window);
+//         return FALSE;
+//      }
+//   }
+//
+//   return TRUE;
+//}
 
-   // initialize SDL video system
-   if (SDL_Init(SDL_INIT_VIDEO) == FALSE) {
-      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize SDL!",
-         SDL_GetError(), NULL);
-      return FALSE;
-   }
-
-
-   // create and initialize main window
-   {
-      SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
-      s_sdl_program_window = SDL_CreateWindow("paciFIST Studios", WINDOW_RES_X, WINDOW_RES_Y, windowFlags);
-      if (s_sdl_program_window== NULL) {
-         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize main window!", SDL_GetError(), NULL);
-         return FALSE;
-      }
-
-   }
-
-   // create and initialize software renderer
-   {
-      s_sdl_renderer = SDL_CreateRenderer(s_sdl_program_window, NULL);
-      if (s_sdl_renderer == NULL) {
-         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize renderer!", SDL_GetError(), NULL);
-         SDL_DestroyWindow(s_sdl_program_window);
-         return FALSE;
-      }
-   }
-
+int32_t try_initialize_sdl_image(int arg_count, char* args[]) {
    return TRUE;
 }
 
-int32_t try_initialize_sdl_image(void) {
+int32_t try_initialize_sdl_font(int arg_count, char* args[]){
    return TRUE;
 }
 
-int32_t try_initialize_sdl_font(void){
+int32_t try_initialize_sdl_audio(int arg_count, char* args[]) {
    return TRUE;
 }
 
-int32_t try_initialize_sdl_audio(void) {
-   return TRUE;
-}
-
-int32_t try_initialize_nuklear(void) {
+int32_t try_initialize_nuklear(int arg_count, char* args[]) {
 //   s_nk_context = nk_sdl_init(s_sdl_program_window, s_sdl_renderer);
 //   const size_t max_memory = 1024 * 16;
 //   nk_init_fixed(s_nk_context, calloc(1, max_memory), max_memory, NULL);
@@ -192,6 +201,55 @@ int32_t try_initialize_nuklear(void) {
 }
 
 int32_t try_read_engine_configuration(int arg_count, char* args[], void* engine_configuration) {
+
+    int32_t has_set_project_name = FALSE;
+    char project_name[64] = {0};
+    
+
+    
+    for (uint32_t i = 0; i < arg_count; i++) {
+        PString_t const argument_pstr = { .string = args[i], .length = strlen(args[i]) };
+
+        // project argument
+        if (pf_pstring_contains_char_sub(argument_pstr, "project", 7)) {
+            char const * project_name_value = args[i];
+            while (++project_name_value != NULL) {
+                if (*project_name_value == '=') { project_name_value++; break; }
+            }
+            size_t const project_name_length = strnlen(project_name_value, argument_pstr.length - (project_name_value - argument_pstr.string));
+            memcpy(project_name, project_name_value, project_name_length);
+
+            if (!pf_pstring_contains_char_sub(argument_pstr, "pfproject", 9)) {
+                memcpy((project_name + project_name_length), ".pfproject", 10);
+            }
+
+            has_set_project_name = TRUE;
+        }
+
+        // argument
+        
+    }
+
+    // string internment for all of the parsed arguments
+    if (has_set_project_name) {
+        //pf_string_internment_emplace_cstr()
+    }
+
+
+
+
+
+    
+    
+    // if contains "-project=name"
+    // split
+    //  project = name
+    // look for name in the files in this depot
+    // if not found, return false
+    // parse file
+    // 
+
+    
     return TRUE;
 }
 
@@ -201,20 +259,20 @@ int32_t try_read_project_configuration(int arg_count, char* args[], void* projec
 }
 
 
-int32_t try_allocate_application_memory(size_t const memory_size, void** out_memory) {
-    if (memory_size == 0) {
-        return FALSE;
-    }
-    
-    // this is the only place in the program which should allocate memory
-    *out_memory = allocate_application_memory(memory_size);
-    if (out_memory == NULL) {
-        return FALSE;
-    }
-    return TRUE;
-}
+//int32_t try_allocate_application_memory(size_t const memory_size, void** out_memory) {
+//    if (memory_size == 0) {
+//        return FALSE;
+//    }
+//    
+//    // this is the only place in the program which should allocate memory
+//    *out_memory = allocate_application_memory(memory_size);
+//    if (out_memory == NULL) {
+//        return FALSE;
+//    }
+//    return TRUE;
+//}
 
-int32_t try_initialize_program_lifetime_allocator(void* program_lifetime_memory, size_t const memory_size, PFAllocator_MemoryArena_t** out_arena) {
+int32_t try_initialize_engine_lifetime_allocator(void* program_lifetime_memory, size_t const memory_size, PFAllocator_MemoryArena_t** out_arena) {
     if (program_lifetime_memory == NULL) {
         PF_LOG_CRITICAL(PF_INITIALIZATION, "Tried to initialize program lifetime allocator, but got ptr to NULL for program_lifetime_memory!");
         return FALSE;
@@ -277,111 +335,12 @@ int32_t try_initialize_game_lifetime_state_struct(void* memory, PFAllocator_Memo
 
 
 SDL_AppResult SDL_AppInit(void ** appstate, int argc, char* argv[]) {
-    // -------------------------------------------------------------------------------------------------------
-    // Systems Init
-    // -------------------------------------------------------------------------------------------------------
-
-    if (!try_initialize_video_systems()) {
-        PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize video systems!");
-        return SDL_APP_FAILURE;
-    }
-
-    if (!try_initialize_sdl_image()) {
-        PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize SDL_Image!");
-        return SDL_APP_FAILURE;
-    }
-
-    if (!try_initialize_sdl_font()) {
-        PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize SDL_Font!");
-        return SDL_APP_FAILURE;
-    }
-
-    if(!try_initialize_sdl_audio()) {
-        PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize SDL_Audio!");
-        return SDL_APP_FAILURE;
-    }
-
-    if (!try_initialize_nuklear()) {
-        PF_LOG_CRITICAL(PF_APPLICATION, "");
-        return SDL_APP_FAILURE;
-    }
-
-    // -------------------------------------------------------------------------------------------------------
-    // Configuration Init
-    // -------------------------------------------------------------------------------------------------------
-
-    if (!try_read_engine_configuration(argc, argv, &s_engine_configuration)) {
-        PF_LOG_CRITICAL(PF_APPLICATION, "Could not read engine configuration!");
-        return SDL_APP_FAILURE;
-    }
-
-    if (!try_read_project_configuration(argc, argv, &s_project_configuration)) {
-        PF_LOG_CRITICAL(PF_APPLICATION, "Could not read project configuration!");
-        return SDL_APP_FAILURE;
-    }
-
-
-    // -------------------------------------------------------------------------------------------------------
-    // Application init
-    // -------------------------------------------------------------------------------------------------------
-
-    void* application_memory = NULL;
-    if (!try_allocate_application_memory(s_application_memory_size, &application_memory)) {
-        PF_LOG_CRITICAL(PF_APPLICATION, "Could not allocation application memory!");
-        return SDL_APP_FAILURE;
-    }
-
-
-    if (!try_initialize_program_lifetime_allocator(application_memory,
-        s_application_memory_size, &s_program_lifetime_memory_arena))
-    {
-        PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize program lifetime allocator!");
-        return SDL_APP_FAILURE;
-    }
-
-
-    if (!try_initialize_engine_state_struct(s_program_lifetime_memory_arena, &s_engine_state)) {
-        PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize engine state struct!");
-        return SDL_APP_FAILURE;
-    }
-
-    SlainGameLifetimeState_t* slain_game_state = NULL;
-    if (!try_initialize_game_lifetime_state_struct(s_program_lifetime_memory_arena,
-        s_program_lifetime_memory_arena, &slain_game_state)) {
-        PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize game lifetime state struct!")
-        return SDL_APP_FAILURE;
-    }
-
-
-    // we'll use the game state struct to handle all the calls from outside of the game:
-    // hardware, os, etc
-    *appstate = slain_game_state;
-
-
-    char const * splash_image_file_path = "/home/ellie/git/paciFIST/src/splash.bmp";
-    s_sdl_surface = SDL_LoadBMP(splash_image_file_path);
-    if (s_sdl_surface == NULL) {
-       printf("Could not load splash image! %s\n", splash_image_file_path);
-    }
-
-    s_sdl_texture = SDL_CreateTextureFromSurface(s_sdl_renderer, s_sdl_surface);
-    if (s_sdl_texture == NULL) {
-       printf("Could not create sdl texture from surface!\n");
-    }
-    SDL_DestroySurface(s_sdl_surface);
-    s_sdl_surface = NULL;
-
-
-
-
-
-
-
-    return SDL_APP_CONTINUE; 
+    return pf_app_init(appstate, argc, argv);
 }
 
 
 SDL_AppResult SDL_AppEvent(void * appstate, SDL_Event * event) {
+    return pf_app_event(appstate, event);
     if (appstate == NULL) {
         PF_LOG_CRITICAL(PF_APPLICATION, "Lost access to application lifetime state!");
         return SDL_APP_FAILURE;
@@ -452,14 +411,16 @@ SDL_AppResult SDL_AppEvent(void * appstate, SDL_Event * event) {
 
 
 SDL_AppResult SDL_AppIterate(void * appstate) {
-   //SDL_Log("Hey girl! love youu!");
+    return pf_app_iterate(appstate);
+
+    //SDL_Log("Hey girl! love youu!");
    //SDL_Log("You're doing your best!");
 
    SDL_RenderClear(s_sdl_renderer);
    SDL_FRect destination_rect;
    destination_rect.w = 828;
    destination_rect.h = 988;
-   destination_rect.x = WINDOW_CENTER_X - (destination_rect.w / 2);
+   destination_rect.x = 640 - (destination_rect.w / 2);
    destination_rect.y = 0;
    SDL_RenderTexture(s_sdl_renderer, s_sdl_texture, NULL, &destination_rect);
    SDL_RenderPresent(s_sdl_renderer);
@@ -469,9 +430,11 @@ SDL_AppResult SDL_AppIterate(void * appstate) {
 }
 
 void SDL_AppQuit(void * appstate, SDL_AppResult result) {
-   //nk_end(s_nk_context);
+    pf_app_quit(appstate, result);
+    return;
+    //nk_end(s_nk_context);
    
-   deallocate_application_memory(s_program_lifetime_memory_arena, s_application_memory_size);
+   //deallocate_application_memory(s_engine_lifetime_memory_arena, s_engine_memory_size);
 
    SDL_DestroyRenderer(s_sdl_renderer);
    SDL_DestroyWindow(s_sdl_program_window);
