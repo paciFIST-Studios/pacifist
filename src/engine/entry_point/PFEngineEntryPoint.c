@@ -26,8 +26,13 @@
 //static SDL_Surface* s_sdl_surface = NULL;
 //static SDL_Texture* s_sdl_texture = NULL;
 
+// the total amount of memory which will be requested from the OS for the engine (including game)
 static size_t const s_engine_memory_size = Mebibytes(64);
+// the base of all engine memory
+static void* s_engine_memory_base = NULL;
 
+// the lifetime allocator cannot deallocate.  it's primary purpose is to divide memory into
+// discipline-oriented groups: strings, fonts, textures, game, etc
 static PFAllocator_MemoryArena_t* s_engine_lifetime_allocator = NULL;
 
 static PFEngineConfiguration_t* s_engine_configuration = NULL;
@@ -42,8 +47,13 @@ static PFEngineState_t* s_engine_state = NULL;
 //------------------------------------------------------------------------------------------------------------
 
 SDL_AppResult pf_app_init(void **appstate, int argc, char *argv[]) {
+    // Systems Init - get SDL running
+    // Engine Init - get engine running
+    // Config Init - figure out the metadata
+    // App Init - get game running
 
 
+    
     // -------------------------------------------------------------------------------------------------------
     // Systems Init
     // -------------------------------------------------------------------------------------------------------
@@ -77,25 +87,25 @@ SDL_AppResult pf_app_init(void **appstate, int argc, char *argv[]) {
     // -------------------------------------------------------------------------------------------------------
     // Engine Init
     // -------------------------------------------------------------------------------------------------------
+    if (!pf_try_allocate_engine_memory_from_os(s_engine_memory_size, &s_engine_memory_base)) {
+        PF_LOG_CRITICAL(PF_APPLICATION, "Could not allocate engine memory!");
+        return SDL_APP_FAILURE;
+    }
+
+    if (!pf_try_create_engine_lifetime_allocator(s_engine_memory_base,
+        s_engine_memory_size, &s_engine_lifetime_allocator))
+    {
+        PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize engine lifetime allocator!");
+        return SDL_APP_FAILURE;
+    }
+
     if (!pf_try_create_engine_state_struct(s_engine_lifetime_allocator, &s_engine_state)) {
         PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize engine state struct!");
         return SDL_APP_FAILURE;
     }
 
 
-    void* engine_memory = NULL;
-    if (!pf_try_allocate_engine_memory_from_os(s_engine_memory_size, &engine_memory)) {
-        PF_LOG_CRITICAL(PF_APPLICATION, "Could not allocate engine memory!");
-        return SDL_APP_FAILURE;
-    }
 
-    if (!pf_try_create_engine_lifetime_allocator(engine_memory,
-        s_engine_memory_size, &s_engine_lifetime_allocator))
-    {
-        PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize engine lifetime allocator!");
-        return SDL_APP_FAILURE;
-    }
-    
     // -------------------------------------------------------------------------------------------------------
     // Configuration Init
     // -------------------------------------------------------------------------------------------------------
@@ -153,7 +163,7 @@ SDL_AppResult pf_app_init(void **appstate, int argc, char *argv[]) {
 // fn pf_app_event
 //------------------------------------------------------------------------------------------------------------
 
-SDL_AppResult pf_app_event(void *app_state, SDL_Event *event) {
+SDL_AppResult pf_app_event(void* app_state, SDL_Event* event) {
     return SDL_APP_CONTINUE;
 }
 
@@ -164,7 +174,9 @@ SDL_AppResult pf_app_event(void *app_state, SDL_Event *event) {
 // fn pf_app_iterate
 //------------------------------------------------------------------------------------------------------------
 
-SDL_AppResult pf_app_iterate(void *app_state) {
+SDL_AppResult pf_app_iterate(void* app_state) {
+    SDL_Log("Hey girl! love youu!");
+    SDL_Log("You're doing your best!");
     return SDL_APP_SUCCESS;
 }
 
@@ -174,5 +186,5 @@ SDL_AppResult pf_app_iterate(void *app_state) {
 // fn pf_app_quit
 //------------------------------------------------------------------------------------------------------------
 
-void pf_app_quit(void *app_state, SDL_AppResult result) {
+void pf_app_quit(void* app_state, SDL_AppResult result) {
 }

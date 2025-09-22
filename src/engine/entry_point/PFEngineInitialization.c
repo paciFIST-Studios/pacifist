@@ -8,6 +8,10 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_init.h>
 // engine
+#include <core/define.h>
+#include <core/error.h>
+#include <string/pstring.h>
+#include <parse/parse_utilities.h>
 
 
 
@@ -16,11 +20,12 @@ static SDL_Renderer* s_sdl_renderer = NULL;
 
 
 
+//------------------------------------------------------------------------------------------------------------
+// memory: move these
+//------------------------------------------------------------------------------------------------------------
 
-
-
-
-void * pf_allocate_engine_memory(size_t engine_total_memory_allocation) {
+// FIXME: move these allocate and deallocate fns somewhere else
+void * pf_allocate_engine_memory(size_t const engine_total_memory_allocation) {
     void * memory = NULL;
 
     //#if __linux__
@@ -65,9 +70,12 @@ void pf_deallocate_engine_memory(void* memory, size_t engine_total_memory_alloca
     free(memory);
 }
 
-int32_t pf_try_initialize_sdl_video_systems(int argc, char* argv[]) {
-    PF_DEBUG_PARSE_FOR_RETURN_FALSE(argc, argv, "try_initialize_video_systems");
 
+//------------------------------------------------------------------------------------------------------------
+// SDL initialization
+//------------------------------------------------------------------------------------------------------------
+
+int32_t pf_try_initialize_sdl_video_systems(int argc, char* argv[]) {
     // initialize SDL video system
     if (SDL_Init(SDL_INIT_VIDEO) == FALSE) {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize SDL!",
@@ -77,7 +85,7 @@ int32_t pf_try_initialize_sdl_video_systems(int argc, char* argv[]) {
 
     // create and initialize main window
     {
-        SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+        SDL_WindowFlags const windowFlags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
         s_sdl_program_window = SDL_CreateWindow("paciFIST Studios", STARTUP_WINDOW_RES_X, STARTUP_WINDOW_RES_Y, windowFlags);
         if (s_sdl_program_window== NULL) {
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize main window!", SDL_GetError(), NULL);
@@ -110,17 +118,99 @@ int32_t pf_try_initialize_sdl_audio(int argc, char* argv[]) {
     return TRUE;
 }
 
+
+//------------------------------------------------------------------------------------------------------------
+// Engine Initialization
+//------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief this fn manages the process of a request for memory
+ *
+ * @param memory_size 
+ * @param out_memory 
+ * @return 
+ */
 int32_t pf_try_allocate_engine_memory_from_os(size_t memory_size, void** out_memory) {
+    if (out_memory == NULL) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "Need an out-param in order to allocate engine memory from os!");
+        return FALSE;
+    }
+    if (memory_size == 0) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "Cannot allocate 0 bytes for engine memory!");
+        return FALSE;
+    }
+
+    *out_memory = pf_allocate_engine_memory(memory_size);
+    if (*out_memory == NULL) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "Fn pf_allocate_engine_memory has returned NULL!");
+        return FALSE;
+    }
+
     return TRUE;
 }
 
+/**
+ * @brief this fn creates a single, lifetime allocator, to manage all of the engine memory
+ * @note: the lifetime allocator cannot deallocate, and this memory is held until
+ * engine shutdown
+ *
+ * @param lifetime_memory_base 
+ * @param memory_size 
+ * @param out_lifetime_allocator 
+ * @return 
+ */
 int32_t pf_try_create_engine_lifetime_allocator(
-    void *lifetime_memory_base,
-    size_t memory_size,
+    void* lifetime_memory_base,
+    size_t const memory_size,
     PFAllocator_MemoryArena_t** out_lifetime_allocator)
 {
+    if (lifetime_memory_base == NULL) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "Got NULL ptr for lifetime-memory-base param!");
+        return FALSE;
+    }
+    if (memory_size == 0) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "Got zero for memory-size param!");
+        return FALSE;
+    }
+    if (out_lifetime_allocator == NULL) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "Got null ptr for out-lifetime-allocator param!");
+        return FALSE;
+    }
+
+    // all of our memory is allocated now.  in order to manage it, put in a
+    // memory arena aligned to byte 0
+    *out_lifetime_allocator = pf_allocator_memory_arena_create_with_memory(lifetime_memory_base, memory_size);
     return TRUE;
 }
+
+int32_t pf_try_create_engine_state_struct(
+    void* memory_base,
+    PFEngineState_t** out_engine_state_struct)
+{
+    if (memory_base == NULL) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "Got NULL ptr to memory-base param!");
+        return FALSE;
+    }
+    if (out_engine_state_struct == NULL) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "Got NULL ptr to out-engine-state param!");
+        return FALSE;
+    }
+
+    // first allocation from within the memory area holds the engine state.
+    // This struct owns the string internment struct, 
+    *out_engine_state_struct = PF_PUSH_STRUCT(memory_base, PFEngineState_t);
+    memset(*out_engine_state_struct, 0, sizeof(PFEngineState_t));
+    if (out_engine_state_struct == NULL) {
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+
+//------------------------------------------------------------------------------------------------------------
+// Configuration Initialization
+//------------------------------------------------------------------------------------------------------------
 
 int32_t pf_try_read_engine_configuration(
     int argc,
@@ -131,9 +221,3 @@ int32_t pf_try_read_engine_configuration(
     return TRUE;
 }
 
-int32_t pf_try_create_engine_state_struct(
-    void* memory_base,
-    PFEngineState_t** out_engine_state_struct)
-{
-    return TRUE;
-}

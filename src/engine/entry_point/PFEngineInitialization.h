@@ -7,14 +7,10 @@
 #include <stdint.h>
 // framework
 // engine
-#include <core/define.h>
-#include <core/error.h>
 #include <engine/PFEngineState.h>
 #include <engine/PFEngineConfiguration.h>
 #include <log/log.h>
 #include <memory/allocator/PFMemoryArena.h>
-#include <string/pstring.h>
-#include <parse/parse_utilities.h>
 
 // defines ---------------------------------------------------------------------------------------------------
 
