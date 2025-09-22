@@ -3,13 +3,14 @@
 // include
 #include <check.h>
 #include "../pftest_utilities.h"
-#include "../../src/string/pstring.h"
+#include <string/pstring.h>
+
 // stdlib
 #include <stdlib.h>
 // framework
 // engine
-#include "../../src/core/define.h"
-#include "../../src/core/error.h"
+#include <core/define.h>
+#include <core/error.h>
 
 // struct PString_t ------------------------------------------------------------------------------------------
 
