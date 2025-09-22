@@ -50,9 +50,9 @@ typedef size_t MemoryIndex_t;
 #define FALSE 0
 
 // more explicit terms for different uses of static
-#define internal static
-#define global_persist static
-#define global_variable static
+//#define internal static
+//#define global_persist static
+//#define global_variable static
 
 // The value of PI, in 32 bits
 #define PI_32 = 3.14159265359f
