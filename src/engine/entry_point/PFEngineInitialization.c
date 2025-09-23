@@ -10,6 +10,7 @@
 // engine
 #include <core/define.h>
 #include <core/error.h>
+#include <engine/engine_define.h>
 #include <string/pstring.h>
 #include <parse/parse_utilities.h>
 
@@ -184,11 +185,11 @@ int32_t pf_try_create_engine_lifetime_allocator(
 }
 
 int32_t pf_try_create_engine_state_struct(
-    void* memory_base,
+    PFAllocator_MemoryArena_t* allocator,
     PFEngineState_t** out_engine_state_struct)
 {
-    if (memory_base == NULL) {
-        PF_LOG_CRITICAL(PF_INITIALIZATION, "Got NULL ptr to memory-base param!");
+    if (allocator == NULL) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "Got NULL ptr to allocator param!");
         return FALSE;
     }
     if (out_engine_state_struct == NULL) {
@@ -197,13 +198,26 @@ int32_t pf_try_create_engine_state_struct(
     }
 
     // first allocation from within the memory area holds the engine state.
-    // This struct owns the string internment struct, 
-    *out_engine_state_struct = PF_PUSH_STRUCT(memory_base, PFEngineState_t);
-    memset(*out_engine_state_struct, 0, sizeof(PFEngineState_t));
-    if (out_engine_state_struct == NULL) {
+    // This struct owns the string internment struct,
+    PFEngineState_t* engine_state = PF_PUSH_STRUCT(allocator, PFEngineState_t);
+    if (engine_state == NULL) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "Could not allocate from provided allocator!");
         return FALSE;
     }
 
+    // zero it out and we'll build it fresh
+    memset(engine_state, 0, sizeof(PFEngineState_t));
+
+    // fist is the StringInternment singleton, which lasts the entire lifetime of the engine,
+    // and which cannot deallocate an interned string
+    size_t const slis_size = STRING_INTERNMENT_MEMORY_SIZE;
+    void* slis_memory_base = pf_allocator_memory_arena_push_size(allocator, slis_size);
+    PFStringLifetimeInternmentSingleton_t* string_internment = pf_string_lifetime_internment_create_with_memory(slis_memory_base, slis_size);
+    engine_state->m_lifetime_string_internment = string_internment;
+
+
+
+    *out_engine_state_struct = engine_state;
     return TRUE;
 }
 

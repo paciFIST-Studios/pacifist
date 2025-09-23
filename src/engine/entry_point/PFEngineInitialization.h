@@ -94,6 +94,19 @@ int32_t pf_try_create_engine_lifetime_allocator(
     size_t memory_size,
     PFAllocator_MemoryArena_t** out_lifetime_allocator);
 
+
+/**
+ * @brief Creates a struct for the engine state, at the memory location
+ *
+ * @param allocator 
+ * @param out_engine_state_struct 
+ * @return 
+ */
+int32_t pf_try_create_engine_state_struct(
+    PFAllocator_MemoryArena_t* allocator,
+    PFEngineState_t** out_engine_state_struct);
+
+
 /**
  * @brief reads in the engine configuration and creates the configuration object
  * 
@@ -108,18 +121,6 @@ int32_t pf_try_read_engine_configuration(
     char* argv[],
     PFAllocator_MemoryArena_t* lifetime_allocator,
     PFEngineConfiguration_t** out_engine_configuration);
-
-/**
- * @brief Creates a struct for the engine state, at the memory location
- *
- * @param memory_base 
- * @param out_engine_state_struct 
- * @return 
- */
-int32_t pf_try_create_engine_state_struct(
-    void* memory_base,
-    PFEngineState_t** out_engine_state_struct);
-
 
 #endif // PF_ENGINE_INITIALIZATION_H
 
