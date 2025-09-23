@@ -11,7 +11,7 @@
 
 
 typedef struct PFEngineState_t {
-    PFStringLifetimeInternmentSingleton_t m_string_internment;
+    PFStringLifetimeInternmentSingleton_t* m_lifetime_string_internment;
 
 } PFEngineState_t;
 
