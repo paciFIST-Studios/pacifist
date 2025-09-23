@@ -181,46 +181,71 @@ END_TEST
 
 // pf_try_create_engine_state_struct -------------------------------------------------------------------------
 START_TEST(fn_pf_try_create_engine_state_struct__is_defined) {
-    int32_t(*fptr)(void*, PFEngineState_t**) = &pf_try_create_engine_state_struct;
+    int32_t(*fptr)(PFAllocator_MemoryArena_t*, PFEngineState_t**) = &pf_try_create_engine_state_struct;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
-START_TEST(fn_pf_try_create_engine_state_struct__returns_false__for_null_memory_base_param) {
+START_TEST(fn_pf_try_create_engine_state_struct__returns_false__for_null_allocator_param) {
     PF_SUPPRESS_ERRORS
     ck_assert_int_eq(FALSE, pf_try_create_engine_state_struct(NULL, NULL));
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
 
-START_TEST(fn_pf_try_create_state_struct__sets_correct_error_message__for_null_memory_base_param) {
+START_TEST(fn_pf_try_create_engine_state_struct__sets_correct_error_message__for_null_allocator_param) {
     PF_SUPPRESS_ERRORS
     ck_assert_int_eq(FALSE, pf_try_create_engine_state_struct(NULL, NULL));
     PF_UNSUPPRESS_ERRORS
 
-    char const * expected = "Got NULL ptr to memory-base param!";
+    char const * expected = "Got NULL ptr to allocator param!";
     ck_assert_in_error_buffer(expected);
 }
 END_TEST
 
 START_TEST(fn_pf_try_create_engine_state_struct__returns_false__for_out_engine_state_param) {
-    char memory[16];
+    PFAllocator_MemoryArena_t arena = {0};
     PF_SUPPRESS_ERRORS
-    ck_assert_int_eq(FALSE, pf_try_create_engine_state_struct(memory, NULL));
+    ck_assert_int_eq(FALSE, pf_try_create_engine_state_struct(&arena, NULL));
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
 
-START_TEST(fn_pf_try_create_state_struct__sets_correct_error_message__for_out_engine_state_param) {
-    char memory[16];
+START_TEST(fn_pf_try_create_engine_state_struct__sets_correct_error_message__for_out_engine_state_param) {
+    PFAllocator_MemoryArena_t arena = {0};
     PF_SUPPRESS_ERRORS
-    ck_assert_int_eq(FALSE, pf_try_create_engine_state_struct(memory, NULL));
+    ck_assert_int_eq(FALSE, pf_try_create_engine_state_struct(&arena, NULL));
     PF_UNSUPPRESS_ERRORS
 
     char const * expected = "Got NULL ptr to out-engine-state param!";
     ck_assert_in_error_buffer(expected);
 }
 END_TEST
+
+START_TEST(fn_pf_try_create_engine_state_struct__returns_false__if_allocator_cannot_push_memory) {
+    PFAllocator_MemoryArena_t arena = {0};
+    PF_SUPPRESS_ERRORS
+    PFEngineState_t* engine_state = NULL;
+    ck_assert_int_eq(FALSE, pf_try_create_engine_state_struct(&arena, &engine_state));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_try_create_engine_state_struct__sets_correct_error_message__if_allocator_cannot_push_memory) {
+    PFAllocator_MemoryArena_t arena = {0};
+    PF_SUPPRESS_ERRORS
+    PFEngineState_t* engine_state = NULL;
+    ck_assert_int_eq(FALSE, pf_try_create_engine_state_struct(&arena, &engine_state));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Could not allocate from provided allocator!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+// this fn also allocates the string internmnet
+// this fn also allocates the string internment of the correct size
+
 
 
 // pf_try_read_engine_configuration --------------------------------------------------------------------------

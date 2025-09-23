@@ -17,13 +17,13 @@ START_TEST(fn_struct_PFEngineState_t__is_defined) {
 END_TEST
 
 START_TEST(fn_struct_PFEngineState_t__has_expected_size) {
-    ck_assert_int_eq(sizeof(PFEngineState_t), 4096);
+    ck_assert_int_eq(sizeof(PFEngineState_t), 8);
 }
 END_TEST
 
 START_TEST(fn_struct_PFEngineState_t__has_expected_members) {
     PFEngineState_t const engine_state = {0};
-    ck_assert_ptr_nonnull(&engine_state.m_string_internment);
+    ck_assert_ptr_nonnull(&engine_state.m_lifetime_string_internment);
 }
 END_TEST
 

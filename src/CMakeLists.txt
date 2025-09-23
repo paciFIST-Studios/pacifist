@@ -122,6 +122,7 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/rendering/render.h
         engine/entry_point/PFEngineInitialization.h
         engine/entry_point/PFEngineInitialization.c
+        engine/engine_define.h
         # type
         # u,v,w,x,y,z 
 )

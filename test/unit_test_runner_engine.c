@@ -311,11 +311,12 @@ int main(void) {
 
     // fn pf_try_create_engine_state_struct
     ADD_TEST(fn_pf_try_create_engine_state_struct__is_defined);
-    ADD_TEST(fn_pf_try_create_engine_state_struct__returns_false__for_null_memory_base_param);
-    ADD_TEST(fn_pf_try_create_state_struct__sets_correct_error_message__for_null_memory_base_param);
+    ADD_TEST(fn_pf_try_create_engine_state_struct__returns_false__for_null_allocator_param);
+    ADD_TEST(fn_pf_try_create_engine_state_struct__sets_correct_error_message__for_null_allocator_param);
     ADD_TEST(fn_pf_try_create_engine_state_struct__returns_false__for_out_engine_state_param);
-    ADD_TEST(fn_pf_try_create_state_struct__sets_correct_error_message__for_out_engine_state_param);
-
+    ADD_TEST(fn_pf_try_create_engine_state_struct__sets_correct_error_message__for_out_engine_state_param);
+    ADD_TEST(fn_pf_try_create_engine_state_struct__returns_false__if_allocator_cannot_push_memory);
+    ADD_TEST(fn_pf_try_create_engine_state_struct__sets_correct_error_message__if_allocator_cannot_push_memory);
 
     
     // fn pf_try_read_engine_configuration
