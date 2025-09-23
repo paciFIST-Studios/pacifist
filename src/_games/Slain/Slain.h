@@ -7,7 +7,7 @@
 // framework
 // engine
 #include "../../string/pstring.h"
-#include "../../memory/allocator/MemoryArena.h"
+#include <memory/allocator/PFMemoryArena.h>
 
 
 
@@ -15,7 +15,7 @@
 typedef struct SlainGameLifetimeState_t {
     PString_t window_title;
 
-    MemoryArena_t * program_lifetime_memory_arena;
+    PFAllocator_MemoryArena_t * program_lifetime_memory_arena;
 
     void(*pf_handle_mouse_movement)(float mouse_x, float mouse_y);
     void(*pf_handle_mouse_down)(uint8_t);
