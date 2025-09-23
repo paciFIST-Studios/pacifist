@@ -71,14 +71,14 @@ PString_t pf_pstring_slice(PString_t const pstr, int32_t const begin, int32_t co
  * @param count 
  * @return 
  */
-PString_t pf_pstring_copy_allocate(PString_t const pstr, int32_t const i, int32_t const j, int32_t const count);
+//PString_t pf_pstring_copy_allocate(PString_t const pstr, int32_t const i, int32_t const j, int32_t const count);
 
 /**
  * @brief reverses the supplied string, in the memory it already occupies
  *
  * @param pstr 
  */
-void pf_pstring_reverse_in_place(PString_t * pstr);
+//void pf_pstring_reverse_in_place(PString_t * pstr);
 
 
 /**
@@ -100,13 +100,13 @@ int32_t pf_pstring_compare(PString_t const a, PString_t const b);
  * @param out_array 
  * @param out_array_length 
  */
-void pf_pstring_tokenize_allocate(PString_t const pstr, char const * delimiter, size_t const length, PString_t* out_array, size_t out_array_length);
+//void pf_pstring_tokenize_allocate(PString_t pstr, char const * delimiter, size_t length, PString_t* out_array, size_t out_array_length);
 
 
-void pf_pstring_findall_allocate(PString_t const a, char  const * substring, size_t const length, int32_t* out_array, size_t out_array_length);
+//void pf_pstring_findall_allocate(PString_t a, char  const * substring, size_t length, int32_t* out_array, size_t out_array_length);
 
 /**
- * @brief returns a pstring, containing the first patching substring found in pstr:w
+ * @brief returns a pstring, containing the first patching substring found in pstr
  * 
  *
  * @param pstr 
@@ -114,7 +114,7 @@ void pf_pstring_findall_allocate(PString_t const a, char  const * substring, siz
  * @param length 
  * @return 
  */
-PString_t pf_pstring_find_first(PString_t const pstr, char const * substring, size_t const length);
+//PString_t pf_pstring_find_first(PString_t pstr, char const * substring, size_t length);
 
 /**
  * @brief returns a pstring, containing the last matching substring found in pstr
@@ -124,7 +124,7 @@ PString_t pf_pstring_find_first(PString_t const pstr, char const * substring, si
  * @param length 
  * @return 
  */
-PString_t pf_pstring_find_last(PString_t const pstr, char const * substring, size_t const length);
+//PString_t pf_pstring_find_last(PString_t const pstr, char const * substring, size_t const length);
 
 
 
