@@ -68,6 +68,9 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/project/PFProjectConfiguration.h
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/PFEngineEntryPoint.h
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/PFEngineEntryPoint.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/PFEngineInitialization.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/PFEngineInitialization.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_define.h
         # f
         # gui
         ${CMAKE_CURRENT_SOURCE_DIR}/gui/PFDebugGui.h
@@ -120,9 +123,6 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/resource/PFResourceManager.c
         # rendering
         ${CMAKE_CURRENT_SOURCE_DIR}/rendering/render.h
-        engine/entry_point/PFEngineInitialization.h
-        engine/entry_point/PFEngineInitialization.c
-        engine/engine_define.h
         # type
         # u,v,w,x,y,z 
 )
