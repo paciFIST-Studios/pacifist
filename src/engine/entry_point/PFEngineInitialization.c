@@ -296,15 +296,22 @@ int32_t pf_try_read_engine_configuration(
         PF_LOG_CRITICAL(PF_INITIALIZATION, "PFEngineState_t had null ptr to lifetime_string_internment!");
         return FALSE;
     }
-
-
+    
     PFEngineConfiguration_t* engine_configuration = PF_PUSH_STRUCT(engine_state->p_lifetime_memory_allocator, PFEngineConfiguration_t);
 
+    // figure out:
+    //  * engine_base_path
+    //  * project_name -- read from config?
+    //  * project_config_file_path -- take from startup arg?
 
     char const * engine_base_path = "engine_base_path";
     char const * project_name = "project_name";
     char const * project_config_file_path = "project_config_file_path";
 
+    // moar data?
+    // logs?
+
+    
     PFStringLifetimeInternmentSingleton_t* string_internment = engine_state->p_lifetime_string_internment;
     pf_string_lifetime_internment_emplace_cstr(string_internment, engine_base_path, strlen(engine_base_path));
     pf_string_lifetime_internment_emplace_cstr(string_internment, project_name, strlen(project_name));

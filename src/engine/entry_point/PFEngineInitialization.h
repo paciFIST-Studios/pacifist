@@ -68,8 +68,6 @@ int32_t pf_try_initialize_sdl_font(int argc, char* argv[]);
  */
 int32_t pf_try_initialize_sdl_audio(int argc, char* argv[]);
 
-
-
 /**
  * @brief requests a single allocation, of all the memory the engine will own for its lifetime
  *
@@ -94,7 +92,6 @@ int32_t pf_try_create_engine_lifetime_allocator(
     size_t memory_size,
     PFAllocator_MemoryArena_t** out_lifetime_allocator);
 
-
 /**
  * @brief Creates a struct for the engine state, at the memory location
  *
@@ -105,7 +102,6 @@ int32_t pf_try_create_engine_lifetime_allocator(
 int32_t pf_try_create_engine_state_struct(
     PFAllocator_MemoryArena_t* engine_scope,
     PFEngineState_t** out_engine_state_struct);
-
 
 /**
  * @brief reads in the engine configuration and creates the configuration object

@@ -2,7 +2,7 @@
 
 // includes
 #include <check.h>
-#include "../../src/engine/PFEngineState.h"
+#include <engine/PFEngineState.h>
 
 // stdlib
 // framework

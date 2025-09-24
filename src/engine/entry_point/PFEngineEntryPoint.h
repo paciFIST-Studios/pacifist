@@ -14,15 +14,18 @@
  */
 SDL_AppResult pf_app_init(void ** appstate, int argc, char* argv[]);
 
+
 /**
  * Called by SDL_AppEvent, and wraps all PFEngine functionality for that fn
  */
 SDL_AppResult pf_app_event(void* app_state, SDL_Event* event);
 
+
 /**
  * Called by SDL_AppResult, and wraps all PFEngine functionality for that fn
  */
 SDL_AppResult pf_app_iterate(void* app_state);
+
 
 /**
  * Called by SDL_AppQuit, and wraps all PFEngine functionality for that fn
