@@ -278,6 +278,15 @@ int main(void) {
     // PFEngineInitialization //
     //------------------------//
 
+    // fn pf_get_program_window
+    ADD_TEST(fn_pf_get_program_window__is_defined);
+    ADD_TEST(fn_pf_get_program_window__returns_null_if_sdl_is_not_initialized);
+    ADD_TEST(fn_pf_get_program_window__sets_correct_error_message__if_sdl_is_not_initialized);
+    // fn pf_get_sdl_renderer
+    ADD_TEST(fn_pf_get_sdl_renderer__is_defined);
+    ADD_TEST(fn_pf_get_sdl_renderer__returns_null_if_sdl_is_not_initialized);
+    ADD_TEST(fn_pf_get_sdl_renderer__sets_correct_error_message__if_sdl_is_not_initialized);
+    
     // fn pf_allocate_engine_memory
     ADD_TEST(fn_pf_allocate_engine_memory__is_defined);
     // fn pf_deallocate_engine_memory

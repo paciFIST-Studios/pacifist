@@ -6,11 +6,14 @@
 // stdlib
 #include <stdint.h>
 // framework
+#include <SDL3/SDL.h>
 // engine
 #include <engine/PFEngineState.h>
 #include <engine/PFEngineConfiguration.h>
 #include <log/log.h>
 #include <memory/allocator/PFMemoryArena.h>
+
+
 
 // defines ---------------------------------------------------------------------------------------------------
 
@@ -18,6 +21,22 @@
 #define STARTUP_WINDOW_RES_Y 720
 #define STARTUP_WINDOW_CENTER_X 640
 #define STARTUP_WINDOW_CENTER_y 360
+
+
+/**
+ * @brief: if SDL has already been initialized, returns the current program window
+ *
+ * @return 
+ */
+SDL_Window* pf_get_program_window(void);
+
+
+/**
+ * @brief: if SDL has already been initialized, returns the renderer
+ *
+ * @return 
+ */
+SDL_Renderer* pf_get_sdl_renderer(void);
 
 
 /**

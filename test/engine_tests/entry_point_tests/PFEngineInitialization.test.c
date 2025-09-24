@@ -14,6 +14,55 @@
 #include <memory/allocator/PFMemoryArena.h>
 
 
+// pf_get_program_window -------------------------------------------------------------------------------------
+START_TEST(fn_pf_get_program_window__is_defined) {
+    SDL_Window*(*fptr)(void) = &pf_get_program_window;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_get_program_window__returns_null_if_sdl_is_not_initialized) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_get_program_window());
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_get_program_window__sets_correct_error_message__if_sdl_is_not_initialized) {
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_get_program_window());
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Someone called pf_get_program_window before initializing SDL_VIDEO!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+// pf_get_sdl_renderer ---------------------------------------------------------------------------------------
+START_TEST(fn_pf_get_sdl_renderer__is_defined) {
+    SDL_Renderer*(*fptr)(void) = &pf_get_sdl_renderer;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_get_sdl_renderer__returns_null_if_sdl_is_not_initialized) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_get_sdl_renderer());
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_get_sdl_renderer__sets_correct_error_message__if_sdl_is_not_initialized) {
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_get_sdl_renderer());
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Someone called pf_get_sdl_renderer before initializing SDL_VIDEO!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
 
 
 

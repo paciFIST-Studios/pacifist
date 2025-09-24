@@ -22,10 +22,10 @@
 //------------------------------------------------------------------------------------------------------------
 
 //static SDL_Window* s_sdl_program_window = NULL;
-//static SDL_Renderer* s_sdl_renderer = NULL;
+static SDL_Renderer* s_sdl_renderer = NULL;
 
-//static SDL_Surface* s_sdl_surface = NULL;
-//static SDL_Texture* s_sdl_texture = NULL;
+static SDL_Surface* s_sdl_surface = NULL;
+static SDL_Texture* s_sdl_texture = NULL;
 
 // the total amount of memory which will be requested from the OS for the engine (including game)
 static size_t const s_engine_memory_size = ENGINE_MEMORY_TOTAL_ALLOCATION_SIZE;
@@ -62,7 +62,7 @@ SDL_AppResult pf_app_init(void **appstate, int argc, char *argv[]) {
     // Systems Init
     // -------------------------------------------------------------------------------------------------------
 
-    if (!pf_try_initialize_sdl_video_systems (argc, argv)) {
+    if (!pf_try_initialize_sdl_video_systems(argc, argv)) {
         PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize video systems!");
         return SDL_APP_FAILURE;
     }
@@ -143,19 +143,22 @@ SDL_AppResult pf_app_init(void **appstate, int argc, char *argv[]) {
     //// hardware, os, etc
     //*appstate = slain_game_state;
 
+    *appstate = s_engine_state;
 
-    //char const * splash_image_file_path = "/home/ellie/git/paciFIST/src/splash.bmp";
-    //s_sdl_surface = SDL_LoadBMP(splash_image_file_path);
-    //if (s_sdl_surface == NULL) {
-    //   printf("Could not load splash image! %s\n", splash_image_file_path);
-    //}
+    s_sdl_renderer = pf_get_sdl_renderer();
+    
+    char const * splash_image_file_path = "/home/ellie/git/paciFIST/src/splash.bmp";
+    s_sdl_surface = SDL_LoadBMP(splash_image_file_path);
+    if (s_sdl_surface == NULL) {
+       printf("Could not load splash image! %s\n", splash_image_file_path);
+    }
 
-    //s_sdl_texture = SDL_CreateTextureFromSurface(s_sdl_renderer, s_sdl_surface);
-    //if (s_sdl_texture == NULL) {
-    //   printf("Could not create sdl texture from surface!\n");
-    //}
-    //SDL_DestroySurface(s_sdl_surface);
-    //s_sdl_surface = NULL;
+    s_sdl_texture = SDL_CreateTextureFromSurface(s_sdl_renderer, s_sdl_surface);
+    if (s_sdl_texture == NULL) {
+       printf("Could not create sdl texture from surface!\n");
+    }
+    SDL_DestroySurface(s_sdl_surface);
+    s_sdl_surface = NULL;
 
     return SDL_APP_CONTINUE;
 }
@@ -167,6 +170,71 @@ SDL_AppResult pf_app_init(void **appstate, int argc, char *argv[]) {
 //------------------------------------------------------------------------------------------------------------
 
 SDL_AppResult pf_app_event(void* app_state, SDL_Event* event) {
+    if (app_state == NULL) {
+        PF_LOG_CRITICAL(PF_APPLICATION, "Lost access to application lifetime state!");
+        return SDL_APP_FAILURE;
+    }
+
+    //SlainGameLifetimeState_t* ln_game_state = appstate;
+
+    switch (event->type) {
+
+        case SDL_EVENT_QUIT:
+            return SDL_APP_SUCCESS;
+
+        case SDL_EVENT_KEY_DOWN: {
+           if (event->key.key == SDLK_ESCAPE) {
+              return SDL_APP_SUCCESS;
+           }
+
+           //if (ln_game_state->pf_handle_key_down != NULL) {
+           //    ln_game_state->pf_handle_key_down(event->key.key, event->key.mod);
+           //} else {
+           //    PF_LOG_CRITICAL(PF_APPLICATION, "Application is missing function: \"pf_handle_key_down\"!");
+           //    return SDL_APP_FAILURE;
+           //}
+        } break;
+
+        case SDL_EVENT_KEY_UP: {
+            //if (ln_game_state->pf_handle_key_up != NULL) {
+            //    ln_game_state->pf_handle_key_up(event->key.key, event->key.mod);
+            //} else {
+            //    PF_LOG_CRITICAL(PF_APPLICATION, "Application is missing function: \"pf_handle_key_up\"!");
+            //    return SDL_APP_FAILURE;
+            //}
+        } break;
+
+        case SDL_EVENT_MOUSE_MOTION: {
+            //if (ln_game_state->pf_handle_mouse_movement != NULL) {
+            //    ln_game_state->pf_handle_mouse_movement(event->motion.x, event->motion.y);
+            //} else {
+            //    PF_LOG_CRITICAL(PF_APPLICATION, "Application is missing function: \"pf_handle_mouse_movement\"!");
+            //    return SDL_APP_FAILURE;
+            //}
+        } break;
+
+        case SDL_EVENT_MOUSE_BUTTON_DOWN: {
+            //if (ln_game_state->pf_handle_mouse_down != NULL) {
+            //    ln_game_state->pf_handle_mouse_down(event->button.button);
+            //} else {
+            //    PF_LOG_CRITICAL(PF_APPLICATION, "Application is missing function: \"pf_handle_mouse_down\"!");
+            //    return SDL_APP_FAILURE;
+            //}
+        } break;
+
+        case SDL_EVENT_MOUSE_BUTTON_UP: {
+            //if (ln_game_state->pf_handle_mouse_up != NULL) {
+            //    ln_game_state->pf_handle_mouse_up(event->button.button);
+            //} else {
+            //    PF_LOG_CRITICAL(PF_APPLICATION, "Application is missing function: \"pf_handle_mouse_up\"!");
+            //    return SDL_APP_FAILURE;
+            //}
+        } break;
+
+      default:
+         break;
+    }
+
     return SDL_APP_CONTINUE;
 }
 
@@ -178,9 +246,22 @@ SDL_AppResult pf_app_event(void* app_state, SDL_Event* event) {
 //------------------------------------------------------------------------------------------------------------
 
 SDL_AppResult pf_app_iterate(void* app_state) {
-    SDL_Log("Hey girl! love youu!");
-    SDL_Log("You're doing your best!");
-    return SDL_APP_SUCCESS;
+    //SDL_Log("Hey girl! love youu!");
+    //SDL_Log("You're doing your best!");
+    //return SDL_APP_SUCCESS;
+
+
+    SDL_RenderClear(s_sdl_renderer);
+    SDL_FRect destination_rect;
+    destination_rect.w = 828;
+    destination_rect.h = 988;
+    destination_rect.x = 640 - (destination_rect.w / 2);
+    destination_rect.y = 0;
+    SDL_RenderTexture(s_sdl_renderer, s_sdl_texture, NULL, &destination_rect);
+    SDL_RenderPresent(s_sdl_renderer);
+
+   
+    return SDL_APP_CONTINUE;
 }
 
 

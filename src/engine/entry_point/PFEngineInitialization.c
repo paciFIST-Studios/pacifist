@@ -5,7 +5,6 @@
 // stdlib
 #include <stdlib.h>
 // framework
-#include <SDL3/SDL.h>
 #include <SDL3/SDL_init.h>
 // engine
 #include <core/define.h>
@@ -24,6 +23,22 @@ static SDL_Renderer* s_sdl_renderer = NULL;
 //------------------------------------------------------------------------------------------------------------
 // memory: move these
 //------------------------------------------------------------------------------------------------------------
+
+SDL_Window * pf_get_program_window(void) {
+    if (!SDL_WasInit(SDL_INIT_VIDEO)){
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "Someone called pf_get_program_window before initializing SDL_VIDEO!");
+        return NULL;
+    }
+    return s_sdl_program_window;
+}
+
+SDL_Renderer * pf_get_sdl_renderer(void) {
+    if (!SDL_WasInit(SDL_INIT_VIDEO)){
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "Someone called pf_get_sdl_renderer before initializing SDL_VIDEO!");
+        return NULL;
+    }
+    return s_sdl_renderer;
+}
 
 // FIXME: move these allocate and deallocate fns somewhere else
 void * pf_allocate_engine_memory(size_t const engine_total_memory_allocation) {
