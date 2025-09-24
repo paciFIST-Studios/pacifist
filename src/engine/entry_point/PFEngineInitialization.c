@@ -273,9 +273,45 @@ int32_t pf_try_create_engine_state_struct(
 int32_t pf_try_read_engine_configuration(
     int argc,
     char *argv[],
-    PFEngineState_t* engine_state,
+    PFEngineState_t const * engine_state,
     PFEngineConfiguration_t** out_engine_configuration)
 {
+    if (engine_state == NULL) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "Got null ptr to PFEngineState_t!");
+        return FALSE;
+    }
+    if (out_engine_configuration == NULL) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "Got null ptr to out_engine_configuration param!");
+        return FALSE;
+    }
+    if (engine_state->p_lifetime_memory_allocator == NULL) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "PFEngineState_t had null ptr to lifetime_memory_allocator!");
+        return FALSE;
+    }
+    if (engine_state->p_recoverable_memory_allocator == NULL) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "PFEngineState_t had null ptr to recoverable_memory_allocator!");
+        return FALSE;
+    }
+    if (engine_state->p_lifetime_string_internment == NULL) {
+        PF_LOG_CRITICAL(PF_INITIALIZATION, "PFEngineState_t had null ptr to lifetime_string_internment!");
+        return FALSE;
+    }
+
+
+    PFEngineConfiguration_t* engine_configuration = PF_PUSH_STRUCT(engine_state->p_lifetime_memory_allocator, PFEngineConfiguration_t);
+
+
+    char const * engine_base_path = "engine_base_path";
+    char const * project_name = "project_name";
+    char const * project_config_file_path = "project_config_file_path";
+
+    PFStringLifetimeInternmentSingleton_t* string_internment = engine_state->p_lifetime_string_internment;
+    pf_string_lifetime_internment_emplace_cstr(string_internment, engine_base_path, strlen(engine_base_path));
+    pf_string_lifetime_internment_emplace_cstr(string_internment, project_name, strlen(project_name));
+    pf_string_lifetime_internment_emplace_cstr(string_internment, project_config_file_path, strlen(project_config_file_path));
+
+
+    *out_engine_configuration = engine_configuration;
     return TRUE;
 }
 

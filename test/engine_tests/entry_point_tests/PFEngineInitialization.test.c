@@ -287,9 +287,212 @@ END_TEST
 
 // pf_try_read_engine_configuration --------------------------------------------------------------------------
 START_TEST(fn_pf_try_read_engine_configuration__is_defined) {
-    int32_t(*fptr)(int, char*[], PFEngineState_t*, PFEngineConfiguration_t**) = &pf_try_read_engine_configuration;
+    int32_t(*fptr)(int, char*[], PFEngineState_t const *, PFEngineConfiguration_t**) = &pf_try_read_engine_configuration;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
+START_TEST(fn_pf_try_read_engine_configuration__returns_false__for_null_ptr_to_engine_state_param) {
+    int const argc = 1;
+    char* argv[] = { "" };
+    
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(FALSE, pf_try_read_engine_configuration(argc, argv, NULL, NULL));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
 
+START_TEST(fn_pf_try_read_engine_configuration__sets_correct_error_message__for_null_ptr_to_engine_state_param) {
+    int const argc = 1;
+    char* argv[] = { "" };
+
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(FALSE, pf_try_read_engine_configuration(argc, argv, NULL, NULL));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Got null ptr to PFEngineState_t!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+
+START_TEST(fn_pf_try_read_engine_configuration__returns_false__for_null_ptr_to_out_engine_configuration_param) {
+    int const argc = 1;
+    char* argv[] = { "" };
+    PFEngineState_t const engine_state = {0};
+    
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(FALSE, pf_try_read_engine_configuration(argc, argv, &engine_state, NULL));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_try_read_engine_configuration__sets_correct_error_message__for_null_ptr_to_out_engine_configuration_param) {
+    int const argc = 1;
+    char* argv[] = { "" };
+    PFEngineState_t const engine_state = {0};
+
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(FALSE, pf_try_read_engine_configuration(argc, argv, &engine_state, NULL));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Got null ptr to out_engine_configuration param!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_try_read_engine_configuration__returns_false__for_null_ptr_to_engine_state_param_lifetime_memory_allocator_member) {
+    int const argc = 1;
+    char* argv[] = { "" };
+    PFEngineState_t const engine_state = { 0 };
+    PFEngineConfiguration_t* engine_configuration = NULL;
+
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(FALSE, pf_try_read_engine_configuration(argc, argv, &engine_state, &engine_configuration));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_try_read_engine_configuration__sets_correct_error_message__for_null_ptr_to_engine_state_param_lifetime_memory_allocator_member) {
+    int const argc = 1;
+    char* argv[] = { "" };
+    PFEngineState_t const engine_state = { 0 };
+    PFEngineConfiguration_t* engine_configuration = NULL;
+
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(FALSE, pf_try_read_engine_configuration(argc, argv, &engine_state, &engine_configuration));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "PFEngineState_t had null ptr to lifetime_memory_allocator!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+
+START_TEST(fn_pf_try_read_engine_configuration__returns_false__for_null_ptr_to_engine_state_param_recoverable_memory_allocator_member) {
+    int const argc = 1;
+    char* argv[] = { "" };
+    PFAllocator_MemoryArena_t arena = {0};
+    PFEngineState_t const engine_state = { .p_lifetime_memory_allocator = &arena };
+    PFEngineConfiguration_t* engine_configuration = NULL;
+
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(FALSE, pf_try_read_engine_configuration(argc, argv, &engine_state, &engine_configuration));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_try_read_engine_configuration__sets_correct_error_message__for_null_ptr_to_engine_state_param_recoverable_memory_allocator_member) {
+    int const argc = 1;
+    char* argv[] = { "" };
+    PFAllocator_MemoryArena_t arena = {0};
+    PFEngineState_t const engine_state = { .p_lifetime_memory_allocator = &arena };
+    PFEngineConfiguration_t* engine_configuration = NULL;
+
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(FALSE, pf_try_read_engine_configuration(argc, argv, &engine_state, &engine_configuration));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "PFEngineState_t had null ptr to recoverable_memory_allocator!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_try_read_engine_configuration__returns_false__for_null_ptr_to_engine_state_param_lifetime_string_internment_member) {
+    int const argc = 1;
+    char* argv[] = { "" };
+    PFAllocator_MemoryArena_t arena = {0};
+    PFAllocator_FreeList_t recoverable = {0};
+    PFEngineState_t const engine_state = { .p_lifetime_memory_allocator = &arena, .p_recoverable_memory_allocator = &recoverable };
+    PFEngineConfiguration_t* engine_configuration = NULL;
+
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(FALSE, pf_try_read_engine_configuration(argc, argv, &engine_state, &engine_configuration));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_try_read_engine_configuration__sets_correct_error_message__for_null_ptr_to_engine_state_param_lifetime_string_internment_member) {
+    int const argc = 1;
+    char* argv[] = { "" };
+    PFAllocator_MemoryArena_t arena = {0};
+    PFAllocator_FreeList_t recoverable = {0};
+    PFEngineState_t const engine_state = { .p_lifetime_memory_allocator = &arena, .p_recoverable_memory_allocator = &recoverable };
+    PFEngineConfiguration_t* engine_configuration = NULL;
+
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(FALSE, pf_try_read_engine_configuration(argc, argv, &engine_state, &engine_configuration));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "PFEngineState_t had null ptr to lifetime_string_internment!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+
+
+START_TEST(fn_pf_try_read_engine_configuration__returns_true__for_successful_use) {
+    int const argc = 1;
+    char* argv[] = { "" };
+
+    /**
+     * 20250923 - EBarrett
+     *
+     *  This test mimics the actual calling of this fn during engine startup.
+     *  I'm hardcoding the values at the current size, hoping they'll stay valid
+     *  for the duration of the project.
+     *
+     *  Total memory is split into two groups (halves, at time of writing)
+     *
+     *      "Lifetime" group    - memory which can be allocated, but not deallocated
+     *      "Recoverable" group - memory which can be allocated and deallocated
+     *
+     *  The string_internment struct lives in the lifetime group.  Once all of this
+     *  is setup, we can call the fn, and it should actually do work using this memory,
+     *  and then return true
+     */
+    size_t const size = Kibibytes(256);
+    void* memory = malloc(size);
+
+    PFAllocator_MemoryArena_t* scope = pf_allocator_memory_arena_create_with_memory(memory, size);
+    ck_assert_ptr_nonnull(scope);
+
+    // lifetime
+    size_t const lifetime_size = Kibibytes(128);
+    void* lifetime_memory = pf_allocator_memory_arena_push_size(scope, lifetime_size);
+    PFAllocator_MemoryArena_t* lifetime = pf_allocator_memory_arena_create_with_memory(lifetime_memory, lifetime_size);
+    ck_assert_ptr_nonnull(lifetime);
+
+    // recoverable
+    size_t const recoverable_size = Kibibytes(127);
+    void* recoverable_memory = pf_allocator_memory_arena_push_size(scope, recoverable_size);
+    PFAllocator_FreeList_t* recoverable = pf_allocator_free_list_create_with_memory(recoverable_memory, recoverable_size);
+    ck_assert_ptr_nonnull(recoverable);
+
+    // string_internment lives in lifetime
+    size_t const string_internment_size = Kibibytes(32);
+    void* string_internment_memory = pf_allocator_memory_arena_push_size(lifetime, string_internment_size);
+    PFStringLifetimeInternmentSingleton_t* string_internment = pf_string_lifetime_internment_create_with_memory(
+        string_internment_memory, string_internment_size);
+    ck_assert_ptr_nonnull(string_internment);
+
+    // a "real" engine state
+    PFEngineState_t const engine_state = {
+        .p_lifetime_memory_allocator = lifetime,
+        .p_recoverable_memory_allocator = recoverable,
+        .p_lifetime_string_internment = string_internment
+    };
+    PFEngineConfiguration_t* engine_configuration = NULL;
+
+    // fn call and result measurement
+    ck_assert_int_eq(TRUE, pf_try_read_engine_configuration(argc, argv, &engine_state, &engine_configuration));
+    ck_assert_ptr_nonnull(engine_configuration);
+
+    free(memory);
+}
+END_TEST

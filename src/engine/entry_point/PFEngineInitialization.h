@@ -119,7 +119,7 @@ int32_t pf_try_create_engine_state_struct(
 int32_t pf_try_read_engine_configuration(
     int argc,
     char* argv[],
-    PFEngineState_t* engine_state,
+    PFEngineState_t const * engine_state,
     PFEngineConfiguration_t** out_engine_configuration);
 
 #endif // PF_ENGINE_INITIALIZATION_H

@@ -317,13 +317,31 @@ int main(void) {
     ADD_TEST(fn_pf_try_create_engine_state_struct__sets_correct_error_message__for_out_engine_state_param);
     ADD_TEST(fn_pf_try_create_engine_state_struct__returns_false__if_allocator_cannot_push_memory);
     ADD_TEST(fn_pf_try_create_engine_state_struct__sets_correct_error_message__if_allocator_cannot_push_memory);
+    // tests to make sure this sets up the engine state correctly when called
     ADD_TEST(fn_pf_try_create_engine_state_struct__allocates_string_internment_singleton_as_well__when_called);
-    
-    
+    ADD_TEST(fn_pf_try_create_engine_state_Struct__allocates_recoverable_allocator_as_well__when_called);
+
+
     // fn pf_try_read_engine_configuration
     ADD_TEST(fn_pf_try_read_engine_configuration__is_defined);
+    // param: engine_state
+    ADD_TEST(fn_pf_try_read_engine_configuration__returns_false__for_null_ptr_to_engine_state_param);
+    ADD_TEST(fn_pf_try_read_engine_configuration__sets_correct_error_message__for_null_ptr_to_engine_state_param);
+    // param: out_engine_config
+    ADD_TEST(fn_pf_try_read_engine_configuration__returns_false__for_null_ptr_to_out_engine_configuration_param);
+    ADD_TEST(fn_pf_try_read_engine_configuration__sets_correct_error_message__for_null_ptr_to_out_engine_configuration_param);
+    // param: engine_state->s_lifetime_memory_allocator
+    ADD_TEST(fn_pf_try_read_engine_configuration__returns_false__for_null_ptr_to_engine_state_param_lifetime_memory_allocator_member);
+    ADD_TEST(fn_pf_try_read_engine_configuration__sets_correct_error_message__for_null_ptr_to_engine_state_param_lifetime_memory_allocator_member);
+    // param: engine_state->s_recoverable_memory_allocator
+    ADD_TEST(fn_pf_try_read_engine_configuration__returns_false__for_null_ptr_to_engine_state_param_recoverable_memory_allocator_member);
+    ADD_TEST(fn_pf_try_read_engine_configuration__sets_correct_error_message__for_null_ptr_to_engine_state_param_recoverable_memory_allocator_member);
+    // param: engine_state->s_lifetime_string_internment
+    ADD_TEST(fn_pf_try_read_engine_configuration__returns_false__for_null_ptr_to_engine_state_param_lifetime_string_internment_member);
+    ADD_TEST(fn_pf_try_read_engine_configuration__sets_correct_error_message__for_null_ptr_to_engine_state_param_lifetime_string_internment_member);
 
-
+    ADD_TEST(fn_pf_try_read_engine_configuration__returns_true__for_successful_use);
+    
     RUN_SUITE(fail_count);
     // -------------------------------------------------------------------//
     // End Engine Test Suite                                              //
@@ -331,14 +349,14 @@ int main(void) {
 
 
 
-    
+
     // -------------------------------------------------------------------//
     // Log Test Suite                                                     //
     // -------------------------------------------------------------------//
     BUILD_SUITE("Log");
 
 
-    
+
     RUN_SUITE(fail_count);
     // -------------------------------------------------------------------//
     // End Log Test Suite                                                 //
