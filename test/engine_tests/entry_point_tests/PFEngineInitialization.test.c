@@ -5,9 +5,11 @@
 #include <engine/entry_point/PFEngineInitialization.h>
 
 // stdlib
+#include <stdlib.h>
 // framework
 // engine
 #include <core/define.h>
+#include <engine/engine_define.h>
 #include <engine/PFEngineConfiguration.h>
 #include <memory/allocator/PFMemoryArena.h>
 
@@ -243,9 +245,23 @@ START_TEST(fn_pf_try_create_engine_state_struct__sets_correct_error_message__if_
 }
 END_TEST
 
-// this fn also allocates the string internmnet
-// this fn also allocates the string internment of the correct size
+START_TEST(fn_pf_try_create_engine_state_struct__allocates_string_internment_singleton_as_well__when_called) {
+    size_t const size = STRING_INTERNMENT_MEMORY_SIZE * 16;
+    void* memory = malloc(size);
+    ck_assert_ptr_nonnull(memory);
+    
+    PFAllocator_MemoryArena_t* arena = pf_allocator_memory_arena_create_with_memory(memory, size);
+    ck_assert_ptr_nonnull(arena);
 
+    PFEngineState_t* engine_state = NULL;
+    ck_assert_int_eq(TRUE, pf_try_create_engine_state_struct(arena, &engine_state));
+    ck_assert_ptr_nonnull(engine_state);
+    ck_assert_ptr_nonnull(engine_state->m_lifetime_string_internment);
+    ck_assert_int_eq(engine_state->m_lifetime_string_internment->owned_memory_size, STRING_INTERNMENT_MEMORY_SIZE);
+    
+    free(memory);
+}
+END_TEST
 
 
 // pf_try_read_engine_configuration --------------------------------------------------------------------------

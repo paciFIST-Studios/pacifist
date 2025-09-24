@@ -317,7 +317,8 @@ int main(void) {
     ADD_TEST(fn_pf_try_create_engine_state_struct__sets_correct_error_message__for_out_engine_state_param);
     ADD_TEST(fn_pf_try_create_engine_state_struct__returns_false__if_allocator_cannot_push_memory);
     ADD_TEST(fn_pf_try_create_engine_state_struct__sets_correct_error_message__if_allocator_cannot_push_memory);
-
+    ADD_TEST(fn_pf_try_create_engine_state_struct__allocates_string_internment_singleton_as_well__when_called);
+    
     
     // fn pf_try_read_engine_configuration
     ADD_TEST(fn_pf_try_read_engine_configuration__is_defined);
