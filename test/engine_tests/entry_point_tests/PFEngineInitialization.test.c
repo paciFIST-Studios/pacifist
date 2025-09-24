@@ -246,7 +246,7 @@ START_TEST(fn_pf_try_create_engine_state_struct__sets_correct_error_message__if_
 END_TEST
 
 START_TEST(fn_pf_try_create_engine_state_struct__allocates_string_internment_singleton_as_well__when_called) {
-    size_t const size = STRING_INTERNMENT_MEMORY_SIZE * 16;
+    size_t const size = ENGINE_MEMORY_TOTAL_ALLOCATION_SIZE;
     void* memory = malloc(size);
     ck_assert_ptr_nonnull(memory);
     
@@ -256,17 +256,38 @@ START_TEST(fn_pf_try_create_engine_state_struct__allocates_string_internment_sin
     PFEngineState_t* engine_state = NULL;
     ck_assert_int_eq(TRUE, pf_try_create_engine_state_struct(arena, &engine_state));
     ck_assert_ptr_nonnull(engine_state);
-    ck_assert_ptr_nonnull(engine_state->m_lifetime_string_internment);
-    ck_assert_int_eq(engine_state->m_lifetime_string_internment->owned_memory_size, STRING_INTERNMENT_MEMORY_SIZE);
+
+    ck_assert_ptr_nonnull(engine_state->p_lifetime_string_internment);
+    ck_assert_int_eq(engine_state->p_lifetime_string_internment->owned_memory_size, ENGINE_SYSTEM_SIZE__STRING_INTERNMENT_MEMORY);
+    
+    free(memory);
+}
+END_TEST
+
+START_TEST(fn_pf_try_create_engine_state_Struct__allocates_recoverable_allocator_as_well__when_called) {
+    size_t const size = ENGINE_MEMORY_TOTAL_ALLOCATION_SIZE;
+    void* memory = malloc(size);
+    ck_assert_ptr_nonnull(memory);
+
+    PFAllocator_MemoryArena_t* arena = pf_allocator_memory_arena_create_with_memory(memory, size);
+    ck_assert_ptr_nonnull(arena);
+
+    PFEngineState_t* engine_state = NULL;
+    ck_assert_int_eq(TRUE, pf_try_create_engine_state_struct(arena, &engine_state));
+    ck_assert_ptr_nonnull(engine_state);
+
+    ck_assert_ptr_nonnull(engine_state->p_recoverable_memory_allocator);
+    ck_assert_int_eq(engine_state->p_recoverable_memory_allocator->base_memory_size, ENGINE_ALLOCATOR_SIZE__RECOVERABLE_MEMORY);
     
     free(memory);
 }
 END_TEST
 
 
+
 // pf_try_read_engine_configuration --------------------------------------------------------------------------
 START_TEST(fn_pf_try_read_engine_configuration__is_defined) {
-    int32_t(*fptr)(int, char*[], PFAllocator_MemoryArena_t*, PFEngineConfiguration_t**) = &pf_try_read_engine_configuration;
+    int32_t(*fptr)(int, char*[], PFEngineState_t*, PFEngineConfiguration_t**) = &pf_try_read_engine_configuration;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST

@@ -6,13 +6,21 @@
 // stdlib
 // framework
 // engine
-#include "string/PFStringInternmentSingleton.h"
-#include "core/error.h"
+#include <core/error.h>
+#include <memory/allocator/PFAllocator.h>
+#include <memory/allocator/PFMemoryArena.h>
+#include <string/PFStringInternmentSingleton.h>
 
 
 typedef struct PFEngineState_t {
-    PFStringLifetimeInternmentSingleton_t* m_lifetime_string_internment;
+    // has memory which cannot be deallocated
+    PFStringLifetimeInternmentSingleton_t* p_lifetime_string_internment;
 
+    PFAllocator_MemoryArena_t* p_lifetime_memory_allocator;
+    
+    // manages memory which can be deallocated
+    PFAllocator_FreeList_t* p_recoverable_memory_allocator;
+    
 } PFEngineState_t;
 
 

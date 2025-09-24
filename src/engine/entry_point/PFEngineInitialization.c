@@ -185,10 +185,10 @@ int32_t pf_try_create_engine_lifetime_allocator(
 }
 
 int32_t pf_try_create_engine_state_struct(
-    PFAllocator_MemoryArena_t* allocator,
+    PFAllocator_MemoryArena_t* engine_scope,
     PFEngineState_t** out_engine_state_struct)
 {
-    if (allocator == NULL) {
+    if (engine_scope == NULL) {
         PF_LOG_CRITICAL(PF_INITIALIZATION, "Got NULL ptr to allocator param!");
         return FALSE;
     }
@@ -199,7 +199,7 @@ int32_t pf_try_create_engine_state_struct(
 
     // first allocation from within the memory area holds the engine state.
     // This struct owns the string internment struct,
-    PFEngineState_t* engine_state = PF_PUSH_STRUCT(allocator, PFEngineState_t);
+    PFEngineState_t* engine_state = PF_PUSH_STRUCT(engine_scope, PFEngineState_t);
     if (engine_state == NULL) {
         PF_LOG_CRITICAL(PF_INITIALIZATION, "Could not allocate from provided allocator!");
         return FALSE;
@@ -208,12 +208,56 @@ int32_t pf_try_create_engine_state_struct(
     // zero it out and we'll build it fresh
     memset(engine_state, 0, sizeof(PFEngineState_t));
 
+
+    //--------------------------------------------------------------------------------------------------------
+    // Lifetime Allocations
+    //--------------------------------------------------------------------------------------------------------
+    // things which cannot return their memory until program shutdown go here
+    // the last part of this section is the recoverable allocator
+
+    //--------------------//
+    // Lifetime Allocator //
+    //--------------------//
+    size_t const pfama_size = ENGINE_ALLOCATOR_SIZE__LIFETIME_MEMORY;
+    void* pfama_memory_base = pf_allocator_memory_arena_push_size(engine_scope, pfama_size);
+    PFAllocator_MemoryArena_t* lifetime_allocator = pf_allocator_memory_arena_create_with_memory(pfama_memory_base, pfama_size);
+    engine_state->p_lifetime_memory_allocator = lifetime_allocator;
+    
+    //-------------------//
+    // String Internment //
+    //-------------------//
     // fist is the StringInternment singleton, which lasts the entire lifetime of the engine,
     // and which cannot deallocate an interned string
-    size_t const slis_size = STRING_INTERNMENT_MEMORY_SIZE;
-    void* slis_memory_base = pf_allocator_memory_arena_push_size(allocator, slis_size);
+
+    size_t const slis_size = ENGINE_SYSTEM_SIZE__STRING_INTERNMENT_MEMORY;
+    void* slis_memory_base = pf_allocator_memory_arena_push_size(lifetime_allocator, slis_size);
     PFStringLifetimeInternmentSingleton_t* string_internment = pf_string_lifetime_internment_create_with_memory(slis_memory_base, slis_size);
-    engine_state->m_lifetime_string_internment = string_internment;
+    engine_state->p_lifetime_string_internment = string_internment;
+
+
+    //-------//
+    // empty //
+    //-------//
+
+
+
+
+
+    //-----------------------//
+    // Recoverable Allocator //
+    //-----------------------//
+    // the recoverable allocator itself is a lifetime allocation.
+    // anything which can return its memory goes in the recoverable memory section
+
+    size_t const pfafl_size = ENGINE_ALLOCATOR_SIZE__RECOVERABLE_MEMORY;
+    void* pfafl_memory_base = pf_allocator_memory_arena_push_size(engine_scope, pfafl_size);
+    PFAllocator_FreeList_t* pfafl_allocator = pf_allocator_free_list_create_with_memory(pfafl_memory_base, pfafl_size);
+    engine_state->p_recoverable_memory_allocator = pfafl_allocator;
+
+    //--------------------------------------------------------------------------------------------------------
+    // Recoverable Memory
+    //--------------------------------------------------------------------------------------------------------
+
 
 
 
@@ -229,7 +273,7 @@ int32_t pf_try_create_engine_state_struct(
 int32_t pf_try_read_engine_configuration(
     int argc,
     char *argv[],
-    PFAllocator_MemoryArena_t* lifetime_allocator,
+    PFEngineState_t* engine_state,
     PFEngineConfiguration_t** out_engine_configuration)
 {
     return TRUE;

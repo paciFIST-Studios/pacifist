@@ -6,6 +6,7 @@
 #include <SDL3/SDL_render.h>
 // engine
 #include <core/define.h>
+#include <engine/engine_define.h>
 #include <engine/PFEngineConfiguration.h>
 #include <engine/entry_point/PFEngineEntryPoint.h>
 #include <engine/entry_point/PFEngineInitialization.h>
@@ -27,13 +28,16 @@
 //static SDL_Texture* s_sdl_texture = NULL;
 
 // the total amount of memory which will be requested from the OS for the engine (including game)
-static size_t const s_engine_memory_size = Mebibytes(64);
+static size_t const s_engine_memory_size = ENGINE_MEMORY_TOTAL_ALLOCATION_SIZE;
 // the base of all engine memory
 static void* s_engine_memory_base = NULL;
 
-// the lifetime allocator cannot deallocate.  it's primary purpose is to divide memory into
-// discipline-oriented groups: strings, fonts, textures, game, etc
-static PFAllocator_MemoryArena_t* s_engine_lifetime_allocator = NULL;
+/**
+ * While technically an allocator, the EngineLifetimeScope, cannot deallocate,
+ * so it enforces the validity of a single allocation from the os.  When the
+ * program shuts down, this block is freed, and this scope exits.
+ */
+static PFAllocator_MemoryArena_t* s_engine_lifetime_scope = NULL;
 
 static PFEngineConfiguration_t* s_engine_configuration = NULL;
 static PFEngineState_t* s_engine_state = NULL;
@@ -93,13 +97,13 @@ SDL_AppResult pf_app_init(void **appstate, int argc, char *argv[]) {
     }
 
     if (!pf_try_create_engine_lifetime_allocator(s_engine_memory_base,
-        s_engine_memory_size, &s_engine_lifetime_allocator))
+        s_engine_memory_size, &s_engine_lifetime_scope))
     {
         PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize engine lifetime allocator!");
         return SDL_APP_FAILURE;
     }
 
-    if (!pf_try_create_engine_state_struct(s_engine_lifetime_allocator, &s_engine_state)) {
+    if (!pf_try_create_engine_state_struct(s_engine_lifetime_scope, &s_engine_state)) {
         PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize engine state struct!");
         return SDL_APP_FAILURE;
     }
@@ -110,8 +114,7 @@ SDL_AppResult pf_app_init(void **appstate, int argc, char *argv[]) {
     // Configuration Init
     // -------------------------------------------------------------------------------------------------------
 
-    if (!pf_try_read_engine_configuration(argc, argv,
-        s_engine_lifetime_allocator, &s_engine_configuration)) {
+    if (!pf_try_read_engine_configuration(argc, argv, s_engine_state, &s_engine_configuration)) {
         PF_LOG_CRITICAL(PF_APPLICATION, "Could not read engine configuration!");
         return SDL_APP_FAILURE;
     }
