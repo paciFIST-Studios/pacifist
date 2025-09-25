@@ -90,42 +90,52 @@ PString_t pf_pstring_slice(PString_t const pstr, int32_t const begin, int32_t co
  */
 int32_t pf_pstring_compare(PString_t const a, PString_t const b);
 
+///**
+// * @brief tokenizes the supplied PString_t, based on the delimiter.  Allocates space for PString_t to hold tokens, but does not copy or change memory:w
+// * 
+// * 
+// * @param pstr
+// * @param delimiter 
+// * @param length 
+// * @param out_array 
+// * @param out_array_length 
+// */
+////void pf_pstring_tokenize_allocate(PString_t pstr, char const * delimiter, size_t length, PString_t* out_array, size_t out_array_length);
+//
+//
+////void pf_pstring_findall_allocate(PString_t a, char  const * substring, size_t length, int32_t* out_array, size_t out_array_length);
+//
+///**
+// * @brief returns a pstring, containing the first patching substring found in pstr
+// * 
+// *
+// * @param pstr 
+// * @param substring 
+// * @param length 
+// * @return 
+// */
+////PString_t pf_pstring_find_first(PString_t pstr, char const * substring, size_t length);
+//
+///**
+// * @brief returns a pstring, containing the last matching substring found in pstr
+// *
+// * @param pstr 
+// * @param substring 
+// * @param length 
+// * @return 
+// */
+////PString_t pf_pstring_find_last(PString_t const pstr, char const * substring, size_t const length);
+
+
 /**
- * @brief tokenizes the supplied PString_t, based on the delimiter.  Allocates space for PString_t to hold tokens, but does not copy or change memory:w
- * 
- * 
- * @param pstr 
- * @param delimiter 
- * @param length 
- * @param out_array 
- * @param out_array_length 
- */
-//void pf_pstring_tokenize_allocate(PString_t pstr, char const * delimiter, size_t length, PString_t* out_array, size_t out_array_length);
-
-
-//void pf_pstring_findall_allocate(PString_t a, char  const * substring, size_t length, int32_t* out_array, size_t out_array_length);
-
-/**
- * @brief returns a pstring, containing the first patching substring found in pstr
- * 
+ * @brief returns the index of the ith character
  *
  * @param pstr 
- * @param substring 
- * @param length 
+ * @param character
+ * @param indexth          0=first, 1=second, 2=third, 3=4th
  * @return 
  */
-//PString_t pf_pstring_find_first(PString_t pstr, char const * substring, size_t length);
-
-/**
- * @brief returns a pstring, containing the last matching substring found in pstr
- *
- * @param pstr 
- * @param substring 
- * @param length 
- * @return 
- */
-//PString_t pf_pstring_find_last(PString_t const pstr, char const * substring, size_t const length);
-
+size_t pf_pstring_find_indexth_character_location(PString_t pstr, char character, int32_t indexth);
 
 
 #endif //PSTRING_H

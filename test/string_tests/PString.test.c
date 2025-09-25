@@ -298,7 +298,106 @@ START_TEST(fn_pstring_slice__feels_okay_in_casual_usage) {
 
 
 
+// fn pf_pstring_find_indexth_character_location -------------------------------------------------------------
 
+START_TEST(fn_pf_pstring_find_indexth_character_location__is_defined) {
+    size_t(*fptr)(PString_t, char, int32_t) = &pf_pstring_find_indexth_character_location;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_pstring_find_indexth_character_location__returns_int_max__for_null_string_in_pstring_param) {
+    PString_t const pstr = { .length = 1};
+
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)-1, pf_pstring_find_indexth_character_location(pstr, '\\', 0));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_pstring_find_indexth_character_location__sets_correct_error_message__for_null_string_in_pstring_param) {
+    PString_t const pstr = { .length = 1};
+
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)-1, pf_pstring_find_indexth_character_location(pstr, '\\', 0));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "PString param had ptr to NULL string!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_pstring_find_indexth_character_location__returns_int_max__for_zero_length_in_pstring_param) {
+    char string = 'a';
+    PString_t const pstr = { .string = &string, .length = 0 };
+
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)-1, pf_pstring_find_indexth_character_location(pstr, '\\', 0));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fwn_pf_pstring_find_indexth_character_location__sets_correct_error_message__for_zero_length_in_pstring_param) {
+    char string = 'a';
+    PString_t const pstr = { .string = &string, .length = 0 };
+
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)-1, pf_pstring_find_indexth_character_location(pstr, '\\', 0));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "PString param had zero length!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_pstring_find_indexth_character_location__returns_int_max__for_indexth_param_greater_than_pstring_length) {
+    char string = 'a';
+    PString_t const pstr = { .string = &string, .length = 1 };
+
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)-1, pf_pstring_find_indexth_character_location(pstr, 'a', 1));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fwn_pf_pstring_find_indexth_character_location__sets_correct_error_message__for_indexth_param_greater_than_pstring_length) {
+    char string = 'a';
+    PString_t const pstr = { .string = &string, .length = 1 };
+
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)-1, pf_pstring_find_indexth_character_location(pstr, 'a', 1));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Tried to find a character which occurs more times than there are characters in the string!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_pstring_find_indexth_character_location__returns_int_max__for_string_with_fewer_instances_of_character_than_requested) {
+    char string[4] = "aaaa";
+    PString_t const pstr = { .string = string, .length = 4 };
+
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)-1, pf_pstring_find_indexth_character_location(pstr, 'b', 0));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fwn_pf_pstring_find_indexth_character_location__sets_correct_error_message__for_string_with_fewer_instances_of_character_than_requested) {
+    char string[4] = "aaaa";
+    PString_t const pstr = { .string = string, .length = 1 };
+
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)-1, pf_pstring_find_indexth_character_location(pstr, 'b', 0));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "String had fewer instances of character than fn was asked to locate!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
 
 
 

@@ -151,3 +151,39 @@ PString_t pf_pstring_slice(PString_t const pstr, int32_t const begin, int32_t co
     return result;
 }
 
+size_t pf_pstring_find_indexth_character_location(PString_t pstr, char character, int32_t indexth) {
+    if (pstr.string == NULL) {
+        PF_LOG_ERROR(PF_STRING, "PString param had ptr to NULL string!");
+        return -1;
+    }
+    if (pstr.length == 0) {
+        PF_LOG_ERROR(PF_STRING, "PString param had zero length!");
+        return -1;
+    }
+    // the +1 is to convert our index form back into a "counting" form, which length uses
+    if (indexth+1 > pstr.length) {
+        PF_LOG_ERROR(PF_STRING, "Tried to find a character which occurs more times than there are characters in the string!");
+        return -1;
+    }
+
+    int32_t index_result = -1;
+
+    for (size_t i = 0; i < pstr.length; i++) {
+        if (pstr.string[i] == character) {
+            index_result++;
+            if(index_result == indexth) {
+                break;
+            }
+        }
+    }
+
+    if (index_result < indexth) {
+        PF_LOG_ERROR(PF_STRING, "String had fewer instances of character than fn was asked to locate!");
+        return -1;
+    }
+    
+    // if we didn't find anything, and index_result is still negative,
+    // this cast should make it wrap around to int max
+    return (size_t)index_result;
+}
+

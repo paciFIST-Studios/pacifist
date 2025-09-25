@@ -905,7 +905,18 @@ int main(void) {
     ADD_TEST(fn_pstring_slice__returns_slice__when_using_positive_then_negative_indicies);
     ADD_TEST(fn_pstring_slice__feels_okay_in_casual_usage);
 
+    // fn pf_pfstring_find_indexth_character_location
+    ADD_TEST(fn_pf_pstring_find_indexth_character_location__is_defined);
+    ADD_TEST(fn_pf_pstring_find_indexth_character_location__returns_int_max__for_null_string_in_pstring_param);
+    ADD_TEST(fn_pf_pstring_find_indexth_character_location__sets_correct_error_message__for_null_string_in_pstring_param);
+    ADD_TEST(fn_pf_pstring_find_indexth_character_location__returns_int_max__for_zero_length_in_pstring_param);
+    ADD_TEST(fwn_pf_pstring_find_indexth_character_location__sets_correct_error_message__for_zero_length_in_pstring_param);
+    ADD_TEST(fn_pf_pstring_find_indexth_character_location__returns_int_max__for_indexth_param_greater_than_pstring_length);
+    ADD_TEST(fwn_pf_pstring_find_indexth_character_location__sets_correct_error_message__for_indexth_param_greater_than_pstring_length);
+    ADD_TEST(fn_pf_pstring_find_indexth_character_location__returns_int_max__for_string_with_fewer_instances_of_character_than_requested);
+    ADD_TEST(fwn_pf_pstring_find_indexth_character_location__sets_correct_error_message__for_string_with_fewer_instances_of_character_than_requested);
 
+    
     //-------------------------------//
     // PFStringInternmentSingleton_t //
     //-------------------------------//
