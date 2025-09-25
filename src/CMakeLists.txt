@@ -66,10 +66,10 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/PFEngineState.c
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/PFEngineConfiguration.h
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/project/PFProjectConfiguration.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/PFEngineEntryPoint.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/PFEngineEntryPoint.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/PFEngineInitialization.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/PFEngineInitialization.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/pf_engine_entry_point.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/pf_engine_entry_point.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/pf_engine_initialization.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/pf_engine_initialization.c
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_define.h
         # f
         # gui
@@ -103,6 +103,7 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/os/path.h
         ${CMAKE_CURRENT_SOURCE_DIR}/os/os_utility.h
         ${CMAKE_CURRENT_SOURCE_DIR}/os/os_utility.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/os/os_define.h
         # parse
         ${CMAKE_CURRENT_SOURCE_DIR}/parse/parse_utilities.h
         # project data types
@@ -179,8 +180,17 @@ target_include_directories(${PROJECT_NAME}_engine PRIVATE ${ENGINE_LIB_INCLUDE_F
 target_link_libraries(${PROJECT_NAME}_engine PUBLIC ${ENGINE_LIB_DEPENDENCIES})
 
 
+# Config files -----------------------------------------------------------------------------------------------
 
-# Doxygen -------------------------------------------------------------------------------------------------------------
+# copies over the engine config file, but only if it has changed
+configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine_config.pfengine
+        ${CMAKE_CURRENT_BINARY_DIR}/engine_config.pfengine
+        COPYONLY
+)
+
+
+# Doxygen ----------------------------------------------------------------------------------------------------
 
 option(BUILD_DOC "Build Documentation" ON)
 

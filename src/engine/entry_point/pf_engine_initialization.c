@@ -1,7 +1,7 @@
 // paciFIST studios. 2025. MIT License
 
 // header
-#include <engine/entry_point/PFEngineInitialization.h>
+#include <engine/entry_point/pf_engine_initialization.h>
 // stdlib
 #include <stdlib.h>
 // framework
@@ -322,6 +322,9 @@ int32_t pf_try_read_engine_configuration(
     pf_string_lifetime_internment_emplace_pstr(string_internment, program_execution_path);
     engine_configuration->program_execution_path = program_execution_path;
 
+
+    // look for 
+    
 
     /**
      * This does cut off the back two slashes and store the string, but I think what we really need,

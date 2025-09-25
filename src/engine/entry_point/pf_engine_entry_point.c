@@ -1,7 +1,7 @@
 // paciFIST studios. 2025. MIT License
 
 // header
-#include <engine/entry_point/PFEngineEntryPoint.h>
+#include <engine/entry_point/pf_engine_entry_point.h>
 
 // stdlib
 #include <stdio.h>
@@ -11,7 +11,7 @@
 #include <core/define.h>
 #include <engine/engine_define.h>
 #include <engine/PFEngineConfiguration.h>
-#include <engine/entry_point/PFEngineInitialization.h>
+#include <engine/entry_point/pf_engine_initialization.h>
 #include <engine/project/PFProjectConfiguration.h>
 
 
