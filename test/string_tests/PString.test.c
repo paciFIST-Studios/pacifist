@@ -337,7 +337,7 @@ START_TEST(fn_pf_pstring_find_indexth_character_location__returns_int_max__for_z
 }
 END_TEST
 
-START_TEST(fwn_pf_pstring_find_indexth_character_location__sets_correct_error_message__for_zero_length_in_pstring_param) {
+START_TEST(fn_pf_pstring_find_indexth_character_location__sets_correct_error_message__for_zero_length_in_pstring_param) {
     char string = 'a';
     PString_t const pstr = { .string = &string, .length = 0 };
 
@@ -361,7 +361,7 @@ START_TEST(fn_pf_pstring_find_indexth_character_location__returns_int_max__for_i
 }
 END_TEST
 
-START_TEST(fwn_pf_pstring_find_indexth_character_location__sets_correct_error_message__for_indexth_param_greater_than_pstring_length) {
+START_TEST(fn_pf_pstring_find_indexth_character_location__sets_correct_error_message__for_indexth_param_greater_than_pstring_length) {
     char string = 'a';
     PString_t const pstr = { .string = &string, .length = 1 };
 
@@ -385,7 +385,7 @@ START_TEST(fn_pf_pstring_find_indexth_character_location__returns_int_max__for_s
 }
 END_TEST
 
-START_TEST(fwn_pf_pstring_find_indexth_character_location__sets_correct_error_message__for_string_with_fewer_instances_of_character_than_requested) {
+START_TEST(fn_pf_pstring_find_indexth_character_location__sets_correct_error_message__for_string_with_fewer_instances_of_character_than_requested) {
     char string[4] = "aaaa";
     PString_t const pstr = { .string = string, .length = 1 };
 
@@ -399,12 +399,58 @@ START_TEST(fwn_pf_pstring_find_indexth_character_location__sets_correct_error_me
 }
 END_TEST
 
+// fn pf_pstring_count_character_occurrences_in_string --------------------------------------------------------
+
+START_TEST(fn_pf_pstring_count_character_occurrences_in_string__is_defined) {
+    size_t(*fptr)(PString_t, char) = &pf_pstring_count_character_occurrences_in_string;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_pstring_count_character_occurrences_in_string__returns_int_max__for_null_string_in_pstring_param) {
+    PString_t const pstr = { .length = 1 };
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)-1, pf_pstring_count_character_occurrences_in_string(pstr, 'a'));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_pstring_count_character_occurrences_in_string__sets_correct_error_message__for_null_string_in_pstring_param) {
+    PString_t const pstr = { .length = 1 };
+
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)-1, pf_pstring_count_character_occurrences_in_string(pstr, 'a'));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected ="PString param had ptr to NULL string!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
 
 
+START_TEST(fn_pf_pstring_count_character_occurrences_in_string__returns_int_max__for_zero_length_in_pstring_param) {
+    char string = 'a';
+    PString_t const pstr = { .string = &string };
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)-1, pf_pstring_count_character_occurrences_in_string(pstr, 'a'));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
 
+START_TEST(fn_pf_pstring_count_character_occurrences_in_string__sets_correct_error_message__for_zero_length_in_pstring_param) {
+    char string = 'a';
+    PString_t const pstr = { .string = &string };
 
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)-1, pf_pstring_count_character_occurrences_in_string(pstr, 'a'));
+    PF_UNSUPPRESS_ERRORS
 
-
+    char const * expected = "PString param had zero length!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
 
 
 

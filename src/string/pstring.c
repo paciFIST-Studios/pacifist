@@ -151,6 +151,28 @@ PString_t pf_pstring_slice(PString_t const pstr, int32_t const begin, int32_t co
     return result;
 }
 
+size_t pf_pstring_count_character_occurrences_in_string(PString_t pstr, char character) {
+    if (pstr.string == NULL) {
+        PF_LOG_ERROR(PF_STRING, "PString param had ptr to NULL string!");
+        return -1;
+    }
+    if (pstr.length == 0) {
+        PF_LOG_ERROR(PF_STRING, "PString param had zero length!");
+        return -1;
+    }
+
+    size_t character_count = 0;
+
+    for (size_t i = 0; i < pstr.length; i++) {
+        if (pstr.string[i] == character) {
+            character_count++;
+        }
+    }
+
+    return character_count;
+}
+
+
 size_t pf_pstring_find_indexth_character_location(PString_t pstr, char character, int32_t indexth) {
     if (pstr.string == NULL) {
         PF_LOG_ERROR(PF_STRING, "PString param had ptr to NULL string!");

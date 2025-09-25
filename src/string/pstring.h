@@ -128,6 +128,17 @@ int32_t pf_pstring_compare(PString_t const a, PString_t const b);
 
 
 /**
+ * @brief counts how many instances of a character occur in the given pstring.
+ * @note WARNING! This requires ASCII strings, and does not work on UTF8
+ *
+ * @param pstr
+ * @param character
+ * @return
+ */
+size_t pf_pstring_count_character_occurrences_in_string(PString_t pstr, char character);
+
+
+/**
  * @brief returns the index of the ith character
  *
  * @param pstr 
