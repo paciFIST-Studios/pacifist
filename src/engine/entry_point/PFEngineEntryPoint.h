@@ -5,6 +5,7 @@
 
 // stdlib
 // framework
+#include <SDL3/SDL.h>
 #include <SDL3/SDL_init.h>
 // engine
 

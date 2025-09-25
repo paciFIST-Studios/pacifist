@@ -5,14 +5,16 @@
 // stdlib
 #include <stdlib.h>
 // framework
+#include <SDL3/SDL.h>
 #include <SDL3/SDL_init.h>
+//#include <SDL3/SDL_render.h>
 // engine
 #include <core/define.h>
 #include <core/error.h>
 #include <engine/engine_define.h>
 #include <string/pstring.h>
 #include <parse/parse_utilities.h>
-
+#include <os/os_define.h>
 
 
 static SDL_Window* s_sdl_program_window = NULL;
@@ -101,7 +103,7 @@ int32_t pf_try_initialize_sdl_video_systems(int argc, char* argv[]) {
 
     // create and initialize main window
     {
-        SDL_WindowFlags const windowFlags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+        uint64_t const windowFlags = (SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
         s_sdl_program_window = SDL_CreateWindow("paciFIST Studios", STARTUP_WINDOW_RES_X, STARTUP_WINDOW_RES_Y, windowFlags);
         if (s_sdl_program_window== NULL) {
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize main window!", SDL_GetError(), NULL);
@@ -146,7 +148,7 @@ int32_t pf_try_initialize_sdl_audio(int argc, char* argv[]) {
  * @param out_memory 
  * @return 
  */
-int32_t pf_try_allocate_engine_memory_from_os(size_t memory_size, void** out_memory) {
+int32_t pf_try_allocate_engine_memory_from_os(size_t const memory_size, void** out_memory) {
     if (out_memory == NULL) {
         PF_LOG_CRITICAL(PF_INITIALIZATION, "Need an out-param in order to allocate engine memory from os!");
         return FALSE;
@@ -311,24 +313,43 @@ int32_t pf_try_read_engine_configuration(
         PF_LOG_CRITICAL(PF_INITIALIZATION, "PFEngineState_t had null ptr to lifetime_string_internment!");
         return FALSE;
     }
-    
+
     PFEngineConfiguration_t* engine_configuration = PF_PUSH_STRUCT(engine_state->p_lifetime_memory_allocator, PFEngineConfiguration_t);
+    PFStringLifetimeInternmentSingleton_t* string_internment = engine_state->p_lifetime_string_internment;
 
-    // figure out:
-    //  * engine_base_path
-    //  * project_name -- read from config?
-    //  * project_config_file_path -- take from startup arg?
+    // this is the path to the binary of the executing program
+    PString_t program_execution_path = { .string = argv[0], .length=strlen(argv[0]) };
+    pf_string_lifetime_internment_emplace_pstr(string_internment, program_execution_path);
+    engine_configuration->program_execution_path = program_execution_path;
 
-    char const * engine_base_path = "engine_base_path";
+    
+    // take the program execution path
+    // find the last two slashes('\') in it
+    // cut from the second-to-last slash
+    // intern that string
+    // save that string as engine_base_path
+
+
+    // take the engine base path
+    // add engine_config.pfengine
+    // intern that string
+    // save that string as path to engine config
+
+    // other parsing from engine config
+
+    
+
+    // this is parsing from project config
     char const * project_name = "project_name";
     char const * project_config_file_path = "project_config_file_path";
 
     // moar data?
     // logs?
 
+
+
+
     
-    PFStringLifetimeInternmentSingleton_t* string_internment = engine_state->p_lifetime_string_internment;
-    pf_string_lifetime_internment_emplace_cstr(string_internment, engine_base_path, strlen(engine_base_path));
     pf_string_lifetime_internment_emplace_cstr(string_internment, project_name, strlen(project_name));
     pf_string_lifetime_internment_emplace_cstr(string_internment, project_config_file_path, strlen(project_config_file_path));
 

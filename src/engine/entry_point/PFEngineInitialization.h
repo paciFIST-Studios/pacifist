@@ -14,7 +14,6 @@
 #include <memory/allocator/PFMemoryArena.h>
 
 
-
 // defines ---------------------------------------------------------------------------------------------------
 
 #define STARTUP_WINDOW_RES_X 1280

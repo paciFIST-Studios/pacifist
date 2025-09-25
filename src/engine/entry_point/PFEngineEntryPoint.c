@@ -1,5 +1,8 @@
 // paciFIST studios. 2025. MIT License
 
+// header
+#include <engine/entry_point/PFEngineEntryPoint.h>
+
 // stdlib
 #include <stdio.h>
 // framework
@@ -8,7 +11,6 @@
 #include <core/define.h>
 #include <engine/engine_define.h>
 #include <engine/PFEngineConfiguration.h>
-#include <engine/entry_point/PFEngineEntryPoint.h>
 #include <engine/entry_point/PFEngineInitialization.h>
 #include <engine/project/PFProjectConfiguration.h>
 
@@ -21,7 +23,7 @@
 // Static Variables
 //------------------------------------------------------------------------------------------------------------
 
-//static SDL_Window* s_sdl_program_window = NULL;
+static SDL_Window* s_sdl_program_window = NULL;
 static SDL_Renderer* s_sdl_renderer = NULL;
 
 static SDL_Surface* s_sdl_surface = NULL;
@@ -65,7 +67,12 @@ SDL_AppResult pf_app_init(void **appstate, int argc, char *argv[]) {
     if (!pf_try_initialize_sdl_video_systems(argc, argv)) {
         PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize video systems!");
         return SDL_APP_FAILURE;
+    } else {
+        // these results are not returned from try init video, so just call them
+        s_sdl_program_window = pf_get_program_window();
+        s_sdl_renderer = pf_get_sdl_renderer();
     }
+
 
     if (!pf_try_initialize_sdl_image(argc, argv)) {
         PF_LOG_CRITICAL(PF_APPLICATION, "Could not initialize SDL_Image!");
@@ -271,4 +278,11 @@ SDL_AppResult pf_app_iterate(void* app_state) {
 //------------------------------------------------------------------------------------------------------------
 
 void pf_app_quit(void* app_state, SDL_AppResult result) {
+    pf_deallocate_engine_memory(s_engine_memory_base, s_engine_memory_size);
+
+    SDL_DestroyRenderer(s_sdl_renderer);
+    s_sdl_renderer = NULL;
+
+    SDL_DestroyWindow(s_sdl_program_window);
+    s_sdl_program_window = NULL;
 }
