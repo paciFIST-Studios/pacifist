@@ -10,7 +10,7 @@
 #include <memory/allocator/PFAllocator.h>
 #include <memory/allocator/PFMemoryArena.h>
 #include <string/PFStringInternmentSingleton.h>
-
+#include <engine/PFEngineConfiguration.h>
 
 typedef struct PFEngineState_t {
     // has memory which cannot be deallocated
@@ -20,7 +20,8 @@ typedef struct PFEngineState_t {
     
     // manages memory which can be deallocated
     PFAllocator_FreeList_t* p_recoverable_memory_allocator;
-    
+
+    //PFEngineConfiguration_t* engine_configuration;
 } PFEngineState_t;
 
 

@@ -10,7 +10,7 @@
 
 
 typedef struct PFEngineConfiguration_t {
-    PString_t project_name;
+    PString_t program_execution_path;
     PString_t project_config_file_path;
     PString_t engine_base_path;
 
