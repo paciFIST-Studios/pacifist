@@ -487,7 +487,7 @@ END_TEST
 
 START_TEST(fn_pf_try_read_engine_configuration__returns_true__for_successful_use) {
     int const argc = 1;
-    char* argv[] = { "" };
+    char* argv[] = { "Example/Execution/Path/String" };
 
     /**
      * 20250923 - EBarrett

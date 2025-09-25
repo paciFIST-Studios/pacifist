@@ -55,7 +55,7 @@ typedef struct PFAllocator_MemoryArena_t {
  * @param buffer 
  * @param total_bytes 
  */
-void pf_allocator_memory_arena_set_bytes_to_zero(void* buffer, size_t const total_bytes);
+void pf_allocator_memory_arena_set_bytes_to_zero(void* buffer, size_t total_bytes);
 
 
 /**
@@ -66,7 +66,7 @@ void pf_allocator_memory_arena_set_bytes_to_zero(void* buffer, size_t const tota
  * @return 
  */
 __attribute__((unused))
-PFAllocator_MemoryArena_t* pf_allocator_memory_arena_create_with_memory(void* base_memory, size_t const total_size);
+PFAllocator_MemoryArena_t* pf_allocator_memory_arena_create_with_memory(void* base_memory, size_t total_size);
 
 
 /**
