@@ -3,56 +3,54 @@
 #ifndef PATH_H
 #define PATH_H
 
-//#include <sys/stat.h>
-//
-//#include "../core/define.h"
-//
-//static bool32 path_exists(const char* path) {
-//    // is it null?
-//    if (path == NULL) {
-//        return FALSE;
-//    }
-//
-//    struct stat path_stat;
-//    // returns non-zero on error
-//    if (stat(path, &path_stat) != 0) {
-//        return FALSE;
-//    }
-//
-//    // it is either a file or a directory
-//    return TRUE;
-//}
-//
-//
-//static bool32 directory_exists(const char* dirPath) {
-//    if (dirPath == NULL) {
-//        return FALSE;
-//    }
-//
-//    struct stat path_stat;
-//    // returns non-zero on error
-//    if (stat(dirPath, &path_stat) != 0) {
-//        return FALSE;
-//    }
-//
-//    // is it a directory?
-//    return S_ISDIR(path_stat.st_mode);
-//}
-//
-//static bool32 file_exists(const char* filePath) {
-//    if (filePath == NULL) {
-//        return FALSE;
-//    }
-//
-//    struct stat path_stat;
-//    // returns non-zero on error
-//    if (stat(filePath, &path_stat) != 0) {
-//        return FALSE;
-//    }
-//
-//    // is it a regular file?
-//    return S_ISREG(path_stat.st_mode);
-//}
+// stdlib
+#include <stdint.h>
+#include <stddef.h>
+// framework
+// engine
+#include <string/pstring.h>
+
+
+/**
+ * @brief Returns TRUE(1) if this path can be found on disk, else FALSE(0)
+ *
+ * @param path
+ * @param length
+ * @return 
+ */
+int32_t pf_os_path_exists_cstr_linux(char const * path, size_t length);
+int32_t pf_os_path_exists_pstr_linux(PString_t pstr);
+
+
+/**
+ * @brief returns TRUE(1) if this is a path to a file, else FALSE(0)
+ *
+ * @param path 
+ * @param length
+ * @return 
+ */
+int32_t pf_os_file_exists_cstr_linux(char const * path, size_t length);
+int32_t pf_os_file_exists_pstr_linus(PString_t pstr);
+
+/**
+ * @brief Returns TRUE(1) if this is a path to a directory, else FALSE(0)
+ *
+ * @param path 
+ * @param length
+ * @return 
+ */
+int32_t pf_os_directory_exists_cstr_linux(char const * path, size_t length);
+int32_t pf_os_directory_exists_pstr_linus(PString_t pstr);
+
+/**
+ * @brief Returns the size of this file on disk, and writes error if there is no file
+ *
+ * @param path 
+ * @param length
+ * @return 
+ */
+size_t pf_os_file_size_cstr_linux(char const * path, size_t length);
+size_t ps_os_file_size_pstr_linus(PString_t pstr);
 
 
 #endif //PATH_H
