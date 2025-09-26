@@ -29,14 +29,12 @@
  */
 SDL_Window* pf_get_program_window(void);
 
-
 /**
  * @brief: if SDL has already been initialized, returns the renderer
  *
  * @return 
  */
 SDL_Renderer* pf_get_sdl_renderer(void);
-
 
 /**
  * @brief This fn allocates all of the memory used by the engine, for its entire lifetime, as a single block

@@ -323,22 +323,20 @@ int32_t pf_try_read_engine_configuration(
     engine_configuration->program_execution_path = program_execution_path;
 
 
-    // look for 
+    char const slash = '/';
+    size_t const slashes_in_exe_path = pf_pstring_count_character_occurrences_in_string(program_execution_path, slash);
+    size_t const second_to_last_slash = slashes_in_exe_path - 1;
+    size_t const second_to_last_slash_idx = pf_pstring_find_indexth_character_location(program_execution_path, slash, second_to_last_slash);
+
+    PString_t engine_base_path = pf_pstring_slice(program_execution_path, 0, (int32_t)second_to_last_slash_idx);
+    engine_base_path = pf_string_lifetime_internment_emplace_pstr(string_internment, engine_base_path);
+    engine_configuration->engine_base_path = engine_base_path;
+
+
     
+    //size_t const engine_config_path_len  = pf_string_join(engine_base_path, "src/engine_config.pfengine");
 
-    /**
-     * This does cut off the back two slashes and store the string, but I think what we really need,
-     * is to get the config file copied over
-     */ 
-    //char const slash = '/';
-    //size_t const slashes_in_exe_path = pf_pstring_count_character_occurrences_in_string(program_execution_path, slash);
-    //size_t const second_to_last_slash = slashes_in_exe_path - 1;
-    //size_t const second_to_last_slash_idx = pf_pstring_find_indexth_character_location(program_execution_path, slash, second_to_last_slash);
-
-    //PString_t engine_base_path = pf_pstring_slice(program_execution_path, 0, (int32_t)second_to_last_slash_idx);
-    //engine_base_path = pf_string_lifetime_internment_emplace_pstr(string_internment, engine_base_path);
-    //engine_configuration->engine_base_path = engine_base_path;
-
+    
 
     // take the program execution path
     // find the last two slashes('\') in it
