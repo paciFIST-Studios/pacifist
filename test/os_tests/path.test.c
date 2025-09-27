@@ -6,6 +6,7 @@
 #include <os/path.h>
 
 // stdlib
+#include <stdio.h>
 // framework
 // engine
 
@@ -200,18 +201,209 @@ START_TEST(fn_pf_os_path_is_file_pstr_linux__returns_false__for_invalid_path) {
 END_TEST
 
 
-// fn pf_os_directory_exists_cstr_linux ---------------------------------------------------------------------------
+// fn pf_os_is_directory_cstr_linux ---------------------------------------------------------------------------
 START_TEST(fn_pf_os_path_is_directory__is_defined) {
-    int32_t (*fptr)(char const *, size_t) = &pf_os_is_directory_cstr_linux;
+    int32_t (*fptr)(char const *, size_t) = &pf_os_path_is_directory_cstr_linux;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_os_path_is_directory_cstr_linux__returns_correct_error_code__for_null_path_param) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_os_path_is_directory_cstr_linux(NULL, 1));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_os_path_is_directory_cstr_linux__sets_correct_error_message__for_null_path_param) {
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_os_path_is_directory_cstr_linux(NULL, 1));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Null ptr to path!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_os_path_is_directory_cstr_linux__returns_correct_error_code__for_zero_length_param) {
+    char path[] = "some/path";
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_INVALID_LENGTH, pf_os_path_is_directory_cstr_linux(path, 0));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_os_path_is_directory_cstr_linux__sets_correct_error_message__for_zero_length_param) {
+    char path[] = "some/path";
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_INVALID_LENGTH, pf_os_path_is_directory_cstr_linux(path, 0));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Invalid path length!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+
+START_TEST(fn_pf_os_path_is_directory_cstr_linux__returns_false__for_file) {
+    char const path[] = "/home/ellie/git/paciFIST/test/os_tests/path.test.c";
+    ck_assert_int_eq(FALSE, pf_os_path_is_directory_cstr_linux(path, strlen(path)));
+}
+END_TEST
+
+START_TEST(fn_pf_os_path_is_directory_cstr_linux__returns_true__for_directory) {
+    char const path[] = "/home/ellie/git/paciFIST/test/os_tests";
+    ck_assert_int_eq(TRUE, pf_os_path_is_directory_cstr_linux(path, strlen(path)));
+}
+END_TEST
+
+START_TEST(fn_pf_os_path_is_directory_cstr_linux__returns_false__for_invalid_path) {
+    char const path[] = "fake/path/lol/get/wrekd";
+    ck_assert_int_eq(FALSE, pf_os_path_is_directory_cstr_linux(path, strlen(path)));
+}
+END_TEST
+
+// fn pf_os_directory_exists_pstr_linux ---------------------------------------------------------------------------
+
+START_TEST(fn_pf_os_path_is_directory_pstr_linux__is_defined) {
+    int32_t (*fptr)(PString_t const) = &pf_os_path_is_directory_pstr_linux;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
 
-// fn pf_os_directory_exists_pstr_linux ---------------------------------------------------------------------------
+START_TEST(fn_pf_os_path_is_directory_pstr_linux__returns_false__for_file) {
+    char path[] = "/home/ellie/git/paciFIST/test/os_tests/path.test.c";
+    PString_t pstr = { .string = path, .length = strlen(path) };
+    ck_assert_int_eq(FALSE, pf_os_path_is_directory_pstr_linux(pstr));
+}
+END_TEST
+
+START_TEST(fn_pf_os_path_is_directory_pstr_linux__returns_true__for_directory) {
+    char path[] = "/home/ellie/git/paciFIST/test/os_tests";
+    PString_t pstr = { .string = path, .length = strlen(path) };
+    ck_assert_int_eq(TRUE, pf_os_path_is_directory_pstr_linux(pstr));
+}
+END_TEST
+
+START_TEST(fn_pf_os_path_is_directory_pstr_linux__returns_false__for_invalid_path) {
+    char path[] = "fake/path/lol/get/wrekd";
+    PString_t pstr = { .string = path, .length = strlen(path) };
+    ck_assert_int_eq(FALSE, pf_os_path_is_directory_pstr_linux(pstr));
+}
+END_TEST
+
+
 
 // fn pf_os_file_size_cstr_linux ---------------------------------------------------------------------------
+START_TEST(fn_pf_os_file_size_cstr_linux__is_defined) {
+    size_t(*fptr)(char const *, size_t) = &pf_os_file_size_cstr_linux;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_os_file_size_cstr_linux__returns_correct_error_code__for_null_path_param) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_os_file_size_cstr_linux(NULL, 1));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_os_file_size_cstr_linux__sets_correct_error_message__for_null_path_param) {
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_os_file_size_cstr_linux(NULL, 1));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Null ptr to path!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_os_file_size_cstr_linux__returns_correct_error_code__for_zero_length_param) {
+    char path[] = "some/path";
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_INVALID_LENGTH, pf_os_file_size_cstr_linux(path, 0));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_os_file_size_cstr_linux__sets_correct_error_message__for_zero_length_param) {
+    char path[] = "some/path";
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_INVALID_LENGTH, pf_os_file_size_cstr_linux(path, 0));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Invalid path length!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+
+START_TEST(fn_pf_os_file_size_cstr_linux__returns_file_size__for_file) {
+    char const path[] = "/home/ellie/git/paciFIST/src/splash.bmp";
+    ck_assert_int_eq(2454330, pf_os_file_size_cstr_linux(path, strlen(path)));
+}
+END_TEST
+
+START_TEST(fn_pf_os_file_size_cstr_linux__returns_error_size__for_directory) {
+    char const path[] = "/home/ellie/git/paciFIST/test/os_tests";
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)-1, pf_os_file_size_cstr_linux(path, strlen(path)));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_os_file_size_cstr_linux__sets_correct_error_message__for_directory) {
+    char const path[] = "/home/ellie/git/paciFIST/test/os_tests";
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)-1, pf_os_file_size_cstr_linux(path, strlen(path)));
+    PF_UNSUPPRESS_ERRORS
+
+    char error_message[256] = {0};
+    sprintf(error_message, "Got path to a directory! Cannot give size in bytes!  Path=\"%s\"", path);
+    ck_assert_in_error_buffer(error_message);
+}
+END_TEST
+
+START_TEST(fn_pf_os_file_size_cstr_linux__returns_error_size__for_invalid_path) {
+    char const path[] = "fake/path/lol/get/wrekd";
+    ck_assert_int_eq((size_t)-1, pf_os_file_size_cstr_linux(path, strlen(path)));
+}
+END_TEST
+
+
+
 // fn pf_os_file_size_pstr_linux ---------------------------------------------------------------------------
 
+START_TEST(fn_pf_os_file_size_pstr_linux__is_defined) {
+    size_t(*fptr)(PString_t const) = &pf_os_file_size_pstr_linux;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
 
+START_TEST(fn_pf_os_file_size_pstr_linux__returns_file_size__for_file) {
+    char path[] = "/home/ellie/git/paciFIST/src/splash.bmp";
+    PString_t const pstr = { .string = path, .length = strlen(path) };
+    ck_assert_int_eq(2454330, pf_os_file_size_pstr_linux(pstr));
+}
+END_TEST
 
+START_TEST(fn_pf_os_file_size_pstr_linux__returns_error_size__for_directory) {
+    char path[] = "/home/ellie/git/paciFIST/test/os_tests";
+    PString_t const pstr = { .string = path, .length = strlen(path) };
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)-1, pf_os_file_size_pstr_linux(pstr));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_os_file_size_pstr_linux__returns_error_size__for_invalid_path) {
+    char path[] = "fake/path/lol/get/wrekd";
+    PString_t const pstr = { .string = path, .length = strlen(path) };
+    ck_assert_int_eq((size_t)-1, pf_os_file_size_pstr_linux(pstr));
+}
+END_TEST
