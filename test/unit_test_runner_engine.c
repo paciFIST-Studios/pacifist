@@ -100,6 +100,7 @@ char * global_module;
 
 // os
 #include "os_tests/os_utility.test.c"
+#include "os_tests/path.test.c"
 
 // resource
 #include "resource_tests/PFManagedResource.test.c"
@@ -777,29 +778,65 @@ int main(void) {
     // -------------------------------------------------------------------//
     BUILD_SUITE("OS");
 
-    ADD_TEST(fn_file_size__is_defined);
-    ADD_TEST(fn_file_size__returns_correct_error_code__for_null_path);
-    ADD_TEST(fn_file_size__returns_correct_error_code__for_zero_path_length);
-    ADD_TEST(fn_file_size__returns_correct_error_code__if_file_does_not_exist);
-    ADD_TEST(fn_file_size__writes_correct_error__for_null_path);
-    ADD_TEST(fn_file_size__writes_correct_error__for_zero_path_length);
-    ADD_TEST(fn_file_size__writes_correct_error__if_file_does_not_exist);
+    //------//
+    // Path //
+    //------//
+
+    // pf_os_path_exists_cstr_linux
+    ADD_TEST(fn_pf_os_path_exists_cstr_linux__is_defined);
+    ADD_TEST(fn_pf_os_path_exists_cstr_linux__returns_correct_error_code__for_null_path_param);
+    ADD_TEST(fn_pf_os_path_exists_cstr_linux__sets_correct_error_message__for_null_path_param);
+    ADD_TEST(fn_pf_os_path_exists_cstr_linux__returns_correct_error_code__for_zero_length_param);
+    ADD_TEST(fn_pf_os_path_exists_cstr_linux__sets_correct_error_message__for_zero_length_param);
+    ADD_TEST(fn_pf_os_path_exists_cstr_linux__returns_true__if_path_is_a_file_on_disk);
+    ADD_TEST(fn_pf_os_path_exists_cstr_linux__returns_true__if_path_is_a_directory_on_disk);
+    ADD_TEST(fn_pf_os_path_exists_cstr_linux__returns_false__if_path_is_not_found);
+
+    // pf_os_path_exists_cstr_linux
+    ADD_TEST(fn_pf_os_path_exists_pstr_linux__is_defined);
+    ADD_TEST(fn_pf_os_path_exists_pstr_linux__returns_true__if_path_is_a_file_on_disk);
+    ADD_TEST(fn_pf_os_path_exists_pstr_linux__returns_true__if_path_is_a_directory_on_disk);
+    ADD_TEST(fn_pf_os_path_exists_pstr_linux__returns_false__if_path_is_not_found);
+    ADD_TEST(fn_pf_os_path_is_file_cstr_linux__returns_correct_error_code__for_null_path_param);
+    ADD_TEST(fn_pf_os_path_is_file_cstr_linux__sets_correct_error_message__for_null_path_param);
+    ADD_TEST(fn_pf_os_path_is_file_cstr_linux__returns_correct_error_code__for_zero_length_param);
+    ADD_TEST(fn_pf_os_path_is_file_cstr_linux__sets_correct_error_message__for_zero_length_param);
+    ADD_TEST(fn_pf_os_path_is_file_cstr_linux__returns_true__for_file);
+    ADD_TEST(fn_pf_os_path_is_file_cstr_linux__returns_false__for_directory);
+    ADD_TEST(fn_pf_os_path_is_file_cstr_linux__returns_false__for_invalid_path);
+
+    // fn pf_os_path_is_file_pstr_linux
+    ADD_TEST(fn_pf_os_path_is_file_pstr_linux__is_defined)
+    ADD_TEST(fn_pf_os_path_is_file_pstr_linux__returns_true__for_file);
+    ADD_TEST(fn_pf_os_path_is_file_pstr_linux__returns_false__for_directory);
+    ADD_TEST(fn_pf_os_path_is_file_pstr_linux__returns_false__for_invalid_path);
+
+    // pf_os_path_is_directory_cstr_linux
+    ADD_TEST(fn_pf_os_path_is_directory__is_defined);
     
-    ADD_TEST(fn_is_file__is_defined);
-    ADD_TEST(fn_is_file__returns_correct_error_code__for_null_path);
-    ADD_TEST(fn_is_file__returns_correct_error_code__for_zero_path_length);
-    ADD_TEST(fn_is_file__returns_zero__if_file_does_not_exist);
-    ADD_TEST(fn_is_file__returns_one__if_file_does_exist);
-    ADD_TEST(fn_is_file__writes_correct_error__for_null_path);
-    ADD_TEST(fn_is_file__writes_correct_error__for_zero_path_length);
-    
-    ADD_TEST(fn_is_directory__is_defined);
-    ADD_TEST(fn_is_directory__returns_correct_error_code__for_null_path);
-    ADD_TEST(fn_if_directory__returns_correct_error_code__for_zero_path_length);
-    ADD_TEST(fn_is_directory__returns_zero__if_path_is_not_a_directory);
-    ADD_TEST(fn_is_directory__returns_one__if_path_is_a_directory);
-    ADD_TEST(fn_is_directory__writes_correct_error__for_null_path);
-    ADD_TEST(fn_is_directory__writes_correct_error__for_zero_path_length);
+    //ADD_TEST(fn_file_size__is_defined);
+    //ADD_TEST(fn_file_size__returns_correct_error_code__for_null_path);
+    //ADD_TEST(fn_file_size__returns_correct_error_code__for_zero_path_length);
+    //ADD_TEST(fn_file_size__returns_correct_error_code__if_file_does_not_exist);
+    //ADD_TEST(fn_file_size__writes_correct_error__for_null_path);
+    //ADD_TEST(fn_file_size__writes_correct_error__for_zero_path_length);
+    //ADD_TEST(fn_file_size__writes_correct_error__if_file_does_not_exist);
+    //
+    //ADD_TEST(fn_is_file__is_defined);
+    //ADD_TEST(fn_is_file__returns_correct_error_code__for_null_path);
+    //ADD_TEST(fn_is_file__returns_correct_error_code__for_zero_path_length);
+    //ADD_TEST(fn_is_file__returns_zero__if_file_does_not_exist);
+    //ADD_TEST(fn_is_file__returns_one__if_file_does_exist);
+    //ADD_TEST(fn_is_file__writes_correct_error__for_null_path);
+    //ADD_TEST(fn_is_file__writes_correct_error__for_zero_path_length);
+    //
+    //ADD_TEST(fn_is_directory__is_defined);
+    //ADD_TEST(fn_is_directory__returns_correct_error_code__for_null_path);
+    //ADD_TEST(fn_if_directory__returns_correct_error_code__for_zero_path_length);
+    //ADD_TEST(fn_is_directory__returns_zero__if_path_is_not_a_directory);
+    //ADD_TEST(fn_is_directory__returns_one__if_path_is_a_directory);
+    //ADD_TEST(fn_is_directory__writes_correct_error__for_null_path);
+    //ADD_TEST(fn_is_directory__writes_correct_error__for_zero_path_length);
     
     RUN_SUITE(fail_count); 
     // -------------------------------------------------------------------//

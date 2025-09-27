@@ -29,8 +29,8 @@ int32_t pf_os_path_exists_pstr_linux(PString_t pstr);
  * @param length
  * @return 
  */
-int32_t pf_os_file_exists_cstr_linux(char const * path, size_t length);
-int32_t pf_os_file_exists_pstr_linus(PString_t pstr);
+int32_t pf_os_path_is_file_cstr_linux(char const * path, size_t length);
+int32_t pf_os_path_is_file_pstr_linux(PString_t pstr);
 
 /**
  * @brief Returns TRUE(1) if this is a path to a directory, else FALSE(0)
@@ -39,8 +39,8 @@ int32_t pf_os_file_exists_pstr_linus(PString_t pstr);
  * @param length
  * @return 
  */
-int32_t pf_os_directory_exists_cstr_linux(char const * path, size_t length);
-int32_t pf_os_directory_exists_pstr_linus(PString_t pstr);
+int32_t pf_os_is_directory_cstr_linux(char const * path, size_t length);
+int32_t pf_os_is_directory_pstr_linus(PString_t pstr);
 
 /**
  * @brief Returns the size of this file on disk, and writes error if there is no file
