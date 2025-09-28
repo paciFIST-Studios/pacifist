@@ -664,3 +664,52 @@ START_TEST(fn_pf_os_path_join_cstr__uses_back_slash_for_back_slash_in_first_path
 END_TEST
 
 
+// fn pf_os_path_join_pstr
+
+START_TEST(fn_pf_os_path_join_pstr__is_defined) {
+    size_t(*fptr)(PString_t, PString_t, PString_t) = pf_os_path_join_pstr;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_os_path_join_pstr__returns_correctly_joined_string__in_valid_use) {
+    char buffer[32] = {0};
+    size_t const buffer_size = 32;
+    PString_t const buffer_pstr = {  .string = buffer, .length = buffer_size };
+    
+    char first_path[16] = "some/test/path";
+    size_t const first_length = strlen(first_path);
+    PString_t const first_pstr = { .string = first_path, .length = first_length };
+
+    char second_path[16] = "moar/test/path";
+    size_t const second_length = strlen(second_path);
+    PString_t const second_pstr = { .string = second_path, .length = second_length };
+
+    pf_clear_error();
+    PF_SUPPRESS_ERRORS
+    size_t const copied_length = pf_os_path_join_pstr(buffer_pstr, first_pstr, second_pstr);
+    size_t const expected_length = first_length + second_length + /*delimiter*/ 1 + /*nul-terminator*/ 1;
+    ck_assert_int_eq(expected_length, copied_length);
+    PF_UNSUPPRESS_ERRORS
+
+    ck_assert_int_eq(TRUE, pf_pstring_contains_pstr_sub(buffer_pstr, first_pstr));
+    ck_assert_int_eq(TRUE, pf_pstring_contains_pstr_sub(buffer_pstr, second_pstr));
+
+    for (size_t i = 0; i < copied_length; i++) {
+        if (i < first_length) {
+            ck_assert_int_eq((unsigned)buffer[i], (unsigned)first_path[i]);
+        }
+        if (i == first_length) {
+            ck_assert_int_eq((unsigned)buffer[i], (unsigned)'/');
+        }
+        if (i > first_length) {
+            // i - first_length gets us the character number, and then -1 takes it back to index form
+            size_t const idx = i - first_length - 1;
+            ck_assert_int_eq((unsigned)buffer[i], (unsigned)second_path[idx]);
+        }
+    }
+
+}
+END_TEST
+
+

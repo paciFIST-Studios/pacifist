@@ -54,22 +54,6 @@ size_t pf_os_file_size_pstr_linux(PString_t pstr);
 
 
 /**
- * 
- * @param out_path_buffer 
- * @param first 
- * @param first_length 
- * @param second 
- * @param second_length 
- * @return 
- */
-int32_t pf_os_path_join2(
-    char * out_path_buffer,
-    char const * first,
-    size_t first_length,
-    char const * second,
-    size_t second_length);
-
-/**
  * @brief joins to cstr to create a path.
  * @note: will check to see if / or \ is used, and use the first found as a delimiter between the two cstr
  *

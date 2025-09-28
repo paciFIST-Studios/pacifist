@@ -869,7 +869,14 @@ int main(void) {
     ADD_TEST(fn_pf_os_path_join_cstr__uses_forward_slash_for_forward_slash_in_first_path__for_successfully_joined_path);
     ADD_TEST(fn_pf_os_path_join_cstr__uses_back_slash_for_back_slash_in_first_path__for_successfully_joined_path);
 
+    // pf_os_path_join_pstr
+    ADD_TEST(fn_pf_os_path_join_pstr__is_defined);
+    ADD_TEST(fn_pf_os_path_join_pstr__returns_correctly_joined_string__in_valid_use);
 
+
+
+
+    
     
     RUN_SUITE(fail_count); 
     // -------------------------------------------------------------------//

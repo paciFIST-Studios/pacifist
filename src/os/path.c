@@ -178,5 +178,9 @@ size_t pf_os_path_join_cstr(char *out_path_buffer, size_t const path_buffer_size
     return copy_length;
 }
 
+size_t pf_os_path_join_pstr(PString_t const out_path_buffer, PString_t const first, PString_t const second) {
+    return pf_os_path_join_cstr(out_path_buffer.string, out_path_buffer.length, first.string, first.length, second.string, second.length);
+}
+
 
 
