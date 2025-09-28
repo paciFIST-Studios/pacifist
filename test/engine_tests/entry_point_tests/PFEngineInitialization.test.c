@@ -2,7 +2,7 @@
 
 #include <check.h>
 #include <pftest_utilities.h>
-#include <engine/entry_point/PFEngineInitialization.h>
+#include <engine/entry_point/pf_engine_initialization.h>
 
 // stdlib
 #include <stdlib.h>

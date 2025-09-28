@@ -1,7 +1,7 @@
 // paciFIST studios. 2025. MIT License.
 
 #include <check.h>
-#include "engine/entry_point/PFEngineEntryPoint.h"
+#include "engine/entry_point/pf_engine_entry_point.h"
 
 // fn pf_app_init --------------------------------------------------------------------------------------------
 START_TEST(fn_pf_app_init__is_defined) {
