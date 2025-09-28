@@ -16,10 +16,10 @@
 // asserts that the supplied string is a substring of the error currently located in the engine error buffer
 static inline void ck_assert_in_error_buffer(char const * expected){
     char const * error_message = pf_get_error();
-    size_t const error_length = pf_strlen(error_message);
+    size_t const error_length = strlen(error_message);
     PString_t const error = { .string = (char*)error_message, .length = error_length};
 
-    size_t const expected_length = pf_strlen(expected);
+    size_t const expected_length = strlen(expected);
 
     ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(error, expected, expected_length));
 }

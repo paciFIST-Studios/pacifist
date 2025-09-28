@@ -845,7 +845,16 @@ int main(void) {
     ADD_TEST(fn_pf_os_file_size_pstr_linux__returns_file_size__for_file);
     ADD_TEST(fn_pf_os_file_size_pstr_linux__returns_error_size__for_directory);
     ADD_TEST(fn_pf_os_file_size_pstr_linux__returns_error_size__for_invalid_path);
-    
+
+    // pf_os_path_join_cstr
+    ADD_TEST(fn_pf_os_path_join_cstr__is_defined);
+    ADD_TEST(fn_pf_os_path_join_cstr__returns_correct_error_code__for_null_path_param);
+    ADD_TEST(fn_pf_os_path_join_cstr__sets_correct_error_message__for_null_path_param);
+    ADD_TEST(fn_pf_os_path_join_cstr__returns_correct_error_code__for_zero_length_buffer_path_param);
+    ADD_TEST(fn_pf_os_path_join_cstr__sets_correct_error_message__for_zero_length_buffer_path_param);
+    ADD_TEST(fn_pf_os_path_join_cstr__returns_correct_error_code__for_null_first_cstr_param);
+    ADD_TEST(fn_pf_os_path_join_cstr__sets_correct_error_message__for_null_first_cstr_param);
+
     
     RUN_SUITE(fail_count); 
     // -------------------------------------------------------------------//
