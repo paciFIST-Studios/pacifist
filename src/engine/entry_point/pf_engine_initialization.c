@@ -15,6 +15,7 @@
 #include <string/pstring.h>
 #include <parse/parse_utilities.h>
 #include <os/os_define.h>
+#include <os/path.h>
 
 
 static SDL_Window* s_sdl_program_window = NULL;
@@ -332,9 +333,13 @@ int32_t pf_try_read_engine_configuration(
     engine_base_path = pf_string_lifetime_internment_emplace_pstr(string_internment, engine_base_path);
     engine_configuration->engine_base_path = engine_base_path;
 
-
     
-    //size_t const engine_config_path_len  = pf_string_join(engine_base_path, "src/engine_config.pfengine");
+    //char path_join_buffer[256] = {0};
+    //__attribute__((unused))
+    //size_t const engine_config_path_len  = pf_os_path_join2D_pstr(
+    //    path_join_buffer,
+    //    engine_base_path,
+    //    '/', "src/engine_config.pfengine");
 
     
 
