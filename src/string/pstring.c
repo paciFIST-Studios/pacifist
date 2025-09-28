@@ -189,11 +189,13 @@ size_t pf_pstring_find_indexth_character_location(PString_t pstr, char character
     }
 
     int32_t index_result = -1;
+    int32_t character_count = 0;
 
     for (size_t i = 0; i < pstr.length; i++) {
         if (pstr.string[i] == character) {
-            index_result++;
-            if(index_result == indexth) {
+            character_count++;
+            if(character_count == indexth) {
+                index_result = i;
                 break;
             }
         }
