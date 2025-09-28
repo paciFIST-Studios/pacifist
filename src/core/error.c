@@ -1,6 +1,6 @@
 // paciFIST studios. 2025. MIT License
 
-// headr
+// header
 #include <core/error.h>
 // stdlib
 #include <stdio.h>
@@ -25,7 +25,6 @@
 
 
 #define ERROR_BUFFER_SIZE 4096
-
 
 // set to TRUE(1) if suppressed, FALSE(0) if not suppressed
 static int32_t s_errors_are_suppressed = 0;
@@ -89,9 +88,6 @@ void pf_set_error(char const * message, size_t const message_len) {
     }
 }
 
-
-
-
 /**
  * @brief if errors are suppress, they'll still be written to the
  * error buffer, but you won't be able to access them, until errors
@@ -125,7 +121,6 @@ int32_t pf_get_is_error_suppressed(void) {
 #endif
 }
 
-
 /**
  * @brief takes an error message, adds additional debug information,
  * and puts it in the error buffer
@@ -142,8 +137,6 @@ void pf_build_and_set_error_message(char const * message, char const * file, int
     sprintf(error_message, "%s:  ERROR %s  --  file: %s[%d]\n", dt, message, file, line);
     pf_set_error(error_message, strlen(error_message));
 }
-
-
 
 void pf_log_verbose(PFLogCategory_t const category, char const * message, char const * file, int32_t const line) {
     pf_build_and_set_error_message(message, file, line);

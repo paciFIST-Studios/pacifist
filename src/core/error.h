@@ -77,17 +77,13 @@ static const int32_t PFEC_ERROR_NOT_ENOUGH_MEMORY = 77;
     pf_log_error(Category, Message, __FILE__, __LINE__);   \
 } while (0);                                               \
 
+#define PF_SUPPRESS_ERRORS do {                            \
+    pf_set_error_suppressed();                             \
+}while(0);                                                 \
 
-
-#define PF_SUPPRESS_ERRORS do {                           \
-    pf_set_error_suppressed();                            \
-}while(0);                                                \
-
-
-#define PF_UNSUPPRESS_ERRORS do {                         \
-    pf_set_error_not_suppressed();                        \
-} while(0);                                               \
-
+#define PF_UNSUPPRESS_ERRORS do {                          \
+    pf_set_error_not_suppressed();                         \
+} while(0);                                                \
 
 
 /**
@@ -132,12 +128,10 @@ static const int32_t PFEC_ERROR_NOT_ENOUGH_MEMORY = 77;
  */
 void pf_build_and_set_error_message(char const * message, char const * file, int32_t line);
 
-
 // Logging fns -----------------------------------------------------------------------------------------------
 
 // these logging fns can be used directly, but there are some simple macro wrappers,
 // which supply the file name and line number for you
-
 
 /**
  * @brief Logs a message with a Verbose modifier (won't print out unless user is using verbose logging)
@@ -149,7 +143,6 @@ void pf_build_and_set_error_message(char const * message, char const * file, int
  */
 void pf_log_verbose(PFLogCategory_t category, char const * message, char const * file, int32_t line);
 
-
 /**
  * @brief Logs a message with a Warning modifier
  * 
@@ -160,7 +153,6 @@ void pf_log_verbose(PFLogCategory_t category, char const * message, char const *
  */
 void pf_log_warning(PFLogCategory_t category, char const * message, char const * file, int32_t line);
 
-
 /**
  * @brief Logs a message with an Error modifier
  * 
@@ -170,7 +162,6 @@ void pf_log_warning(PFLogCategory_t category, char const * message, char const *
  * @param line
  */
 void pf_log_error(PFLogCategory_t category, char const * message, char const * file, int32_t line);
-
 
 /**
  * @brief Logs a message with a Critical modifier
@@ -202,7 +193,6 @@ void pf_clear_error(void);
  * @param message_len 
  */
 void pf_set_error(char const * message, size_t message_len);
-
 
 /**
  * @brief DO NOT CALL - this fn is used internally by the PF_SUPPRESS_ERRORS marco, use that instead 
