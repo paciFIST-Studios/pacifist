@@ -852,8 +852,23 @@ int main(void) {
     ADD_TEST(fn_pf_os_path_join_cstr__sets_correct_error_message__for_null_path_param);
     ADD_TEST(fn_pf_os_path_join_cstr__returns_correct_error_code__for_zero_length_buffer_path_param);
     ADD_TEST(fn_pf_os_path_join_cstr__sets_correct_error_message__for_zero_length_buffer_path_param);
-    ADD_TEST(fn_pf_os_path_join_cstr__returns_correct_error_code__for_null_first_cstr_param);
-    ADD_TEST(fn_pf_os_path_join_cstr__sets_correct_error_message__for_null_first_cstr_param);
+    ADD_TEST(fn_pf_os_path_join_cstr__returns_correct_error_code__for_null_first_path_cstr_param);
+    ADD_TEST(fn_pf_os_path_join_cstr__sets_correct_error_message__for_null_first_path_cstr_param);
+    ADD_TEST(fn_pf_os_path_join_cstr__returns_correct_error_code__for_zero_first_length_param);
+    ADD_TEST(fn_pf_os_path_join_cstr__sets_correct_error_message__for_zero_first_length_param);
+    ADD_TEST(fn_pf_os_path_join_cstr__returns_correct_error_code__for_null_second_path_cstr_param);
+    ADD_TEST(fn_pf_os_path_join_cstr__sets_correct_error_message__for_null_second_path_cstr_param);
+    ADD_TEST(fn_pf_os_path_join_cstr__returns_correct_error_code__for_zero_second_length_param);
+    ADD_TEST(fn_pf_os_path_join_cstr__sets_correct_error_message__for_zero_second_length_param);
+    ADD_TEST(fn_pf_os_path_join_cstr__returns_correct_error_code__for_buffer_size_too_small);
+    ADD_TEST(fn_pf_os_path_join_cstr__sets_correct_error_message__for_buffer_size_to_small);
+
+
+    ADD_TEST(fn_pf_os_path_join_cstr__returns_correct_length__for_successfully_joined_path);
+    ADD_TEST(fn_pf_os_path_join_cstr__correctly_fills_out_buffer__for_successfully_joined_path);
+    ADD_TEST(fn_pf_os_path_join_cstr__uses_forward_slash_for_forward_slash_in_first_path__for_successfully_joined_path);
+    ADD_TEST(fn_pf_os_path_join_cstr__uses_back_slash_for_back_slash_in_first_path__for_successfully_joined_path);
+
 
     
     RUN_SUITE(fail_count); 

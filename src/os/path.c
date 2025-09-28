@@ -117,35 +117,66 @@ size_t pf_os_file_size_pstr_linux(PString_t const pstr) {
     return pf_os_file_size_cstr_linux(pstr.string, pstr.length);
 }
 
+size_t pf_os_path_join_cstr(char *out_path_buffer, size_t const path_buffer_size, char const * first_path,
+    size_t const first_length, char const * second_path, size_t const second_length)
+{
+    if (out_path_buffer == NULL) {
+        PF_LOG_ERROR(PF_OS, "Null ptr to out_path_buffer!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+    if (path_buffer_size == 0) {
+        PF_LOG_ERROR(PF_OS, "Buffer size has zero length!");
+        return PFEC_ERROR_INVALID_LENGTH;
+    }
+    if (first_path == NULL) {
+        PF_LOG_ERROR(PF_OS, "Null ptr to first_path param!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+    if (first_length == 0) {
+        PF_LOG_ERROR(PF_OS, "Zero length for first_length param!");
+        return PFEC_ERROR_INVALID_LENGTH;
+    }
+    if (second_path == NULL) {
+        PF_LOG_ERROR(PF_OS, "Null ptr to second_path param!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+    if (second_length == 0) {
+        PF_LOG_ERROR(PF_OS, "Zero length for second_length param!");
+        return PFEC_ERROR_INVALID_LENGTH;
+    }
 
-//
-//
-//static bool32 directory_exists(const char* dirPath) {
-//    if (dirPath == NULL) {
-//        return FALSE;
-//    }
-//
-//    struct stat path_stat;
-//    // returns non-zero on error
-//    if (stat(dirPath, &path_stat) != 0) {
-//        return FALSE;
-//    }
-//
-//    // is it a directory?
-//    return S_ISDIR(path_stat.st_mode);
-//}
-//
-//static bool32 file_exists(const char* filePath) {
-//    if (filePath == NULL) {
-//        return FALSE;
-//    }
-//
-//    struct stat path_stat;
-//    // returns non-zero on error
-//    if (stat(filePath, &path_stat) != 0) {
-//        return FALSE;
-//    }
-//
-//    // is it a regular file?
-//    return S_ISREG(path_stat.st_mode);
-//}
+    // calculate copy_length
+    size_t const nul_terminator_length = 1;
+    size_t const delimiter_length = 1;
+    size_t const copy_length = first_length + delimiter_length + second_length + nul_terminator_length;
+
+    if (path_buffer_size < copy_length) {
+        PF_LOG_ERROR(PF_OS, "Out Buffer is not big enough to create joined path!");
+        return PFEC_ERROR_NOT_ENOUGH_MEMORY;
+    }
+
+    // zero the out buffer
+    memset(out_path_buffer, 0, copy_length);
+
+    int32_t bHasForwardSlash = FALSE;
+    for (size_t i = 0; i < first_length; i++) {
+        if (first_path[i] == '/') {
+            bHasForwardSlash = TRUE;
+            break;
+        }
+        if (first_path[i] == '\\') {
+            bHasForwardSlash = FALSE;
+            break;
+        }
+    }
+
+    // figure oout which slash to use as the delimiter
+    char const delimiter = bHasForwardSlash ? '/' : '\\';
+
+    snprintf(out_path_buffer, copy_length, "%s%c%s", first_path, delimiter, second_path);
+
+    return copy_length;
+}
+
+
+
