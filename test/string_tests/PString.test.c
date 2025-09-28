@@ -238,7 +238,7 @@ END_TEST
 
 START_TEST(fn_pstring_slice__returns_non_owning_pstring__for_valid_slice) {
     char const test_string[] = "This is a test, it is only a test";
-    size_t const test_length = pf_strlen(test_string);
+    size_t const test_length = strlen(test_string);
     PString_t const pstr = { .string = (char*)test_string, test_length };
 
     int32_t const begin = 10;
@@ -253,7 +253,7 @@ END_TEST
 
 START_TEST(fn_pstring_slice__returns_slice__when_using_negative_indicies) {
     char const test_string[] = "This is a string.  Oh there's an html tag in it <b>bold</b>";
-    size_t const test_length = pf_strlen(test_string);
+    size_t const test_length = strlen(test_string);
     PString_t const pstr = { .string = (char*)test_string, test_length };
 
     int32_t const begin = -12;
@@ -267,7 +267,7 @@ END_TEST
 
 START_TEST(fn_pstring_slice__returns_slice__when_using_positive_then_negative_indicies) {
     char const test_string[] = "GameplayTag=JustALilGuy";
-    size_t const test_length = pf_strlen(test_string);
+    size_t const test_length = strlen(test_string);
     PString_t const pstr = { .string = (char*)test_string, test_length };
 
     int32_t const begin = 12;
@@ -281,7 +281,7 @@ END_TEST
 
 START_TEST(fn_pstring_slice__feels_okay_in_casual_usage) {
     char const test_string[] = "player.skill.fireball.level.1";
-    size_t const test_length = pf_strlen(test_string);
+    size_t const test_length = strlen(test_string);
     PString_t const pstr = { .string = (char*)test_string, test_length };
 
     PString_t const result = pf_pstring_slice(pstr, 14, PSTR_LAST);

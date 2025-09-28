@@ -42,7 +42,7 @@ START_TEST(fn_file_size__returns_correct_error_code__if_file_does_not_exist) {
     sprintf(path, "%s.get_wrekd", __FILE__);
 
     PF_SUPPRESS_ERRORS
-    ck_assert(file_size(path, pf_strlen(path)) == PFEC_ERROR_FILE_DOES_NOT_EXIST);
+    ck_assert(file_size(path, strlen(path)) == PFEC_ERROR_FILE_DOES_NOT_EXIST);
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
@@ -78,7 +78,7 @@ START_TEST(fn_file_size__writes_correct_error__if_file_does_not_exist) {
     sprintf(path, "%s.get_wrekd", __FILE__);
 
     PF_SUPPRESS_ERRORS
-    file_size(path, pf_strlen(path));
+    file_size(path, strlen(path));
     PF_UNSUPPRESS_ERRORS
     
     char const * expected = "File does not exist";
@@ -114,7 +114,7 @@ START_TEST(fn_is_file__returns_zero__if_file_does_not_exist) {
     char path[200];
     for (size_t i = 0; i < 200; i++) { path[i] = 0; }
     sprintf(path, "%s.get_wrekd", __FILE__);
-    size_t const len = pf_strlen(path);
+    size_t const len = strlen(path);
     
     PF_SUPPRESS_ERRORS
     ck_assert_int_eq(FALSE, is_file(path, len));
@@ -124,7 +124,7 @@ END_TEST
 
 START_TEST(fn_is_file__returns_one__if_file_does_exist) {
     char const * path = __FILE__;
-    size_t const len = pf_strlen(path);
+    size_t const len = strlen(path);
     PF_SUPPRESS_ERRORS
     ck_assert_int_eq(TRUE, is_file(path, len));
     PF_UNSUPPRESS_ERRORS
@@ -180,7 +180,7 @@ END_TEST
 
 START_TEST(fn_is_directory__returns_zero__if_path_is_not_a_directory) {
     char const * path = __FILE__;
-    size_t const len = pf_strlen(path);
+    size_t const len = strlen(path);
 
     // learning a path is not a directory should not cause an error
     pf_clear_error();
@@ -189,7 +189,7 @@ START_TEST(fn_is_directory__returns_zero__if_path_is_not_a_directory) {
 
     // verify this does not cause an error
     char const * error = pf_get_error();
-    size_t const error_length = pf_strlen(error);
+    size_t const error_length = strlen(error);
     for (size_t i = 0; i < error_length; i++) {
         ck_assert(error[i] == '\0');
     }
@@ -201,7 +201,7 @@ START_TEST(fn_is_directory__returns_one__if_path_is_a_directory) {
     char path[PATH_MAX];
     for (size_t i = 0; i < PATH_MAX; i++) { path[i] = 0; }
     ck_assert_ptr_nonnull(getcwd(path, PATH_MAX)); 
-    size_t const len = pf_strlen(path);
+    size_t const len = strlen(path);
     ck_assert_int_eq(TRUE, is_directory(path, len)); 
 }
 END_TEST

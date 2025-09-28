@@ -104,7 +104,7 @@ int32_t pf_allocator_free_list_node_set_block_size(PFAllocator_FreeListNode_t * 
 
     // TODO: make a variadic logging macro or something
     char const * error_message_base = "Cannot set a block size larget than %lu on current platform! Tried to set block_size=%lu";
-    size_t const error_message_base_length = pf_strlen(error_message_base);
+    size_t const error_message_base_length = strlen(error_message_base);
     char error_message[error_message_base_length + 128];
     sprintf(error_message, error_message_base, FREE_LIST_NODE_METADATA__MASK_BLOCK_SIZE, block_size);
 

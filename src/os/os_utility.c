@@ -27,7 +27,7 @@ int64_t file_size(char const * file_path, size_t const file_path_length) {
         PF_LOG_ERROR(PF_OS, "Invalid file path length");
         return  PFEC_ERROR_INVALID_LENGTH;
     }
-    if (!is_file(file_path, pf_strlen(file_path))) {
+    if (!is_file(file_path, strlen(file_path))) {
         PF_LOG_ERROR(PF_OS, "File does not exist");
         return PFEC_ERROR_FILE_DOES_NOT_EXIST;
     }

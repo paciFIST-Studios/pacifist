@@ -359,7 +359,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for
     ck_assert_ptr_nonnull(string_internment);
     
     char test_string[] = "test string";
-    size_t const test_length = pf_strlen(test_string);
+    size_t const test_length = strlen(test_string);
     PF_SUPPRESS_ERRORS
     PString_t const ret = pf_string_lifetime_internment_emplace_cstr(string_internment, test_string, test_length);
     PF_UNSUPPRESS_ERRORS
@@ -381,7 +381,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     ck_assert_ptr_nonnull(string_internment);
     
     char test_string[] = "test string";
-    size_t const test_length = pf_strlen(test_string);
+    size_t const test_length = strlen(test_string);
     PF_SUPPRESS_ERRORS
     PString_t const ret = pf_string_lifetime_internment_emplace_cstr(string_internment, test_string, test_length);
     PF_UNSUPPRESS_ERRORS
@@ -408,7 +408,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_error_code__for
     string_internment->next_unused_idx = PFSLI_MAX_STRINGS;
     
     char test_string[] = "test string";
-    size_t const test_length = pf_strlen(test_string);
+    size_t const test_length = strlen(test_string);
     PF_SUPPRESS_ERRORS
     PString_t const ret = pf_string_lifetime_internment_emplace_cstr(string_internment, test_string, test_length);
     PF_UNSUPPRESS_ERRORS
@@ -431,7 +431,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_correct_error_message__for
     string_internment->next_unused_idx = PFSLI_MAX_STRINGS;
     
     char test_string[] = "test string";
-    size_t const test_length = pf_strlen(test_string);
+    size_t const test_length = strlen(test_string);
     PF_SUPPRESS_ERRORS
     PString_t const ret = pf_string_lifetime_internment_emplace_cstr(string_internment, test_string, test_length);
     PF_UNSUPPRESS_ERRORS
@@ -455,7 +455,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__returns_correct_pstr__for_valid
     string_internment.usable_memory_base = test_memory;
     string_internment.owned_memory_size = size;
     char test_string[] = "test string";
-    size_t const test_length = pf_strlen(test_string);
+    size_t const test_length = strlen(test_string);
     PF_SUPPRESS_ERRORS
     PString_t const ret = pf_string_lifetime_internment_emplace_cstr(&string_internment, test_string, test_length);
     PF_UNSUPPRESS_ERRORS
@@ -473,7 +473,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__copies_string_to_memory__for_va
     string_internment.usable_memory_base = test_memory;
     string_internment.owned_memory_size = size;
     char test_string[] = "test string";
-    size_t const test_length = pf_strlen(test_string);
+    size_t const test_length = strlen(test_string);
     PF_SUPPRESS_ERRORS
     PString_t const ret = pf_string_lifetime_internment_emplace_cstr(&string_internment, test_string, test_length);
     PF_UNSUPPRESS_ERRORS
@@ -496,7 +496,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_memory_used_correctly_afte
     string_internment.owned_memory_size = size;
 
     char test_string1[] = "test string";
-    size_t const test_length1 = pf_strlen(test_string1);
+    size_t const test_length1 = strlen(test_string1);
     PString_t const ret1 = pf_string_lifetime_internment_emplace_cstr(&string_internment, test_string1, test_length1);
     // valid return value?
     ck_assert_ptr_nonnull(ret1.string);
@@ -507,7 +507,7 @@ START_TEST(fn_pf_string_internment_emplace_cstr__sets_memory_used_correctly_afte
     ck_assert_int_eq(TRUE, pf_pstring_contains_char_sub(mem, test_string1, test_length1));
 
     char test_string2[] = "another test string";
-    size_t const test_length2 = pf_strlen(test_string2);
+    size_t const test_length2 = strlen(test_string2);
     PString_t const ret2 = pf_string_lifetime_internment_emplace_cstr(&string_internment, test_string2, test_length2);
     // valid return value?
     ck_assert_ptr_nonnull(ret2.string);

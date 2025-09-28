@@ -1,16 +1,27 @@
 // paciFIST studios. 2025. MIT License
 
+// headr
+#include <core/error.h>
 // stdlib
+#include <stdio.h>
 // framework
+#include <SDL3/SDL_error.h>
 // engine
-#include "error.h"
-
-#include "memory/hash_table/HashTable.h"
+#include <core/define.h>
+#include <date/datetime.h>
 // game
 
 // comment out this definition to turn off error suppression, and print errors
 // they'll also show up during the tests, so don't be alarmed
 #define ERROR_SUPPRESSION_ALLOWED
+
+//char const g_error_message__null_ptr[] = "Null ptr to %s param!";
+//char const g_error_message__invalid_length[] = "Invalid length for %s param!";
+//char const g_error_message__file_does_not_exist[] = "File does not exist! path=\"%s\"";
+//char const g_error_message__could_not_get_time[] = "Could not get system time!";
+//char const g_error_message__out_of_memory[] = "Out of memory! %s";
+//char const g_error_message__out_of_bounds_memory_use[] = "Attempted out of bounds memory use! %s";
+
 
 
 #define ERROR_BUFFER_SIZE 4096
@@ -48,6 +59,15 @@ char* pf_get_error(void) {
 }
 
 /**
+ *  @brief zeroes out the error buffer
+ */
+void pf_clear_error(void) {
+    for (size_t i = 0; i < ERROR_BUFFER_SIZE; i++) {
+        s_error_buffer[i] = 0;
+    }
+}
+
+/**
  * @brief places a message in the error buffer
  *
  * @param message 
@@ -70,14 +90,6 @@ void pf_set_error(char const * message, size_t const message_len) {
 }
 
 
-/**
- *  @brief zeroes out the error buffer
- */
-void pf_clear_error(void) {
-    for (size_t i = 0; i < ERROR_BUFFER_SIZE; i++) {
-        s_error_buffer[i] = 0;
-    }
-}
 
 
 /**
@@ -113,6 +125,7 @@ int32_t pf_get_is_error_suppressed(void) {
 #endif
 }
 
+
 /**
  * @brief takes an error message, adds additional debug information,
  * and puts it in the error buffer
@@ -136,7 +149,7 @@ void pf_log_verbose(PFLogCategory_t const category, char const * message, char c
     pf_build_and_set_error_message(message, file, line);
     if (!pf_get_is_error_suppressed()) {
         char const * error = pf_get_error();
-        size_t const error_length = pf_strlen(error);
+        size_t const error_length = strlen(error);
         SDL_LogVerbose((SDL_LogCategory)category, error, error_length);
     }
 }
@@ -145,7 +158,7 @@ void pf_log_warning(PFLogCategory_t const category, char const * message, char c
     pf_build_and_set_error_message(message, file, line);
     if (!pf_get_is_error_suppressed()) {
         char const * error = pf_get_error();
-        size_t const error_length = pf_strlen(error);
+        size_t const error_length = strlen(error);
         SDL_LogWarn((SDL_LogCategory)category, error, error_length);
     }
 }
@@ -154,7 +167,7 @@ void pf_log_error(PFLogCategory_t const category, char const * message, char con
     pf_build_and_set_error_message(message, file, line);
     if (!pf_get_is_error_suppressed()) {
         char const * error = pf_get_error();
-        size_t const error_length = pf_strlen(error);
+        size_t const error_length = strlen(error);
         SDL_LogError((SDL_LogCategory)category, error, error_length);
     }
 }
@@ -163,7 +176,7 @@ void pf_log_critical(PFLogCategory_t const category, char const * message, char 
     pf_build_and_set_error_message(message, file, line);
     if (!pf_get_is_error_suppressed()) {
         char const * error = pf_get_error();
-        size_t const error_length = pf_strlen(error);
+        size_t const error_length = strlen(error);
         SDL_LogCritical((SDL_LogCategory)category, error, error_length);
     }
 }

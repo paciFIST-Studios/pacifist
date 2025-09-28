@@ -9,13 +9,13 @@
 #include <string.h>
 // framework
 // engine
-#include "date/datetime.h"
 #include "log/log_category.h"
 // game
 
 
 // PF Error Codes
 static const int32_t PFEC_NO_ERROR = 0;
+// static const int32_t PFEC_DO_NOT_USE_RESERVED = 1;
 static const int32_t PFEC_ERROR_NULL_PTR = 11;
 static const int32_t PFEC_ERROR_INVALID_LENGTH = 22;
 static const int32_t PFEC_ERROR_FILE_DOES_NOT_EXIST = 33;
@@ -24,17 +24,15 @@ static const int32_t PFEC_ERROR_OUT_OF_MEMORY = 55;
 static const int32_t PFEC_ERROR_OUT_OF_BOUNDS_MEMORY_USE = 66;
 static const int32_t PFEC_ERROR_NOT_ENOUGH_MEMORY = 77;
 
-// utility fns -----------------------------------------------------------------------------------------------
 
-// iirc, this is the strlen implementation
-static inline size_t pf_strlen(char const * string) {
-    size_t count = 0;
-    while (string != NULL && *string++ != 0) {
-        count++;
-    }
-    return count;
-}
+// error strings ---------------------------------------------------------------------------------------------
 
+//extern char const g_error_message__null_ptr[];
+//extern char const g_error_message__invalid_length[];
+//extern char const g_error_message__file_does_not_exist[];
+//extern char const g_error_message__could_not_get_time[];
+//extern char const g_error_message__out_of_memory[];
+//extern char const g_error_message__out_of_bounds_memory_use[];
 
 
 // Logging Macros --------------------------------------------------------------------------------------------
@@ -59,8 +57,6 @@ static inline size_t pf_strlen(char const * string) {
     pf_log_warning(Category, Message, __FILE__, __LINE__);  \
 } while (0);                                                \
 
-
-
 /**
  *  @brief this macro builds and logs an ERROR message to SDL_Log, using the give category and message
  *
@@ -81,13 +77,6 @@ static inline size_t pf_strlen(char const * string) {
     pf_log_error(Category, Message, __FILE__, __LINE__);   \
 } while (0);                                               \
 
-
-
-/**
- * @brief this macro builds an error message, and stores it in the error message buffer.  Retrieve with pf_get_error()
- * 
- * @param message 
- */
 
 
 #define PF_SUPPRESS_ERRORS do {                           \
@@ -141,7 +130,7 @@ static inline size_t pf_strlen(char const * string) {
  * @param file 
  * @param line 
  */
-void pf_build_and_set_error_message(char const * message, char const * file, int32_t const line);
+void pf_build_and_set_error_message(char const * message, char const * file, int32_t line);
 
 
 // Logging fns -----------------------------------------------------------------------------------------------
@@ -158,7 +147,7 @@ void pf_build_and_set_error_message(char const * message, char const * file, int
  * @param file
  * @param line
  */
-void pf_log_verbose(PFLogCategory_t const category, char const * message, char const * file, int32_t const line);
+void pf_log_verbose(PFLogCategory_t category, char const * message, char const * file, int32_t line);
 
 
 /**
@@ -169,7 +158,7 @@ void pf_log_verbose(PFLogCategory_t const category, char const * message, char c
  * @param file
  * @param line
  */
-void pf_log_warning(PFLogCategory_t const category, char const * message, char const * file, int32_t const line);
+void pf_log_warning(PFLogCategory_t category, char const * message, char const * file, int32_t line);
 
 
 /**
@@ -180,7 +169,7 @@ void pf_log_warning(PFLogCategory_t const category, char const * message, char c
  * @param file
  * @param line
  */
-void pf_log_error(PFLogCategory_t const category, char const * message, char const * file, int32_t const line);
+void pf_log_error(PFLogCategory_t category, char const * message, char const * file, int32_t line);
 
 
 /**
@@ -191,15 +180,20 @@ void pf_log_error(PFLogCategory_t const category, char const * message, char con
  * @param file
  * @param line
  */
-void pf_log_critical(PFLogCategory_t const category, char const * message, char const * file, int32_t const line);
+void pf_log_critical(PFLogCategory_t category, char const * message, char const * file, int32_t line);
 
 // Error state fns -------------------------------------------------------------------------------------------
 
 // gets the current allocation size of the error buffer
-size_t pf_get_error_buffer_size();
+size_t pf_get_error_buffer_size(void);
 
 // gets ptr to the start of the error buffer
-char* pf_get_error();
+char* pf_get_error(void);
+
+/**
+ * @brief Zeroes out the error buffer
+ */
+void pf_clear_error(void);
 
 /**
  *  @brief Sets an error message in the error buffer
@@ -207,26 +201,23 @@ char* pf_get_error();
  * @param message 
  * @param message_len 
  */
-void pf_set_error(char const * message, size_t const message_len);
-
-// clears out any information from the error buffer
-void pf_clear_error();
+void pf_set_error(char const * message, size_t message_len);
 
 
 /**
  * @brief DO NOT CALL - this fn is used internally by the PF_SUPPRESS_ERRORS marco, use that instead 
  */
-void pf_set_error_suppressed();
+void pf_set_error_suppressed(void);
 
 /**
  * @brief DO NOT CALL - this fn is used internally by the PF_SUPPRESS_ERRORS marco, use that instead 
  */
-void pf_set_error_not_suppressed();
+void pf_set_error_not_suppressed(void);
 
 // if errors are suppressed, calling get_error will return nullptr
 /**
  * @brief DO NOT CALL - this fn is used internally by the PF_SUPPRESS_ERRORS marco, use that instead 
  */
-int32_t pf_get_is_error_suppressed();
+int32_t pf_get_is_error_suppressed(void);
 
 #endif //ERROR_H
