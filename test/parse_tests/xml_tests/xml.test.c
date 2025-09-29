@@ -105,10 +105,39 @@ START_TEST(fn_pf_load_xml__sets_correct_error_message__for_null_xml_document_par
 }
 END_TEST;
 
+START_TEST(fn_pf_load_xml__returns_correct_error_code__for_invalid_path_to_xml_file) {
+    char string[] = "string";
+    PString_t const ps = { .string = string, .length = strlen(string)};
+    PFAllocator_FreeList_t const allocator = {0};
+    PFXmlDocument_t xml_doc = {0};
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_FILE_DOES_NOT_EXIST, pf_load_xml(ps, &allocator, &xml_doc));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST;
+
+START_TEST(fn_pf_load_xml__sets_correct_error_message__for_invalid_path_to_xml_file) {
+    char string[] = "string";
+    PString_t const ps = { .string = string, .length = strlen(string)};
+    PFAllocator_FreeList_t const allocator = {0};
+    PFXmlDocument_t xml_doc = {0};
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_FILE_DOES_NOT_EXIST, pf_load_xml(ps, &allocator, &xml_doc));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Got invalid path to xml file!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST;
+
+
+
+
+
 
 
 START_TEST(fn_pf_load_xml__returns_correct_error_code__for_successful_use) {
-    char string[] = "string";
+    char string[] = "/home/ellie/git/paciFIST/test/parse_tests/xml_tests/test_file_root.xml";
     PString_t const ps = { .string = string, .length = strlen(string)};
     PFAllocator_FreeList_t allocator = {0};
     PFXmlDocument_t doc = {0};

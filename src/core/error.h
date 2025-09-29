@@ -16,13 +16,13 @@
 // PF Error Codes
 static const int32_t PFEC_NO_ERROR = 0;
 // static const int32_t PFEC_DO_NOT_USE_RESERVED = 1;
-static const int32_t PFEC_ERROR_NULL_PTR = 11;
-static const int32_t PFEC_ERROR_INVALID_LENGTH = 22;
-static const int32_t PFEC_ERROR_FILE_DOES_NOT_EXIST = 33;
-static const int32_t PFEC_ERROR_COULD_NOT_GET_TIME = 44;
-static const int32_t PFEC_ERROR_OUT_OF_MEMORY = 55;
-static const int32_t PFEC_ERROR_OUT_OF_BOUNDS_MEMORY_USE = 66;
-static const int32_t PFEC_ERROR_NOT_ENOUGH_MEMORY = 77;
+static const int32_t PFEC_ERROR_NULL_PTR = -11;
+static const int32_t PFEC_ERROR_INVALID_LENGTH = -22;
+static const int32_t PFEC_ERROR_FILE_DOES_NOT_EXIST = -33;
+static const int32_t PFEC_ERROR_COULD_NOT_GET_TIME = -44;
+static const int32_t PFEC_ERROR_OUT_OF_MEMORY = -55;
+static const int32_t PFEC_ERROR_OUT_OF_BOUNDS_MEMORY_USE = -66;
+static const int32_t PFEC_ERROR_NOT_ENOUGH_MEMORY = -77;
 
 
 // error strings ---------------------------------------------------------------------------------------------

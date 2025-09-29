@@ -903,6 +903,8 @@ int main(void) {
     ADD_TEST(fn_pf_load_xml__returns_correct_error_code__for_null_xml_document_param);
     ADD_TEST(fn_pf_load_xml__sets_correct_error_message__for_null_xml_document_param);
     ADD_TEST(fn_pf_load_xml__returns_correct_error_code__for_successful_use);
+    ADD_TEST(fn_pf_load_xml__returns_correct_error_code__for_invalid_path_to_xml_file);
+    ADD_TEST(fn_pf_load_xml__sets_correct_error_message__for_invalid_path_to_xml_file);
     
     
     RUN_SUITE(fail_count);

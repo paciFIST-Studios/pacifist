@@ -7,6 +7,7 @@
 // framework
 // engine
 #include <core/error.h>
+#include <os/path.h>
 
 
 int32_t pf_load_xml(PString_t const path, PFAllocator_FreeList_t const * allocator, PFXmlDocument_t* out_xml_doc) {
@@ -27,6 +28,10 @@ int32_t pf_load_xml(PString_t const path, PFAllocator_FreeList_t const * allocat
         return PFEC_ERROR_NULL_PTR;
     }
 
+    if (!pf_os_path_is_file_pstr_linux(path)) {
+        PF_LOG_ERROR(PF_PARSE, "Got invalid path to xml file!");
+        return PFEC_ERROR_FILE_DOES_NOT_EXIST;
+    }
 
     
     return PFEC_NO_ERROR;
