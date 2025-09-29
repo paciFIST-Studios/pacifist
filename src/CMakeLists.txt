@@ -64,13 +64,14 @@ set(ENGINE_LIB_SOURCE_FILES
         # engine
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/PFEngineState.h
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/PFEngineState.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_define.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_define.c
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/PFEngineConfiguration.h
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/project/PFProjectConfiguration.h
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/pf_engine_entry_point.h
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/pf_engine_entry_point.c
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/pf_engine_initialization.h
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/pf_engine_initialization.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_define.h
         # f
         # gui
         ${CMAKE_CURRENT_SOURCE_DIR}/gui/PFDebugGui.h
@@ -101,6 +102,7 @@ set(ENGINE_LIB_SOURCE_FILES
         # n
         # os
         ${CMAKE_CURRENT_SOURCE_DIR}/os/path.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/os/path.c
         ${CMAKE_CURRENT_SOURCE_DIR}/os/os_utility.h
         ${CMAKE_CURRENT_SOURCE_DIR}/os/os_utility.c
         ${CMAKE_CURRENT_SOURCE_DIR}/os/os_define.h
@@ -119,12 +121,14 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/string/PFStringInternmentSingleton.c
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.h
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.c
+        # parse
+        ${CMAKE_CURRENT_SOURCE_DIR}/parse/xml/xml.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/parse/xml/xml.c
         # resource
         ${CMAKE_CURRENT_SOURCE_DIR}/resource/PFManagedResource.h
         ${CMAKE_CURRENT_SOURCE_DIR}/resource/PFResourceManager.c
         # rendering
         ${CMAKE_CURRENT_SOURCE_DIR}/rendering/render.h
-        os/path.c
         # type
         # u,v,w,x,y,z 
 )

@@ -102,6 +102,9 @@ char * global_module;
 #include "os_tests/os_utility.test.c"
 #include "os_tests/path.test.c"
 
+// parse
+#include "parse_tests/xml_tests/xml.test.c"
+
 // resource
 #include "resource_tests/PFManagedResource.test.c"
 #include "resource_tests/PFResourceManager.test.c"
@@ -883,6 +886,32 @@ int main(void) {
     // End OS Test Suite                                                  //
     // -------------------------------------------------------------------//
 
+
+    // -------------------------------------------------------------------//
+    // Start Parse Test Suite                                             //
+    // -------------------------------------------------------------------//
+    BUILD_SUITE("Parse");
+    
+    // pf_load_xml
+    ADD_TEST(fn_pf_load_xml__is_defined);
+    ADD_TEST(fn_pf_load_xml__returns_correct_error_code__for_null_string_in_pstring_param);
+    ADD_TEST(fn_pf_load_xml__sets_correct_error_message__for_null_string_in_pstring_param);
+    ADD_TEST(fn_pf_load_xml__returns_correct_error_code__for_zero_length_in_pstring_param);
+    ADD_TEST(fn_pf_load_xml__sets_correct_error_message__for_zero_length_in_pstring_param);
+    ADD_TEST(fn_pf_load_xml__returns_correct_error_code__for_null_allocator_param);
+    ADD_TEST(fn_pf_load_xml__sets_correct_error_message__for_null_allocator_param);
+    ADD_TEST(fn_pf_load_xml__returns_correct_error_code__for_null_xml_document_param);
+    ADD_TEST(fn_pf_load_xml__sets_correct_error_message__for_null_xml_document_param);
+    ADD_TEST(fn_pf_load_xml__returns_correct_error_code__for_successful_use);
+    
+    
+    RUN_SUITE(fail_count);
+    // -------------------------------------------------------------------//
+    // End Parse Test Suite                                               //
+    // -------------------------------------------------------------------//
+
+
+    
     // -------------------------------------------------------------------//
     // Start Resource Test Suite                                          //
     // -------------------------------------------------------------------//

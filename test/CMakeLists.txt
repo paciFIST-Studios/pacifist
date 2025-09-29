@@ -45,11 +45,15 @@ set(TEST_LIB_SOURCE_FILES
 
         # os tests
         ${CMAKE_CURRENT_SOURCE_DIR}/os_tests/os_utility.test.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/os_tests/path.test.c
 
-        # resource manager
+        # parse tests
+        ${CMAKE_CURRENT_SOURCE_DIR}/parse_tests/xml_tests/xml.test.c
+ 
+        # resource manager tests
         ${CMAKE_CURRENT_SOURCE_DIR}/resource_tests/PFManagedResource.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/resource_tests/PFResourceManager.test.c
-        
+
         # string tests
         ${CMAKE_CURRENT_SOURCE_DIR}/string_tests/PString.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/string_tests/PFStringInternmentSingleton.test.c
@@ -58,10 +62,8 @@ set(TEST_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/type_tests/TypedPtr.test.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory_tests/PFAllocator.test.c
 
-
         # game projects
         ${CMAKE_CURRENT_SOURCE_DIR}/_game/slain_tests/SlainGameMode.test.c
-        os_tests/path.test.c
 )
 
 # the run_unit_tests_engine is an executable that you could just run from the
