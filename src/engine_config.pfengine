@@ -5,15 +5,14 @@
         "minor": 0
     },
 
-    "engine_startup": {
-        "window_res_x": 1280,
-        "window_res_y": 720,
-        "window_pos_x": 640,
-        "window_pos_y": 360
+    "program_window": {
+        "res_x": 1280,
+        "res_y": 720,
+        "pos_x": 640,
+        "pos_y": 360
     }
 
     "pf_engine_root_dir": ""
-    "pf_engine_config_relative_path": "\src\engine_config.pfengine"
     "pf_project_config_path": "",
 
 }

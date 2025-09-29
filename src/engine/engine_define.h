@@ -23,6 +23,11 @@
 // 32
 
 
+/**
+ * @brief The path from engine_root, to the engine config file "engine_config.pfengine"
+ */
+extern char const s_file_path_cstr__engine_config[];
+
 
 
 

@@ -329,33 +329,45 @@ int32_t pf_try_read_engine_configuration(
     size_t const second_to_last_slash = slashes_in_exe_path - 1;
     size_t const second_to_last_slash_idx = pf_pstring_find_indexth_character_location(program_execution_path, slash, second_to_last_slash);
 
+    //------------------//
+    // Engine Base Path //
+    //------------------//
     PString_t engine_base_path = pf_pstring_slice(program_execution_path, 0, (int32_t)second_to_last_slash_idx);
     engine_base_path = pf_string_lifetime_internment_emplace_pstr(string_internment, engine_base_path);
     engine_configuration->engine_base_path = engine_base_path;
 
-    
-    //char path_join_buffer[256] = {0};
-    //__attribute__((unused))
-    //size_t const engine_config_path_len  = pf_os_path_join2D_pstr(
-    //    path_join_buffer,
-    //    engine_base_path,
-    //    '/', "src/engine_config.pfengine");
+    //------------------//
+    // Path Join Buffer //
+    //------------------//
+    char path_join_buffer[256] = {0};
+    PString_t path_join_buffer_pstr = { .string = path_join_buffer, .length = 256 };
 
-    
+    //--------------------//
+    // Engine Config Path //
+    //--------------------//
+    // note: we're casting away the const here, just make sure not to write to this path or the program will crash
+    PString_t engine_config_relative_path = { .string = (char*)s_file_path_cstr__engine_config, .length = strlen(s_file_path_cstr__engine_config) };
 
-    // take the program execution path
-    // find the last two slashes('\') in it
-    // cut from the second-to-last slash
-    // intern that string
-    // save that string as engine_base_path
+    pf_os_path_join_pstr(path_join_buffer_pstr, engine_base_path, engine_config_relative_path);
+    // TODO: make a pstr fn which shrinks down the pstr to the first nul-terminator, and call that from the above fn
+    path_join_buffer_pstr.length = strlen(path_join_buffer_pstr.string);
+
+    PString_t const engine_config_path = pf_string_lifetime_internment_emplace_pstr(string_internment, path_join_buffer_pstr);
+    engine_configuration->engine_config_path = engine_config_path;
+
+    // null this out so we don't accidentally dereference it
+    engine_config_relative_path.string = NULL;
+    engine_config_relative_path.length = 0;
+
+    // zero the path_join_buffer
+    memset(path_join_buffer, 0, path_join_buffer_pstr.length);
 
 
-    // take the engine base path
-    // add engine_config.pfengine
-    // intern that string
-    // save that string as path to engine config
+   // deserialize engine config using engine config path 
 
-    // other parsing from engine config
+ 
+
+
 
     
 
