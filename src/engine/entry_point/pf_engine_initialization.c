@@ -315,23 +315,29 @@ int32_t pf_try_read_engine_configuration(
         return FALSE;
     }
 
+    //----------------------//
+    // Engine Configuration //
+    //----------------------//
     PFEngineConfiguration_t* engine_configuration = PF_PUSH_STRUCT(engine_state->p_lifetime_memory_allocator, PFEngineConfiguration_t);
     PFStringLifetimeInternmentSingleton_t* string_internment = engine_state->p_lifetime_string_internment;
 
+    //------------------------//
+    // Program Execution Path //
+    //------------------------//
+
     // this is the path to the binary of the executing program
-    PString_t program_execution_path = { .string = argv[0], .length=strlen(argv[0]) };
+    PString_t const program_execution_path = { .string = argv[0], .length=strlen(argv[0]) };
     pf_string_lifetime_internment_emplace_pstr(string_internment, program_execution_path);
     engine_configuration->program_execution_path = program_execution_path;
-
-
-    char const slash = '/';
-    size_t const slashes_in_exe_path = pf_pstring_count_character_occurrences_in_string(program_execution_path, slash);
-    size_t const second_to_last_slash = slashes_in_exe_path - 1;
-    size_t const second_to_last_slash_idx = pf_pstring_find_indexth_character_location(program_execution_path, slash, second_to_last_slash);
 
     //------------------//
     // Engine Base Path //
     //------------------//
+    char const slash = '/';
+    size_t const slashes_in_exe_path = pf_pstring_count_character_occurrences_in_string(program_execution_path, slash);
+    size_t const second_to_last_slash = slashes_in_exe_path - 1;
+    size_t const second_to_last_slash_idx = pf_pstring_find_indexth_character_location(program_execution_path, slash, (int32_t)second_to_last_slash);
+
     PString_t engine_base_path = pf_pstring_slice(program_execution_path, 0, (int32_t)second_to_last_slash_idx);
     engine_base_path = pf_string_lifetime_internment_emplace_pstr(string_internment, engine_base_path);
     engine_configuration->engine_base_path = engine_base_path;
@@ -339,37 +345,40 @@ int32_t pf_try_read_engine_configuration(
     //------------------//
     // Path Join Buffer //
     //------------------//
-    char path_join_buffer[256] = {0};
-    PString_t path_join_buffer_pstr = { .string = path_join_buffer, .length = 256 };
+    char path_join_buffer[PF_PATH_MAX] = {0};
+    PString_t path_join_buffer_pstr = { .string = path_join_buffer, .length = PF_PATH_MAX };
 
     //--------------------//
     // Engine Config Path //
     //--------------------//
-    // note: we're casting away the const here, just make sure not to write to this path or the program will crash
-    PString_t engine_config_relative_path = { .string = (char*)s_file_path_cstr__engine_config, .length = strlen(s_file_path_cstr__engine_config) };
+    {
+        // note: we're casting away the const here, just make sure not to write to this path or the program will crash
+        PString_t const engine_config_relative_path = { .string = (char*)s_file_path_cstr__engine_config, .length = strlen(s_file_path_cstr__engine_config) };
 
-    pf_os_path_join_pstr(path_join_buffer_pstr, engine_base_path, engine_config_relative_path);
-    // TODO: make a pstr fn which shrinks down the pstr to the first nul-terminator, and call that from the above fn
-    path_join_buffer_pstr.length = strlen(path_join_buffer_pstr.string);
+        pf_os_path_join_pstr(path_join_buffer_pstr, engine_base_path, engine_config_relative_path);
+        // TODO: make a pstr fn which shrinks down the pstr to the first nul-terminator, and call that from the above fn
+        path_join_buffer_pstr.length = strlen(path_join_buffer_pstr.string);
 
-    PString_t const engine_config_path = pf_string_lifetime_internment_emplace_pstr(string_internment, path_join_buffer_pstr);
-    engine_configuration->engine_config_path = engine_config_path;
+        PString_t const engine_config_path = pf_string_lifetime_internment_emplace_pstr(string_internment, path_join_buffer_pstr);
+        engine_configuration->engine_config_path = engine_config_path;
+    }
 
-    // null this out so we don't accidentally dereference it
-    engine_config_relative_path.string = NULL;
-    engine_config_relative_path.length = 0;
-
-    // zero the path_join_buffer
+    // reset the path_join_buffer
     memset(path_join_buffer, 0, path_join_buffer_pstr.length);
+    path_join_buffer_pstr.length = PF_PATH_MAX;
+
+
+
+
 
 
    // deserialize engine config using engine config path 
 
- 
 
 
 
-    
+
+
 
     // this is parsing from project config
     char const * project_name = "project_name";
