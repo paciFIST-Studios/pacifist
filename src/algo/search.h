@@ -3,7 +3,7 @@
 #ifndef SEARCH_H
 #define SEARCH_H
 
-#include "../../src/core/common.h"
+#include "core/common.h"
 
 // A
 // B
