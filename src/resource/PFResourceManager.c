@@ -10,6 +10,40 @@
 #include "core/error.h"
 
 
+/**
+ *  Resource Manager Todo:
+ *      A config file which we can load in for the project
+ *          project config specifies asset config
+ *      A config file we can load in for the assets
+ *          shows:
+ *              path
+ *              level-metadata
+ *              is-register-immediate
+ *              is-load-immediate
+ *              try-load-asset-as
+ *              asset-budget
+ *              engine-labels
+ *
+ *      Resource Manager runs at engine start
+ *      Resource Manager pulls in assets from config at start
+ *      Resource Manager loads assets which are marked as load-immediate
+ *      Resource Manager logs what it does
+ * 
+ */
+
+
+
+
+
+
+
+/**
+ * 
+ * @param base_memory 
+ * @param memory_size 
+ * @param config 
+ * @return 
+ */
 PFResourceManager_t* pf_resource_manager_create_with_memory(
     void* base_memory,
     size_t const memory_size,
