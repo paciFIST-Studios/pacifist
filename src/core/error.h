@@ -23,7 +23,7 @@ static const int32_t PFEC_ERROR_COULD_NOT_GET_TIME = -44;
 static const int32_t PFEC_ERROR_OUT_OF_MEMORY = -55;
 static const int32_t PFEC_ERROR_OUT_OF_BOUNDS_MEMORY_USE = -66;
 static const int32_t PFEC_ERROR_NOT_ENOUGH_MEMORY = -77;
-
+static const int32_t PFEC_ERROR_COULD_NOT_OPEN_FILE = -87;
 
 // error strings ---------------------------------------------------------------------------------------------
 
