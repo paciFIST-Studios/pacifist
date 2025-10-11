@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<project>
+    <project_metadata>
+        <project_root_directoru>~/git/paciFIST/games/littlest_necromancer</project_root_directoru>
+        <project_name>LittlestNecromancer</project_name>
+        <project_title>The Littlest Necromancer: Let's Make Friends</project_title>
+        <company_name>paciFIST studios</company_name>
+        <copyright_license>MIT License</copyright_license>
+        <copyright_year>2025</copyright_year>
+        <uses_engine_version>
+            <major>0</major>
+            <minor>1</minor>
+        </uses_engine_version>
+        <uses_editor_version>
+            <major>0</major>
+            <minor>1</minor>
+        </uses_editor_version>
+
+        <project_file_manifest>
+            <load_units_manifest>
+
+                <program_lifetime_load_unit>
+                    <load_file load_automatically="true">{project_root}/resource/input/input_bindings.xml</load_file>
+                    <load_file load_automatically="true">{project_root}/resource/localization/localization.xml</load_file>
+                    <load_file load_automatically="true">{project_root}/resource/fonts/some_font.ttf</load_file>
+                    <load_file load_automatically="true">{project_root}/resource/sounds/some_sound.ogg</load_file>
+                    <load_file load_automatically="true">{project_root}/resource/images/some_image.png</load_file>
+                    <load_file load_automatically="true">{project_root}/resource/text/some_text.txt</load_file>
+                </program_lifetime_load_unit>
+
+                <load_unit>
+                    <name>TestLevel</name>
+                    <load_unit_config_path>test_level.xml</load_unit_config_path>
+                    <load_automatically>true</load_automatically>
+                    <register_automatically>true</register_automatically>
+                    <load_file load_automatically="true">{project_root}/resource/text/some_text_which_is_only_used_in_this_level.txt</load_file>
+                </load_unit>
+
+            </load_units_manifest>
+        </project_file_manifest>
+
+        <project_budgets>
+            <project_total_memory_allocation_kb>1024</project_total_memory_allocation_kb>
+            <project_font_allocation_kb>64</project_font_allocation_kb>
+            <project_texture_allocation_kb>256</project_texture_allocation_kb>
+            <project_audio_allocation_kb>256</project_audio_allocation_kb>
+            <project_text_allocation_kb>64</project_text_allocation_kb>
+            <project_runtime_swap_allocation_kb>128</project_runtime_swap_allocation_kb>
+            <crash_if_over_budger>true</crash_if_over_budger>
+        </project_budgets>
+
+        <project_logging>
+            <project_logging_format>{project_root}/logs/YYYYmmddTHHMMSS---LittlestNecromancer---{branch}{changelist}.log</project_logging_format>
+            <project_logging_max_log_size_kb>1024</project_logging_max_log_size_kb>
+            <project_logging_keep_last_n_logs>5</project_logging_keep_last_n_logs>
+            <project_default_loggging_level>log</project_default_loggging_level>
+        </project_logging>
+
+    </project_metadata>
+
+    <user_metadata>
+        <user_profiles>{project_root}/profiles</user_profiles>
+        <user_save_file_directory>{project_root}/saves</user_save_file_directory>
+        <user_screenshot_directory>{project_root}/screenshots</user_screenshot_directory>
+    </user_metadata>
+
+    <gay>true</gay>
+
+</project>
+
