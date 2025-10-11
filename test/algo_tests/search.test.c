@@ -6,7 +6,7 @@
 #include <check.h>
 
 // header
-#include "../../src/algo/search.h"
+#include "algo/search.h"
 
 // stdlib
 #include <stdlib.h>

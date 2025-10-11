@@ -104,6 +104,7 @@ char * global_module;
 
 // parse
 #include "parse_tests/xml_tests/xml.test.c"
+#include "parse_tests/xml_tests/pf_xml_structs.test.c"
 
 // resource
 #include "resource_tests/PFManagedResource.test.c"
@@ -891,29 +892,105 @@ int main(void) {
     // Start Parse Test Suite                                             //
     // -------------------------------------------------------------------//
     BUILD_SUITE("Parse");
+
+    // struct PFXmlNode_LoadFile_t
+    ADD_TEST(fn_struct_PFXmlNode_LoadFile_t__is_defined);
+    ADD_TEST(fn_struct_PFXmlNode_LoadFile_t__has_expected_size);
+    ADD_TEST(fn_struct_PFXmlNode_LoadFile_t__has_expected_members);
+    ADD_TEST(fn_struct_PFXmlNode_Load_file_t__is_16_byte_aligned);
+
+    // struct PFXmlNode_LoadUnit_t
+    ADD_TEST(fn_struct_PFXmlNode_LoadUnit_t__is_defined);
+    ADD_TEST(fn_struct_PFXmlNode_LoadUnit_t__has_expected_size);
+    ADD_TEST(fn_struct_PFXmlNode_LoadUnit_t__has_expected_members);
+    ADD_TEST(fn_struct_PFXmlNode_LoadUnit_t__is_16_byte_aligned);
+    ADD_TEST(fn_struct_PFXmlNode_ProjectFileManifest_t__is_defined);
+    ADD_TEST(fn_struct_PFXmlNode_ProjectFileManifest_t__has_expected_size);
+
+    // struct PFxmlNode_ProjectFileManifest_t
+    ADD_TEST(fn_struct_PFXmlNode_ProjectFileManifest_t__is_defined);
+    ADD_TEST(fn_struct_PFXmlNode_ProjectFileManifest_t__has_expected_size);
+    ADD_TEST(fn_struct_PFXmlNode_ProjectFileManifest_t__has_expected_members);
+    ADD_TEST(fn_struct_PFXmlNode_ProjectFileManifest_t__is_16_byte_aligned);
+
+    // struct PFXmlNode_EditorVersion_t
+    ADD_TEST(fn_struct_PFXmlNode_EditorVersion_t__is_defined);
+    ADD_TEST(fn_struct_PFXmlNode_EditorVersion_t__has_expected_size);
+    ADD_TEST(fn_struct_PFXmlNode_EditorVersion_t__has_expected_members);
+
+    // struct PFXmlNode_EditorVersion_t
+    ADD_TEST(fn_struct_PFXmlNode_EngineVersion_t__is_defined);
+    ADD_TEST(fn_struct_PFXmlNode_EngineVersion_t__has_expected_size);
+    ADD_TEST(fn_struct_PFXmlNode_EngineVersion_t__has_expected_members);
+
+    // struct PFXmlNode_ProjectBudgets_t
+    ADD_TEST(fn_struct_PFXmlNode_ProjectBudgets_t__is_defined);
+    ADD_TEST(fn_struct_PFXmlNode_ProjectBudgets_t__has_expected_size);
+    ADD_TEST(fn_struct_PFXmlNode_ProjectBudgets_t__has_expected_members);
+    ADD_TEST(fn_struct_PFXmlNode_ProjectBudgets_t__is_16_byte_aligned);
+
+    // struct PFXmlNode_ProjectLogging_t
+    ADD_TEST(fn_struct_PFXmlNode_ProjectLogging_t__is_defined);
+    ADD_TEST(fn_struct_PFXmlNode_ProjectLogging_t__has_expected_size);
+    ADD_TEST(fn_struct_PFXmlNode_ProjectLogging_t__has_expected_members);
+    ADD_TEST(fn_struct_PFXmlNode_ProjectLogging_t__is_16_byte_aligned);
+
+    // struct PFXmlNode_ProjectMetaData_t
+    ADD_TEST(fn_struct_PFXmlNode_ProjectMetaData_t__is_defined);
+    ADD_TEST(fn_struct_PFXmlNode_ProjectMetaData_t__has_correct_size);
+    ADD_TEST(fn_struct_PFXmlNode_ProjectMetaData_t__has_expected_members);
+    ADD_TEST(fn_struct_PFXmlNode_ProjectMetaData_t__is_16_bytes_aligned);
+
+    // struct PFXmlNode_UserMetaData_t
+    ADD_TEST(fn_struct_PFXmlNode_UserMetaData_t__is_defined);
+    ADD_TEST(fn_struct_PFXmlNode_UserMetaData_t__has_expected_size);
+    ADD_TEST(fn_struct_PFXmlNode_UserMetaData_t__has_expected_members);
+    ADD_TEST(fn_struct_PFXmlNode_UserMetaData_t__is_16_byte_aligned);
+
+    // struct PFXmlDocument_t
+    ADD_TEST(fn_struct_PFXmlDocument_t__is_defined);
+
+
+    
+    
     
     // pf_load_xml
     ADD_TEST(fn_pf_load_xml__is_defined);
-    ADD_TEST(fn_pf_load_xml__returns_correct_error_code__for_null_string_in_pstring_param);
+    ADD_TEST(fn_pf_load_xml__returns_false__for_null_string_in_pstring_param);
     ADD_TEST(fn_pf_load_xml__sets_correct_error_message__for_null_string_in_pstring_param);
-    ADD_TEST(fn_pf_load_xml__returns_correct_error_code__for_zero_length_in_pstring_param);
+    ADD_TEST(fn_pf_load_xml__returns_false__for_zero_length_in_pstring_param);
     ADD_TEST(fn_pf_load_xml__sets_correct_error_message__for_zero_length_in_pstring_param);
-    ADD_TEST(fn_pf_load_xml__returns_correct_error_code__for_null_allocator_param);
+    ADD_TEST(fn_pf_load_xml__returns_false__for_null_allocator_param);
     ADD_TEST(fn_pf_load_xml__sets_correct_error_message__for_null_allocator_param);
-    ADD_TEST(fn_pf_load_xml__returns_correct_error_code__for_null_xml_document_param);
+    ADD_TEST(fn_pf_load_xml__returns_false__for_null_xml_document_param);
     ADD_TEST(fn_pf_load_xml__sets_correct_error_message__for_null_xml_document_param);
-    ADD_TEST(fn_pf_load_xml__returns_correct_error_code__for_successful_use);
-    ADD_TEST(fn_pf_load_xml__returns_correct_error_code__for_invalid_path_to_xml_file);
+    ADD_TEST(fn_pf_load_xml__returns_false__for_invalid_path_to_xml_file);
     ADD_TEST(fn_pf_load_xml__sets_correct_error_message__for_invalid_path_to_xml_file);
+//    ADD_TEST(fn_pf_load_xml__returns_false__if_supplied_file_cannot_be_opened);
+//    ADD_TEST(fn_pf_load_xml__sets_correct_error_message__if_supplied_file_cannot_be_opened);
+
+    //ADD_TEST(fn_pf_load_xml__returns_correct_error_code__for_successful_use);
+
+
+    // pf_free_xml_doc
+    ADD_TEST(fn_pf_free_xml_doc__is_defined);
+
+
+    // pf_xml_node_create_with_memory
+    ADD_TEST(fn_pf_xml_node_create_with_memory__is_defined);
+
+    // pf_xml_node_free
+    ADD_TEST(fn_pf_xml_node_free__is_defined);
+
     
-    
+
     RUN_SUITE(fail_count);
     // -------------------------------------------------------------------//
     // End Parse Test Suite                                               //
     // -------------------------------------------------------------------//
 
 
-    
+
     // -------------------------------------------------------------------//
     // Start Resource Test Suite                                          //
     // -------------------------------------------------------------------//

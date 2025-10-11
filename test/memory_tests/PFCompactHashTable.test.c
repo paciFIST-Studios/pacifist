@@ -104,14 +104,14 @@ END_TEST
 // struct CompactHashTable_t -------------------------------------------------------------------------------------------
 
 START_TEST(struct_CompactHashTable_t__is_defined) {
-    CompactHashTable_t * table = compact_hash_table_create(0, NULL);
+    PFCompactHashTable_t * table = compact_hash_table_create(0, NULL);
     ck_assert_ptr_nonnull(table);
     free(table);
 }
 END_TEST
 
 START_TEST(struct_CompactHashTable_t__is_expected_size) {
-    CompactHashTable_t const table = {0};
+    PFCompactHashTable_t const table = {0};
     ck_assert_int_eq(sizeof(table), 32);
 }
 END_TEST
@@ -120,14 +120,14 @@ END_TEST
 // fn compact_hash_table_create ----------------------------------------------------------------------------------------
 
 START_TEST(fn_compact_hash_table_create__is_defined) {
-    CompactHashTable_t* (*fptr)(uint32_t, HashFunction_t) = &compact_hash_table_create;
+    PFCompactHashTable_t* (*fptr)(uint32_t, HashFunction_t) = &compact_hash_table_create;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
 
 START_TEST(fn_compact_hash_table_create__allocates_memory_for_hash_table) {
-    CompactHashTable_t * table = NULL;
+    PFCompactHashTable_t * table = NULL;
     ck_assert_ptr_null(table);
     table = compact_hash_table_create(0, NULL);
     ck_assert_ptr_nonnull(table);
@@ -137,7 +137,7 @@ END_TEST
 
 
 START_TEST(fn_compact_hash_table_create__correctly_sets_starting_params) {
-    CompactHashTable_t * table = compact_hash_table_create(2, hash_polynomial_64);
+    PFCompactHashTable_t * table = compact_hash_table_create(2, hash_polynomial_64);
     ck_assert_ptr_nonnull(table);
     ck_assert_int_eq(table->size, 2);
     ck_assert_ptr_nonnull(table->hash_fn);
@@ -189,13 +189,13 @@ END_TEST
 
 START_TEST(fn_compact_hash_table_create__allocates_a_32byte_multiple_size_for_hash_table) {
     int32_t const test_element_count = 11;
-    size_t const table_size = sizeof(CompactHashTable_t);
+    size_t const table_size = sizeof(PFCompactHashTable_t);
     size_t const element_size = sizeof(CompactHashTableEntry_t);
 
     // this test repeats with all of these sizes. There shouldn't(TM) be a difference
     // between a table of 7 entries, and one of 11, but you never know
     for (int32_t i = 0; i < test_element_count; ++i) {
-        CompactHashTable_t * ht = compact_hash_table_create(i, hash_fnv1a_64);
+        PFCompactHashTable_t * ht = compact_hash_table_create(i, hash_fnv1a_64);
 
         uint64_t const table_addr = (uint64_t)ht;
         
@@ -219,14 +219,14 @@ END_TEST
 // fn compact_hash_table_destroy ---------------------------------------------------------------------------------------
 
 START_TEST(fn_compact_hash_table_destroy__is_defined) {
-    bool (*fptr)(CompactHashTable_t*) = &compact_hash_table_destroy;
+    bool (*fptr)(PFCompactHashTable_t*) = &compact_hash_table_destroy;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
 
 START_TEST(fn_compact_hash_table_destroy__will_destroy_the_table_correctly) {
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     ck_assert_ptr_nonnull(ht);
     char* test_key = "test_key";
     char const * res = compact_hash_table_insert(ht, test_key, strlen(test_key), EPDT__int8_t,(void*) 5);
@@ -241,13 +241,13 @@ END_TEST
 // fn compact_hash_table_print -----------------------------------------------------------------------------------------
 
 START_TEST(fn_compact_hash_table_print_is_defined) {
-    void(*fptr)(CompactHashTable_t*) = &compact_hash_table_print;
+    void(*fptr)(PFCompactHashTable_t*) = &compact_hash_table_print;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
 START_TEST(fn_compact_hash_table_print__test_usage) {
-    CompactHashTable_t* ht = compact_hash_table_create(2, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(2, hash_polynomial_64);
     compact_hash_table_insert(ht, "test", 4, EPDT__char_ptr_t, "this is just a test");
     compact_hash_table_print(ht);
     compact_hash_table_insert(ht, "test2", 5, EPDT__char_ptr_t, "this_is_also_a_test");
@@ -261,7 +261,7 @@ END_TEST
 // fn compact_hash_table_insert ----------------------------------------------------------------------------------------
 
 START_TEST(fn_compact_hash_table_insert__is_defined) {
-    char const *(*fptr)(CompactHashTable_t*, char const *, size_t const, EProjectDataTypes_t, void*) = &compact_hash_table_insert;
+    char const *(*fptr)(PFCompactHashTable_t*, char const *, size_t const, EProjectDataTypes_t, void*) = &compact_hash_table_insert;
     ck_assert_ptr_nonnull(fptr);    
 }
 END_TEST
@@ -277,7 +277,7 @@ END_TEST
 
 
 START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for__null_key) {
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     ck_assert_ptr_null(compact_hash_table_insert(ht, NULL, 0, 0, NULL));
     ck_assert(strcmp(compact_hash_table_get_error_message(), ERROR_NULL_PTR_TO_KEY) == 0);
     ck_assert(compact_hash_table_destroy(ht));
@@ -285,7 +285,7 @@ START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for
 END_TEST
 
 START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for_key_len_zero) {
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     char* test_key = "test_key";
     ck_assert_ptr_null(compact_hash_table_insert(ht, test_key, 0, 0, test_key));
     ck_assert(strcmp(compact_hash_table_get_error_message(), ERROR_INVALID_KEY_LENGTH) == 0);
@@ -294,7 +294,7 @@ START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for
 END_TEST
 
 START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for_data_type_undefined) {
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     char* test_key = "test_key";
     ck_assert_ptr_null(compact_hash_table_insert(ht, test_key, strlen(test_key), 0, test_key));
     ck_assert(strcmp(compact_hash_table_get_error_message(), ERROR_UNDEFINED_DATA_TYPE) == 0);
@@ -303,7 +303,7 @@ START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for
 END_TEST
 
 START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for_null_value) {
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     char const * test_key = "test_key";
     size_t const key_len = strlen(test_key);
     ck_assert_ptr_null(compact_hash_table_insert(ht, test_key, key_len, EPDT__char_ptr_t, NULL));
@@ -313,7 +313,7 @@ START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for
 END_TEST
 
 START_TEST(fn_compact_hash_table_insert__returns_null_and_sets_error_message_for_reserved_deleted_entry_as_key) {
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     char const * test_key = DELETED_ENTRY;
     size_t const key_len = strlen(test_key);
     ck_assert_ptr_null(compact_hash_table_insert(ht, test_key, key_len, EPDT__char_ptr_t, (void*)test_key));
@@ -324,7 +324,7 @@ END_TEST
 
 
 START_TEST(fn_compact_hash_table_insert__returns_key_of_existing_value__if_value_is_already_in_table) {
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     char const * test_key = "test_key";
     size_t const key_len = strlen(test_key);
     char const * res1 = compact_hash_table_insert(ht, test_key, key_len, EPDT__char_ptr_t, (void*)test_key);
@@ -337,7 +337,7 @@ END_TEST
 
 
 START_TEST(fn_compact_hash_table_insert__modifies_existing_value__if_value_is_already_in_table) {
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     char const * test_key = "test_key";
     void * test_value = (void*)test_key;
     size_t const key_len = strlen(test_key);
@@ -354,7 +354,7 @@ END_TEST
 
 
 START_TEST(fn_compact_hash_table_insert__returns_null__if_called_when_table_is_100_percent_full) {
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     char const * test_key = "test_key";
     size_t const key_len = strlen(test_key);
     char const * res1 = compact_hash_table_insert(ht, test_key, key_len, EPDT__char_ptr_t, (void*)test_key);
@@ -377,7 +377,7 @@ static char * return_null(char const * src, size_t n) {
 }
 
 START_TEST(fn_compact_hash_table_insert__returns_null__if_key_string_could_not_be_duplicated) {
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     ht->string_copy_fn = &return_null; 
     
     char const * test_key = "test_key";
@@ -393,7 +393,7 @@ END_TEST
 // compact_hash_table_lookup -------------------------------------------------------------------------------------------
 
 START_TEST(fn_compact_hash_table_lookup__is_defined) {
-    void*(*fptr)(CompactHashTable_t*,char const *, size_t) = &compact_hash_table_lookup;
+    void*(*fptr)(PFCompactHashTable_t*,char const *, size_t) = &compact_hash_table_lookup;
     ck_assert_ptr_nonnull(fptr); 
 }
 END_TEST
@@ -406,7 +406,7 @@ END_TEST
 
 
 START_TEST(fn_compact_hash_table_lookup__returns_null__for_null_ptr_to_key) {
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     ck_assert_ptr_nonnull(ht);
     ck_assert_ptr_null(compact_hash_table_lookup(ht, NULL, 1));
     ck_assert(compact_hash_table_destroy(ht));
@@ -415,7 +415,7 @@ END_TEST
 
 
 START_TEST(fn_compact_hash_table_lookup__returns_null__for_key_length_zero) {
-    CompactHashTable_t * ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t * ht = compact_hash_table_create(1, hash_polynomial_64);
     ck_assert_ptr_nonnull(ht);
     ck_assert_ptr_null(compact_hash_table_lookup(ht, "test_key", 0));
     ck_assert(compact_hash_table_destroy(ht));
@@ -424,7 +424,7 @@ END_TEST
 
 
 START_TEST(fn_compact_hash_table_lookup__returns_null__for_key_not_found_in_table) {
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     ck_assert_ptr_nonnull(ht);
     ck_assert_ptr_nonnull(compact_hash_table_insert(ht, "k", 2, EPDT__char_ptr_t, (void*)1));
     ck_assert(compact_hash_table_destroy(ht));
@@ -433,7 +433,7 @@ END_TEST
 
 
 START_TEST(fn_compact_hash_table_lookup__returns_stored_value__for_correctly_looked_up_value) {
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     ck_assert_ptr_nonnull(ht);
     char const * test_key = "test_key";
     size_t const test_key_len = strlen(test_key);
@@ -452,7 +452,7 @@ END_TEST
 // fn compact_hash_table_resize ---------------------------------------------------------------------------------------- 
 
 START_TEST(fn_compact_hash_table_resize__is_defined) {
-    CompactHashTable_t*(*fptr)(CompactHashTable_t*, float) = &compact_hash_table_resize;
+    PFCompactHashTable_t*(*fptr)(PFCompactHashTable_t*, float) = &compact_hash_table_resize;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
@@ -463,14 +463,14 @@ START_TEST(fn_compact_hash_table_resize__returns_null__for_null_hash_table_arg) 
 END_TEST
 
 START_TEST(fn_compact_hash_table_resize__returns_null__for_negative_increase_factor) {
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     ck_assert_ptr_null(compact_hash_table_resize(ht, -1.0));
     compact_hash_table_destroy(ht);
 }
 END_TEST
 
 START_TEST(fn_compact_hash_table_resize__returns_null_for_increase_factor_below_one) {
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     ck_assert_ptr_nonnull(ht);
     ck_assert_int_eq(ht->size, 1);
     ck_assert_int_eq(ht->used, 0);
@@ -481,15 +481,15 @@ START_TEST(fn_compact_hash_table_resize__returns_null_for_increase_factor_below_
 END_TEST
 
 START_TEST(fn_compact_hash_table_resize__returns_null__for_null_hash_table_entries_ptr) {
-    CompactHashTable_t ht = {0};
+    PFCompactHashTable_t ht = {0};
     ht.entries = NULL;
     ck_assert_ptr_null(compact_hash_table_resize(&ht, 2));
 }
 END_TEST
 
 START_TEST(fn_compact_hash_table_resize__returns_ptr_to_newly_allocated_hash_table) {
-    CompactHashTable_t* ht1 = compact_hash_table_create(1, hash_polynomial_64);
-    CompactHashTable_t* ht2 = compact_hash_table_resize(ht1, 2.0f);
+    PFCompactHashTable_t* ht1 = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht2 = compact_hash_table_resize(ht1, 2.0f);
     ck_assert_ptr_ne(ht1, ht2);
     ck_assert(compact_hash_table_destroy(ht2));
     ht1 = NULL;
@@ -502,7 +502,7 @@ START_TEST(fn_compact_hash_table_reszie__copies_existing_entries_into_new_table)
     size_t const test_key_len = strlen(test_key);
     char const * test_value = "test_value";
     
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     ck_assert_int_eq(ht->used, 0);
     ck_assert_ptr_nonnull(compact_hash_table_insert(ht, test_key, test_key_len, EPDT__char_ptr_t, (void*)test_value));
     ck_assert_int_eq(ht->used, 1);
@@ -515,7 +515,7 @@ START_TEST(fn_compact_hash_table_reszie__copies_existing_entries_into_new_table)
 END_TEST
 
 START_TEST(fn_compact_hsah_table_resize__copies_state_values_during_resize) {
-    CompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
+    PFCompactHashTable_t* ht = compact_hash_table_create(1, hash_polynomial_64);
     ck_assert_ptr_nonnull(ht);
     ck_assert_int_eq(ht->size, 1);
     ck_assert_int_eq(ht->used, 0);

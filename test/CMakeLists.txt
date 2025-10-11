@@ -64,6 +64,7 @@ set(TEST_LIB_SOURCE_FILES
 
         # game projects
         ${CMAKE_CURRENT_SOURCE_DIR}/_game/slain_tests/SlainGameMode.test.c
+        parse_tests/xml_tests/pf_xml_structs.test.c
 )
 
 # the run_unit_tests_engine is an executable that you could just run from the

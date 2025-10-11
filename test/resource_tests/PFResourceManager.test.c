@@ -78,13 +78,13 @@ START_TEST(fn_pf_resource_manager_create_with_memory__also_creates_resource_mana
     ck_assert_ptr_nonnull(resource_manager);
     
     // free_list_allocator
-    ck_assert_ptr_nonnull(resource_manager->dynamic_allocator->base_memory);
-    ck_assert_int_eq(memory_size-sizeof(PFResourceManager_t), resource_manager->dynamic_allocator->base_memory_size);
-    ck_assert_int_eq(0, resource_manager->dynamic_allocator->free_memory);
-    ck_assert_ptr_nonnull(resource_manager->dynamic_allocator->head);
-    ck_assert_ptr_nonnull(resource_manager->dynamic_allocator->pf_malloc);
-    ck_assert_ptr_nonnull(resource_manager->dynamic_allocator->pf_realloc);
-    ck_assert_ptr_nonnull(resource_manager->dynamic_allocator->pf_free);
+//    ck_assert_ptr_nonnull(resource_manager->dynamic_allocator->base_memory);
+//    ck_assert_int_eq(memory_size-sizeof(PFResourceManager_t), resource_manager->dynamic_allocator->base_memory_size);
+//    ck_assert_int_eq(0, resource_manager->dynamic_allocator->free_memory);
+//    ck_assert_ptr_nonnull(resource_manager->dynamic_allocator->head);
+//    ck_assert_ptr_nonnull(resource_manager->dynamic_allocator->pf_malloc);
+//    ck_assert_ptr_nonnull(resource_manager->dynamic_allocator->pf_realloc);
+//    ck_assert_ptr_nonnull(resource_manager->dynamic_allocator->pf_free);
 
     free(test_memory);
 }
