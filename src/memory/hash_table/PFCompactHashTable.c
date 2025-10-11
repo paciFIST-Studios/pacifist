@@ -1,6 +1,6 @@
 // paciFIST studios. 2025. MIT License
 
-#include "CompactHashTable.h"
+#include "PFCompactHashTable.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Utility Functions
@@ -12,7 +12,7 @@
  */
 static char * compact_hash_table_global_error_message;
 
-char* compact_hash_table_get_error_message() {
+char* compact_hash_table_get_error_message(void) {
     return compact_hash_table_global_error_message; 
 }
 
@@ -80,13 +80,13 @@ uint64_t hash_fnv1a_64(char const *key, size_t const table_size){
 // CompactHashTable Functions
 // ---------------------------------------------------------------------------------------------------------------------
 
-CompactHashTable_t* compact_hash_table_create(uint32_t const size, HashFunction_t * hf) {
+PFCompactHashTable_t* compact_hash_table_create(uint32_t const size, HashFunction_t * hf) {
     compact_hash_table_global_error_message = NULL;  
-    size_t const hash_table_size = sizeof(CompactHashTable_t);
+    size_t const hash_table_size = sizeof(PFCompactHashTable_t);
     size_t const hash_table_entry_size = sizeof(CompactHashTableEntry_t);
     size_t const total_allocation = hash_table_size + (hash_table_entry_size * size);
 
-    CompactHashTable_t * table = calloc(total_allocation, 1);
+    PFCompactHashTable_t * table = calloc(total_allocation, 1);
     if (table == NULL) {
         compact_hash_table_global_error_message  = ERROR_COULD_NOT_ALLOCATE_MEMORY_FOR_HASH_TABLE;
         return NULL;
@@ -115,7 +115,7 @@ CompactHashTable_t* compact_hash_table_create(uint32_t const size, HashFunction_
 
 
 
-bool compact_hash_table_destroy(CompactHashTable_t* ht) {
+bool compact_hash_table_destroy(PFCompactHashTable_t* ht) {
     compact_hash_table_global_error_message = NULL;
     
     if (ht == NULL){
@@ -182,7 +182,7 @@ static void compact_hash_table_print_value(EProjectDataTypes_t value_type, void*
 }
 
 
-void compact_hash_table_print(CompactHashTable_t* ht) {
+void compact_hash_table_print(PFCompactHashTable_t* ht) {
     printf("[CompactHashTable_t] -- START\n");
     
     if (ht != NULL) {
@@ -208,7 +208,7 @@ void compact_hash_table_print(CompactHashTable_t* ht) {
 
 
 char const * compact_hash_table_insert(
-    CompactHashTable_t* ht,
+    PFCompactHashTable_t* ht,
     char const * key,
     size_t const key_len,
     EProjectDataTypes_t const value_type,
@@ -299,7 +299,7 @@ char const * compact_hash_table_insert(
     return key_copy;
 }
 
-void* compact_hash_table_lookup(CompactHashTable_t * ht, char const * key, size_t const key_len){
+void* compact_hash_table_lookup(PFCompactHashTable_t * ht, char const * key, size_t const key_len){
     compact_hash_table_global_error_message = NULL;
 
     if (ht == NULL) {
@@ -324,7 +324,7 @@ void* compact_hash_table_lookup(CompactHashTable_t * ht, char const * key, size_
 }
 
 
-CompactHashTableEntry_t const * compact_hash_table_lookup_entry(CompactHashTable_t * ht, char const * key, size_t const key_len ) {
+CompactHashTableEntry_t const * compact_hash_table_lookup_entry(PFCompactHashTable_t * ht, char const * key, size_t const key_len ) {
     compact_hash_table_global_error_message = NULL;
 
     if (ht == NULL) {
@@ -356,7 +356,7 @@ CompactHashTableEntry_t const * compact_hash_table_lookup_entry(CompactHashTable
 }
 
 
-CompactHashTable_t* compact_hash_table_resize(CompactHashTable_t* ht, float increase_factor) {
+PFCompactHashTable_t* compact_hash_table_resize(PFCompactHashTable_t* ht, float increase_factor) {
     if (ht == NULL) {
         // error, null arg
         return NULL;
@@ -383,7 +383,7 @@ CompactHashTable_t* compact_hash_table_resize(CompactHashTable_t* ht, float incr
     size_t const new_table_size = ht->size * increase_factor + 1;
 
     // creates a new hash table of the correct size, but it's empty
-    CompactHashTable_t* new_ht = compact_hash_table_create(new_table_size, ht->hash_fn);
+    PFCompactHashTable_t* new_ht = compact_hash_table_create(new_table_size, ht->hash_fn);
 
     // iterate all the existing entries
     for (int32_t i = 0; i < old_table_size; i++) {

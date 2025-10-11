@@ -1,18 +1,80 @@
+# paciFIST Studios. 2025. Mit License
+# comment mark
 
-{
-    "version": {
-        "major": 0,
-        "minor": 0
-    },
+#------------------------------------------------------------------------------
+# Engine Version 
+#------------------------------------------------------------------------------
+engine_version_major = 0
+engine_version_minor = 0
+#------------------------------------------------------------------------------
+# Editor Version 
+#------------------------------------------------------------------------------
+editor_version_major = 0
+editor_version_minor = 0
 
-    "program_window": {
-        "res_x": 1280,
-        "res_y": 720,
-        "pos_x": 640,
-        "pos_y": 360
-    }
+#------------------------------------------------------------------------------
+# Program Window
+#------------------------------------------------------------------------------
+program_window_resolution_x = 1280
+program_window_resolution_y = 720
+program_window_position_x = 640
+program_window_position_y = 360
 
-    "pf_engine_root_dir": ""
-    "pf_project_config_path": "",
 
-}
+#------------------------------------------------------------------------------
+# Project
+#------------------------------------------------------------------------------
+#project_config_absolute_path = /home/ellie/git/paciFIST/src/_games/Slain/slain.xml 
+project_config_relative_path = src/_games/Slain/slain.xml
+
+project_name=The Littlest Necromancer: Let's Make Friends
+company_name=paciFIST studios
+copyright_license=MIT License
+copyright_year=2025
+
+project_lifetime_load_file={project_root}/resource/input/input_bindings.ini
+project_lifetime_load_file={project_root}/resource/localization/localization.ini
+project_lifetime_load_file={project_root}/resource/fonts/some_font.tff
+project_lifetime_load_file={project_root}/resource/sounds/some_sound.org
+project_lifetime_load_file={project_root}/resource/images/some_image.png
+project_lifetime_load_file={project_root}/resource/test/some_test.txt
+
+
+#------------------------------------------------------------------------------
+# Budget
+#------------------------------------------------------------------------------
+budget_project_total_memory_allocation_kib=
+budget_project_font_allocation_kib=
+budget_project_texture_allocation_kib=
+budget_project_audio_allocation_kib=
+budget_project_text_allocation_kib=
+budget_project_runtime_swap_allocation_kib=
+budget_project_crash_if_over_budget=true
+
+
+#------------------------------------------------------------------------------
+# Logging
+#------------------------------------------------------------------------------
+logging_project_logging_format=
+logging_project_logging_max_log_size_kb=
+logging_project_logging_keep_last_n_logs=
+logigng_project_default_logging_level=
+
+
+#------------------------------------------------------------------------------
+# User
+#------------------------------------------------------------------------------
+
+user_profiles={project_root}/profiles
+user_save_file_directory={project_root}/saves
+user_screenshot_directory={project_root}/screenshots
+
+
+
+
+
+
+
+
+
+

@@ -48,8 +48,6 @@ set(ENGINE_LIB_SOURCE_FILES
         # bit
         ${CMAKE_CURRENT_SOURCE_DIR}/bit/bitfield.h
         # config
-        ${CMAKE_CURRENT_SOURCE_DIR}/config/PFConfigurationFileParser.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/config/PFConfigurationParser.c
         # core 
         ${CMAKE_CURRENT_SOURCE_DIR}/core/assert.h
         ${CMAKE_CURRENT_SOURCE_DIR}/core/common.h
@@ -108,6 +106,11 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/os/os_define.h
         # parse
         ${CMAKE_CURRENT_SOURCE_DIR}/parse/parse_utilities.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/parse/xml/xml.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/parse/xml/xml.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/parse/xml/pf_xml_structs.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/parse/xml/pf_xml_parse_functions.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/parse/xml/pf_xml_parse_functions.c
         # project data types
         ${CMAKE_CURRENT_SOURCE_DIR}/project_data_types.h
         # q
@@ -116,25 +119,25 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/reflection/metadata_reflection_system.h
         # resource
         ${CMAKE_CURRENT_SOURCE_DIR}/resource/PFResourceManager.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/resource/PFManagedResource.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/resource/PFResourceManager.c
+        # rendering
+        ${CMAKE_CURRENT_SOURCE_DIR}/rendering/render.h
         # string
         ${CMAKE_CURRENT_SOURCE_DIR}/string/PFStringInternmentSingleton.h
         ${CMAKE_CURRENT_SOURCE_DIR}/string/PFStringInternmentSingleton.c
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.h
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.c
-        # parse
-        ${CMAKE_CURRENT_SOURCE_DIR}/parse/xml/xml.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/parse/xml/xml.c
-        # resource
-        ${CMAKE_CURRENT_SOURCE_DIR}/resource/PFManagedResource.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/resource/PFResourceManager.c
-        # rendering
-        ${CMAKE_CURRENT_SOURCE_DIR}/rendering/render.h
-        # type
-        # u,v,w,x,y,z 
+        ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring_utf8.h
+        #parse/pf_config/pf_config.h
+        #parse/pf_config/pf_config.c
+        #parse/pf_config/pf_config_structs.h
+        # t, u,v,w,x,y,z 
 )
 
 include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_SOURCE_DIR}/vendor/libexpat/expat/libs/
 )
 
 

@@ -61,6 +61,7 @@ typedef char* (StringCopyFunction_t)(const char * src, size_t len);
 // Helper Functions
 // ---------------------------------------------------------------------------------------------------------------------
 
+__attribute__((unused))
 static bool is_deleted_entry_key(char const * key) {
     if  (key == NULL) {
         return false;
@@ -125,7 +126,7 @@ typedef struct CompactHashTableEntry_t {
 /**
  * @brief CompactHashTable_t prioritizes small footprint.
  */
-typedef struct CompactHashTable_t {
+typedef struct PFCompactHashTable_t {
     // how many elements can fit in this table
     uint32_t size; 
     // how many elements are in this table now
@@ -136,7 +137,7 @@ typedef struct CompactHashTable_t {
     StringCopyFunction_t * string_copy_fn;
     // ptr to the array of entries
     CompactHashTableEntry_t * entries;
-} CompactHashTable_t;
+} PFCompactHashTable_t;
 
 
 
@@ -153,7 +154,7 @@ typedef struct CompactHashTable_t {
  *
  * @return                 Null, on error, otherwise, an initialized CompactHashTable
  */
-CompactHashTable_t * compact_hash_table_create(
+PFCompactHashTable_t * compact_hash_table_create(
     uint32_t const size,
     HashFunction_t * hf);
 
@@ -164,7 +165,7 @@ CompactHashTable_t * compact_hash_table_create(
  * @param ht 
  * @return 
  */
-bool compact_hash_table_destroy(CompactHashTable_t * ht);
+bool compact_hash_table_destroy(PFCompactHashTable_t * ht);
 
 
 /**
@@ -172,7 +173,7 @@ bool compact_hash_table_destroy(CompactHashTable_t * ht);
  * 
  * @param ht 
  */
-void compact_hash_table_print(CompactHashTable_t * ht);
+void compact_hash_table_print(PFCompactHashTable_t * ht);
 
 
 //
@@ -192,7 +193,7 @@ void compact_hash_table_print(CompactHashTable_t * ht);
  * @returns char const *
  */
 char const * compact_hash_table_insert(
-    CompactHashTable_t * ht,
+    PFCompactHashTable_t * ht,
     char const * key,
     size_t const key_len,
     EProjectDataTypes_t value_type,
@@ -209,7 +210,7 @@ char const * compact_hash_table_insert(
  * @returns NULL on error, or the data associated with this key.
  */
 void* compact_hash_table_lookup(
-    CompactHashTable_t * ht,
+    PFCompactHashTable_t * ht,
     char const * key,
     size_t const key_len);
 
@@ -226,7 +227,7 @@ void* compact_hash_table_lookup(
  * @return NULL on error, or the data associated with this entry 
  */
 CompactHashTableEntry_t const * compact_hash_table_lookup_entry(
-    CompactHashTable_t * ht,
+    PFCompactHashTable_t * ht,
     char const * key,
     size_t const key_len
 );
@@ -244,8 +245,8 @@ CompactHashTableEntry_t const * compact_hash_table_lookup_entry(
  * @param increase_factor 
  * @return 
  */
-CompactHashTable_t* compact_hash_table_resize(
-    CompactHashTable_t* ht,
+PFCompactHashTable_t* compact_hash_table_resize(
+    PFCompactHashTable_t* ht,
     float increase_factor);
 
 
