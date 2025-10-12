@@ -14,10 +14,24 @@
 add_subdirectory(check)
 add_library(check_lib INTERFACE)
 target_link_libraries(check_lib INTERFACE check)
+
 # cimgui for immediate mode gui
-add_subdirectory(cimgui)
-add_library(cimgui_lib INTERFACE)
-target_link_libraries(cimgui_lib INTERFACE cimgui)
+set(CIMGUI_AND_IMGUI_SRC
+        ${CMAKE_CURRENT_DIRECTORY}/cimgui/imgui/backends/imgui_impl_sdl3.cpp
+        ${CMAKE_CURRENT_DIRECTORY}/cimgui/imgui/backends/imgui_impl_sdlrenderer3.cpp
+        ${CMAKE_CURRENT_DIRECTORY}/cimgui/cimgui.cpp
+        ${CMAKE_CURRENT_DIRECTORY}/cimgui/cimgui_impl.cpp
+)
+
+
+#add_subdirectory(cimgui)
+#add_library(cimgui_lib INTERFACE)
+#target_include_directories(cimgui_lib INTERFACE
+#        ${CMAKE_CURRENT_DIRECTORY}/cimgui
+#        ${CMAKE_CURRENT_DIRECTORY}/cimgui/imgui
+#        ${CMAKE_CURRENT_DIRECTORY}/cimgui/imgui/backends
+#)
+#target_link_libraries(cimgui_lib INTERFACE cimgui)
 
 # cscout static analysis
 #add_subdirectory(cscout)
@@ -31,14 +45,26 @@ target_link_libraries(cimgui_lib INTERFACE cimgui)
 
 
 # E ----------------------------------------------------------------------------------------------
+find_package(EXPAT 2.2.8 MODULE REQUIRED)
+add_library(xml_lib INTERFACE)
+target_link_libraries(xml_lib INTERFACE EXPAT::EXPAT)
+
 # F ----------------------------------------------------------------------------------------------
 # G ----------------------------------------------------------------------------------------------
+add_subdirectory(glew/build/cmake)
+add_library(glew_lib INTERFACE)
+target_link_libraries(glew_lib INTERFACE glew)
 # H ----------------------------------------------------------------------------------------------
 # I ----------------------------------------------------------------------------------------------
 # J ----------------------------------------------------------------------------------------------
+# jansson json library
 # K ----------------------------------------------------------------------------------------------
 # L ----------------------------------------------------------------------------------------------
+#add_subdirectory(libxml2)
+#add_library(xml_lib INTERFACE)
+#target_link_libraries(xml_lib INTERFACE LibXml2::LibXml2)
 # M ----------------------------------------------------------------------------------------------
+
 # N ----------------------------------------------------------------------------------------------
 # O ----------------------------------------------------------------------------------------------
 # P ----------------------------------------------------------------------------------------------
