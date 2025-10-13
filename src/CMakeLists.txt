@@ -64,8 +64,6 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/PFEngineState.c
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_define.h
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/engine_define.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/engine/PFEngineConfiguration.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/engine/project/PFProjectConfiguration.h
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/pf_engine_entry_point.h
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/pf_engine_entry_point.c
         ${CMAKE_CURRENT_SOURCE_DIR}/engine/entry_point/pf_engine_initialization.h
@@ -81,10 +79,8 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log.c
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log_category.h
         # memory
-        ${CMAKE_CURRENT_SOURCE_DIR}/memory/type/typed_pointer.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/PFAllocator.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/allocator_utilities.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/memory/handle/PFMemoryHandle.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/QuickHashTable.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/PFCompactHashTable.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/PFCompactHashTable.c
@@ -129,9 +125,6 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.h
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring.c
         ${CMAKE_CURRENT_SOURCE_DIR}/string/pstring_utf8.h
-        #parse/pf_config/pf_config.h
-        #parse/pf_config/pf_config.c
-        #parse/pf_config/pf_config_structs.h
         # t, u,v,w,x,y,z 
 )
 
