@@ -34,3 +34,24 @@
 [submodule "vendor/zlog"]
 	path = vendor/zlog
 	url = https://github.com/HardySimpson/zlog.git
+[submodule "vendor/libxml2"]
+	path = vendor/libxml2
+	url = https://gitlab.gnome.org/GNOME/libxml2.git
+[submodule "vendor/-recursive"]
+	path = vendor/-recursive
+	url = https://github.com/nigels-com/glew.git
+[submodule "vendor/glew"]
+	path = vendor/glew
+	url = https://github.com/nigels-com/glew.git
+[submodule "vendor/Nuklear"]
+	path = vendor/Nuklear
+	url = https://github.com/Immediate-Mode-UI/Nuklear.git
+[submodule "vendor/cJSON"]
+	path = vendor/cJSON
+	url = https://github.com/DaveGamble/cJSON.git
+[submodule "vendor/MiniXML"]
+	path = vendor/MiniXML
+	url = https://github.com/chuckatkins/MiniXML.git
+[submodule "vendor/libexpat"]
+	path = vendor/libexpat
+	url = https://github.com/libexpat/libexpat.git
