@@ -726,7 +726,7 @@ START_TEST(fn_pf_allocator_free_list_get_node_by_index__returns_head_node__for_z
 }
 END_TEST
 
-START_TEST(fn_pf_allocator_fn_list_get_node_by_index__returns_null__for_out_of_range_index) {
+START_TEST(fn_pf_allocator_free_list_get_node_by_index__returns_null__for_out_of_range_index) {
     size_t const size = 512;
     char memory[size];
     PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, size);
@@ -737,6 +737,109 @@ START_TEST(fn_pf_allocator_fn_list_get_node_by_index__returns_null__for_out_of_r
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
+
+// fn pf_allocator_free_list_get_managing_node ---------------------------------------------------------------
+
+START_TEST(fn_pf_allocator_free_list_get_managing_node__is_defined) {
+    PFAllocator_FreeListNode_t*(*fptr)(PFAllocator_FreeList_t const *, void*) = pf_allocator_free_list_get_managing_node;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_get_managing_node__returns_null__for_null_PFAllocator_FreeList_t_param) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_get_managing_node(NULL, NULL));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_get_managing_node__sets_correct_error_message__for_null_PFAllocator_FreeList_t_param) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_get_managing_node(NULL, NULL));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Got null ptr to PFAllocator_FreeList_t param!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_get_managing_node__returns_null__for_null_memory_param) {
+    PFAllocator_FreeList_t const allocator = {0};
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_get_managing_node(&allocator, NULL));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_get_managing_node__sets_correct_error_message__for_null_memory_param) {
+    PFAllocator_FreeList_t const allocator = {0};
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_get_managing_node(&allocator, NULL));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Got null ptr to memory param!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_get_managing_node__returns_null__for_unowned_memory) {
+    char memory[512] = {0};
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, 512);
+    char unowned_memory[64] = {0};
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_get_managing_node(allocator, unowned_memory));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_get_managing_node__sets_correct_error_message__for_unowned_memory) {
+    char memory[512] = {0};
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, 512);
+    char unowned_memory[64] = {0};
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_get_managing_node(allocator, unowned_memory));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Got a ptr to memory which is not owned by this allocator!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+
+
+
+START_TEST(fn_pf_allocator_free_list_get_managing_node__works__when_called) {
+    char memory[512];
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, 512);
+    ck_assert_ptr_nonnull(allocator);
+
+    void* alloc1 = allocator->pf_malloc(allocator, 128);
+    void* alloc2 = allocator->pf_malloc(allocator, 128);
+    void* alloc3 = allocator->pf_malloc(allocator, 128);
+    ck_assert_ptr_nonnull(alloc1);
+    ck_assert_ptr_nonnull(alloc2);
+
+    // there is actually enough memory for this allocation, but it's smaller than a reserve amount
+    // which is defined in PFAllocator, so there isn't enough still there for another allocation
+    // the last successful allocation has gotten some extra memory, but they haven't been notified
+    ck_assert_ptr_null(alloc3);
+    ck_assert_int_eq(0, allocator->free_memory);
+
+    PFAllocator_FreeListNode_t* alloc1_node = allocator->head;
+    PFAllocator_FreeListNode_t* alloc2_node = alloc1_node->next;
+    ck_assert_ptr_nonnull(alloc1_node);
+    ck_assert_ptr_nonnull(alloc2_node);
+
+    ck_assert_ptr_eq(alloc1_node, pf_allocator_free_list_get_managing_node(allocator, alloc1));
+    ck_assert_ptr_eq(alloc2_node, pf_allocator_free_list_get_managing_node(allocator, alloc2));
+}
+END_TEST
+
+
+
+
+
+
 
 
 // fn pf_allocator_is_power_of_two ---------------------------------------------------------------------------
@@ -1292,6 +1395,8 @@ START_TEST(fn_pf_allocator_free_list_find_best__returns_first_node_with_best_fit
     PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, 512);
     ck_assert_ptr_nonnull(allocator);
 
+    PFAllocator_FreeListNode_t* prev_node = NULL;
+    
     // several nodes which aren't allocated, but which "haven't been cleaned up"
     // by the coalescing operation during free (or are sticking around for another reason)
     PFAllocator_FreeListNode_t* node0 = allocator->head;
@@ -1313,10 +1418,11 @@ START_TEST(fn_pf_allocator_free_list_find_best__returns_first_node_with_best_fit
     pf_allocator_free_list_node_set_block_size(&node3, 80);
     pf_allocator_free_list_node_set_block_size(&node4, 80);
 
-    PFAllocator_FreeListNode_t const * node = pf_allocator_free_list_find_best(allocator, 64, 16, NULL, NULL);
+    PFAllocator_FreeListNode_t const * node = pf_allocator_free_list_find_best(allocator, 64, 16, NULL, &prev_node);
     ck_assert_ptr_nonnull(node);
     // node3 and node4 are also valid choices, but they aren't "better", so we should be getting node2 back
     ck_assert_ptr_eq(node, &node2);
+    ck_assert_ptr_eq(prev_node, &node1);
     ck_assert_int_eq(pf_allocator_free_list_node_get_block_size(node), 80);
     ck_assert_int_eq(FALSE, pf_allocator_free_list_node_get_is_allocated(node));
     PF_UNSUPPRESS_ERRORS
@@ -1328,7 +1434,7 @@ END_TEST
 // fn pf_allocator_free_list_malloc --------------------------------------------------------------------------
 
 START_TEST(fn_pf_allocator_free_list_malloc__is_defined) {
-    void*(*fptr)(PFAllocator_FreeList_t*, size_t const) = pf_allocator_free_list_malloc;
+    void*(*fptr)(PFAllocator_FreeList_t*, size_t) = pf_allocator_free_list_malloc;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
@@ -1498,6 +1604,32 @@ START_TEST(fn_pf_allocator_free_list_malloc__returns_memory__if_it_gives_out_the
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
+
+START_TEST(fn_pf_allocator_free_list_malloc__works_for_several_allocations__when_called) {
+    size_t const memory_size = 4096;
+    void* memory = malloc(memory_size);
+    memset(memory, 0, memory_size);
+
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, memory_size);
+    ck_assert_ptr_nonnull(allocator);
+
+    size_t const alloc_size = 256;
+    void* alloc1 = allocator->pf_malloc(allocator, alloc_size);
+    void* alloc2 = allocator->pf_malloc(allocator, alloc_size);
+    void* alloc3 = allocator->pf_malloc(allocator, alloc_size);
+    void* alloc4 = allocator->pf_malloc(allocator, alloc_size);
+
+    ck_assert_ptr_nonnull(alloc1);
+    ck_assert_ptr_nonnull(alloc2);
+    ck_assert_ptr_nonnull(alloc3);
+    ck_assert_ptr_nonnull(alloc4);
+
+    free(memory);
+}
+END_TEST
+
+
+
 
 // pf_allocator_free_list_realloc ----------------------------------------------------------------------------
 

@@ -262,6 +262,39 @@ void * pf_allocator_free_list_node_get_node_by_index(PFAllocator_FreeList_t cons
     return NULL;
 }
 
+PFAllocator_FreeListNode_t * pf_allocator_free_list_get_managing_node(
+    PFAllocator_FreeList_t const * allocator,
+    void* memory)
+{
+    if (allocator == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Got null ptr to PFAllocator_FreeList_t param!");
+        return NULL;
+    }
+    if (memory == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Got null ptr to memory param!");
+        return NULL;
+    }
+    if ((uintptr_t)memory < (uintptr_t)allocator || (uintptr_t)memory > (uintptr_t)(allocator + allocator->base_memory_size)) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Got a ptr to memory which is not owned by this allocator!");
+        return NULL;
+    }
+
+    PFAllocator_FreeListNode_t* node = allocator->head;
+    while (node != NULL) {
+        size_t const node_size = sizeof(PFAllocator_FreeListNode_t);
+        size_t const node_padding = pf_allocator_free_list_node_get_padding(node);
+        void* data = (void*)((uintptr_t)node + node_size + node_padding);
+        if (memory == data) {
+            return node;
+        }
+        node = node->next;
+    }
+
+    PF_LOG_CRITICAL(PF_ALLOCATOR, "Could not find managing node for this memory! Allocator is likely in a bad state!");
+
+    return NULL;
+}
+
 int32_t pf_allocator_is_power_of_two(size_t const size) {
     // we're not checking against zero, b/c size_t can't be negative
     return (size & (size - 1)) == 0;
@@ -616,6 +649,11 @@ void* pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t co
         // update the block sizes
         pf_allocator_free_list_node_set_block_size(next_node, next_node_block_size);
         pf_allocator_free_list_node_set_block_size(alloc_owning_node, bisect_at_offset);
+    } else {
+        // there isn't enough memory left to justify cutting this block, so, in effect,
+        // we've given out the last allocation we can give.  This user can still query
+        // the block size to find out exactly how much they're allowed to use
+        allocator->free_memory = 0;
     }
 
     return (void*)alloc_owning_node_user_memory_offset;
@@ -623,7 +661,7 @@ void* pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t co
 
 void * pf_allocator_free_list_realloc(
     PFAllocator_FreeList_t* allocator,
-    void* ptr,
+    void* memory,
     size_t const size)
 {
     return NULL;
@@ -631,17 +669,19 @@ void * pf_allocator_free_list_realloc(
 
 int32_t pf_allocator_free_list_free(
     PFAllocator_FreeList_t* allocator,
-    void* ptr)
+    void* memory)
 {
     if (allocator == NULL) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Got null ptr to allocator!");
         return PFEC_ERROR_NULL_PTR;
     }
-    if (ptr == NULL) {
+    if (memory == NULL) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Was asked to free ptr to null!");
         return PFEC_ERROR_NULL_PTR;
     }
 
+
+    //PFAllocator_FreeListNode_t* node = NULL;
 
 
 

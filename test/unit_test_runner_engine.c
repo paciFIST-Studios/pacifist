@@ -664,8 +664,18 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_get_node_by_index__returns_null__for_null_allocator_param);
     ADD_TEST(fn_pf_allocator_free_list_get_node_by_index__sets_correct_error_message__for_null_allocator_param);
     ADD_TEST(fn_pf_allocator_free_list_get_node_by_index__returns_head_node__for_zero_index);
-    ADD_TEST(fn_pf_allocator_fn_list_get_node_by_index__returns_null__for_out_of_range_index);
+    ADD_TEST(fn_pf_allocator_free_list_get_node_by_index__returns_null__for_out_of_range_index);
 
+    // fn pf_allocator_free_list_get_managing_node
+    ADD_TEST(fn_pf_allocator_free_list_get_managing_node__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_get_managing_node__returns_null__for_null_PFAllocator_FreeList_t_param);
+    ADD_TEST(fn_pf_allocator_free_list_get_managing_node__sets_correct_error_message__for_null_PFAllocator_FreeList_t_param);
+    ADD_TEST(fn_pf_allocator_free_list_get_managing_node__returns_null__for_null_memory_param);
+    ADD_TEST(fn_pf_allocator_free_list_get_managing_node__sets_correct_error_message__for_null_memory_param);
+    ADD_TEST(fn_pf_allocator_free_list_get_managing_node__returns_null__for_unowned_memory);
+    ADD_TEST(fn_pf_allocator_free_list_get_managing_node__sets_correct_error_message__for_unowned_memory);
+
+    ADD_TEST(fn_pf_allocator_free_list_get_managing_node__works__when_called);
     
     // fn pf_allocator_is_power_of_two
     ADD_TEST(fn_pf_allocator_is_power_of_two__is_defined);
@@ -744,7 +754,9 @@ int main(void) {
     //ADD_TEST(fn_pf_allocator_free_list_malloc__returns_null__if_the_node_it_finds_for_allocation_is_already_allocated);
     //ADD_TEST(fn_pf_allocator_free_list_malloc__sets_correct_error_message__if_the_node_it_finds_for_allocation_is_already_allocated);
     ADD_TEST(fn_pf_allocator_free_list_malloc__returns_memory__if_it_gives_out_the_last_byte_during_request);
+    ADD_TEST(fn_pf_allocator_free_list_malloc__works_for_several_allocations__when_called);
 
+    
     // fn pf_allocator_free_list_realloc
     ADD_TEST(fn_pf_allocator_free_list_realloc__is_defined);
 

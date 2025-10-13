@@ -213,6 +213,16 @@ int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list);
 void* pf_allocator_free_list_node_get_node_by_index(PFAllocator_FreeList_t const * allocator, size_t idx);
 
 
+/**
+ * @brief Given a memory address, returns the node managing that address (or NULL if there's a problem)
+ * @note  returns NULL if the given memory is not actually managed by the given allocator
+ *
+ * @param allocator 
+ * @param memory 
+ * @return 
+ */
+PFAllocator_FreeListNode_t* pf_allocator_free_list_get_managing_node(PFAllocator_FreeList_t const * allocator, void* memory);
+
 
 /**
  * @brief Returns TRUE(1), if the size provided is a power of two
@@ -257,7 +267,7 @@ size_t pf_allocator_free_list_get_memory_overhead_size(PFAllocator_FreeList_t co
  *       This fn does check that the header address is aligned as well.
  *
  *
- * @param ptr - the memory address which the header will live at.  This MUST be aligned to the alignment param
+ * @param header_address - the memory address which the header will live at.  This MUST be aligned to the alignment param
  * @param alignment - usually 16 byte aligned, but no default
  * @param header_size - the size of the header to calculate padding for
  * @return 
@@ -311,19 +321,19 @@ void* pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t re
  * @brief a Realloc fn which uses the PFAllocator_FreeList_t
  *
  * @param allocator
- * @param ptr 
+ * @param memory 
  * @param size 
  * @return 
  */
-void* pf_allocator_free_list_realloc(PFAllocator_FreeList_t* allocator, void* ptr, size_t size);
+void* pf_allocator_free_list_realloc(PFAllocator_FreeList_t* allocator, void* memory, size_t size);
 
 /**
  * @brief a Free fn which uses the PFAllocator_FreeList_t
  *
  * @param allocator
- * @param ptr 
+ * @param memory 
  */
-int32_t pf_allocator_free_list_free(PFAllocator_FreeList_t* allocator, void* ptr);
+int32_t pf_allocator_free_list_free(PFAllocator_FreeList_t* allocator, void* memory);
 
 
 
