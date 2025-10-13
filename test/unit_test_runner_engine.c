@@ -613,13 +613,12 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_node_get_allocation_size__sets_correct_error_message__for_null_ptr_to_node);
     ADD_TEST(fn_pf_allocator_free_list_node_get_allocation_size__returns_correct_value__for_allocation);
 
-    
     //// fn pf_allocator_free_list_node_get_padding
     ADD_TEST(fn_pf_allocator_free_list_node_get_padding_is_defined);
     ADD_TEST(fn_pf_allocator_free_list_node_get_padding__returns_correct_error_code__for_null_ptr_to_node);
     ADD_TEST(fn_pf_allocator_free_list_node_get_padding__sets_correct_error_message__for_null_ptr_to_node);
     ADD_TEST(fn_pf_allocator_free_list_node_get_padding__returns_correct_padding_value__during_correct_use);
-    
+
     // PFAllocator_FreeList_t
     ADD_TEST(struct_PFAllocator_FreeList_t__is_defined);
     ADD_TEST(struct_PFAllocator_FreeList_t__has_expected_size);
@@ -698,7 +697,16 @@ int main(void) {
     
     // fn pf_allocator_free_list_calculate_padding_and_header
     ADD_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__returns_correct_error_code__for_null_ptr_arg);
+    ADD_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__sets_correct_error_message__for_null_ptr_arg);
+    ADD_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__returns_correct_error_code__for_ptr_misaligned);
+    ADD_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__sets_correct_error_message__for_ptr_misaligned);
+    ADD_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__returns_correct_error_code__for_not_power_of_two_alignment);
+    ADD_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__sets_correct_error_message__for_not_power_of_two_alignment);
+    ADD_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__returns_zero__if_header_is_naturally_aligned_to_boundary);
+    ADD_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__returns_padding_number__when_used_correctly);
 
+    
     // fn pf_allocator_free_list_find_first
     ADD_TEST(fn_pf_allocator_free_list_find_first__is_defined);
 
@@ -721,7 +729,21 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_malloc__sets_correct_error_message__if_the_node_it_finds_for_allocation_is_already_allocated);
     ADD_TEST(fn_pf_allocator_free_list_malloc__returns_memory__if_it_gives_out_the_last_byte_during_request);
 
+    // fn pf_allocator_free_list_realloc
+    ADD_TEST(fn_pf_allocator_free_list_realloc__is_defined);
 
+    // fn pf_allocator_free_list_free
+    ADD_TEST(fn_pf_allocator_free_list_free__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_free__returns_correct_error_code__for_null_ptr_to_allocator);
+    ADD_TEST(fn_pf_allocator_free_list_free__sets_correct_error_message__for_null_ptr_to_allocator);
+    ADD_TEST(fn_pf_allocator_free_list_free__returns_correct_error_code__for_null_ptr_to_vacated_memory);
+    ADD_TEST(fn_pf_allocator_free_list_free__sets_correct_error_message__for_null_ptr_to_vacated_memory);
+
+
+    //ADD_TEST(fn_pf_allocator_free_list_free___);
+
+
+    
     // PFAllocator_FreeList_t general usage tests
     ADD_TEST(fn_PFAllocator_FreeList_t__correctly_creates_nodes__during_usage);
 

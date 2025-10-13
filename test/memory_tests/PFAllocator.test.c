@@ -2,8 +2,8 @@
 
 // include
 #include <check.h>
-#include "../pftest_utilities.h"
-#include "../../src/memory/allocator/PFAllocator.h"
+#include <pftest_utilities.h>
+#include <memory/allocator/PFAllocator.h>
 
 // stdlib
 #include <stdlib.h>
@@ -418,7 +418,7 @@ START_TEST(struct_PFAllocator_FreeList_t__has_expected_members) {
 END_TEST
 
 
-// fn pf_allocator_free_list_initialize ----------------------------------------------------------------------
+// fn pf_allocator_free_list_create_with_memory --------------------------------------------------------------
 
 START_TEST(fn_pf_allocator_free_list_create_with_memory__is_defined) {
     PFAllocator_FreeList_t*(*fptr)(void*, size_t const) = &pf_allocator_free_list_create_with_memory;
@@ -981,19 +981,105 @@ START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__is_defined) {
 }
 END_TEST
 
+START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__returns_correct_error_code__for_null_ptr_arg) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding_and_header((uintptr_t)NULL, 16, 16));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__sets_correct_error_message__for_null_ptr_arg) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding_and_header((uintptr_t)NULL, 16, 16));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * message = "Ptr argument is unexpectedly null!";
+    ck_assert_in_error_buffer(message);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__returns_correct_error_code__for_ptr_misaligned) {
+    char data[128] = {0};
+    char* ptr = data + 3;
+
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding_and_header((uintptr_t)ptr, 16, 16));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__sets_correct_error_message__for_ptr_misaligned) {
+    char data[128] = {0};
+    char* ptr = data + 3;
+
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding_and_header((uintptr_t)ptr, 16, 16));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * message = "Ptr is not aligned to given alignment!";
+    ck_assert_in_error_buffer(message);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__returns_correct_error_code__for_not_power_of_two_alignment) {
+    char data[128] = {0};
+
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding_and_header((uintptr_t)data, 15, 16));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__sets_correct_error_message__for_not_power_of_two_alignment) {
+    char const data[128] = {0};
+
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding_and_header((uintptr_t)data, 15, 16));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * message = "Requested alignment is not a power of two!";
+    ck_assert_in_error_buffer(message);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__returns_zero__if_header_is_naturally_aligned_to_boundary) {
+    char const data[128] = {0};
+
+    for (size_t i = 0; i < 4; i++) {
+        ck_assert_int_eq(0, pf_allocator_free_list_calculate_padding_and_header((uintptr_t)data, 16, 16*i));
+    }
+
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__returns_padding_number__when_used_correctly) {
+    char data[128] = {0};
+    size_t const alignment = 16;
+
+    // check for the mod-zero case
+    ck_assert_int_eq(0, pf_allocator_free_list_calculate_padding_and_header((uintptr_t)data, alignment, alignment));
+
+    // check for the other cases
+    for (size_t i = 1; i < 16; i++) {
+        ck_assert_int_eq(alignment-i, pf_allocator_free_list_calculate_padding_and_header((uintptr_t)data, alignment, alignment+i));
+    }
+}
+
+
 
 // fn pf_allocator_free_list_find_first ----------------------------------------------------------------------
 START_TEST(fn_pf_allocator_free_list_find_first__is_defined) {
     PFAllocator_FreeListNode_t* (*fptr)(
         PFAllocator_FreeList_t const * free_list,
-        size_t const list_size,
-        size_t const alignment,
+        size_t list_size,
+        size_t alignment,
         size_t * padding,
         PFAllocator_FreeListNode_t** previous_node
     ) = &pf_allocator_free_list_find_first;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
+
 
 
 // fn pf_allocator_free_list_find_best -----------------------------------------------------------------------
@@ -1182,6 +1268,94 @@ START_TEST(fn_pf_allocator_free_list_malloc__returns_memory__if_it_gives_out_the
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
+
+// pf_allocator_free_list_realloc ----------------------------------------------------------------------------
+
+START_TEST(fn_pf_allocator_free_list_realloc__is_defined) {
+    void*(*fptr)(PFAllocator_FreeList_t*, void*, size_t) = pf_allocator_free_list_realloc;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+// pf_allocator_free_list_free -------------------------------------------------------------------------------
+
+START_TEST(fn_pf_allocator_free_list_free__is_defined) {
+    int32_t(*fptr)(PFAllocator_FreeList_t*, void*) = pf_allocator_free_list_free;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_free__returns_correct_error_code__for_null_ptr_to_allocator) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_free(NULL, NULL));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_free__sets_correct_error_message__for_null_ptr_to_allocator) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_free(NULL, NULL));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Got null ptr to allocator!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_free__returns_correct_error_code__for_null_ptr_to_vacated_memory) {
+    PFAllocator_FreeList_t allocator = {0};
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_free(&allocator, NULL));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_free__sets_correct_error_message__for_null_ptr_to_vacated_memory) {
+    PFAllocator_FreeList_t allocator = {0};
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_free(&allocator, NULL));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Was asked to free ptr to null!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_free___) {
+    size_t const size = 512;
+    char memory[size];
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, size);
+    // verify the allocator seems set up correctly
+    ck_assert_int_eq(size, allocator->base_memory_size);
+    size_t const expected_free_memory_size = size - sizeof(PFAllocator_FreeList_t) - sizeof(PFAllocator_FreeListNode_t);
+    ck_assert_int_eq(expected_free_memory_size, allocator->free_memory);
+
+    // do an allocation
+    size_t const alloc1_size_request =  128;
+    void* alloc1 = allocator->pf_malloc(allocator, alloc1_size_request);
+    ck_assert_ptr_nonnull(alloc1);
+
+    for (size_t i = 0; i < alloc1_size_request; i++) {
+        char* write = (char*)((uintptr_t)alloc1 + i);
+        *write = 'X';
+    }
+
+    
+    // verify the allocator seems to have allocated the correct amount
+    size_t const expected_free_memory_after_alloc = expected_free_memory_size - alloc1_size_request - sizeof(PFAllocator_FreeListNode_t);
+    ck_assert_int_eq(expected_free_memory_after_alloc, allocator->free_memory);
+
+    // verify the allocator seems to have allocated, starting at the correct address
+    uintptr_t const expected_memory_address = (uintptr_t)allocator->head;
+    ck_assert_int_eq(expected_memory_address, (uintptr_t)alloc1);
+    uintptr_t const expected_node_address = (uintptr_t)alloc1 - sizeof(PFAllocator_FreeListNode_t);
+    ck_assert_int_eq(expected_node_address, (uintptr_t)allocator->head);
+
+    
+    allocator->pf_free(allocator, alloc1);
+}
+END_TEST
+
 
 
 // PFAllocator_FreeList_t general usage tests ----------------------------------------------------------------
