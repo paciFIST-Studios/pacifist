@@ -12,7 +12,6 @@
 // engine
 #include "core/define.h"
 #include "core/error.h"
-#include "string/pstring.h"
 
 // -----------------------------------------------------------------------------------------------------------
 // PFAllocator FreeList 
@@ -274,8 +273,6 @@ END_TEST
 
 START_TEST(fn_pf_allocator_free_list_node_set_block_size__sets_correct_error_message__for_too_large_block_size) {
     PFAllocator_FreeListNode_t node = {0};
-    size_t const block_size = -1;
-    size_t const all_but_top_five_bits = ((1ULL << ((sizeof(size_t) * 8) - 5)) - 1);
 
     pf_clear_error();
     PF_SUPPRESS_ERRORS
@@ -745,7 +742,7 @@ END_TEST
 // fn pf_allocator_is_power_of_two ---------------------------------------------------------------------------
 
 START_TEST(fn_pf_allocator_is_power_of_two__is_defined) {
-    int32_t(*fptr)(size_t const) = &pf_allocator_is_power_of_two;
+    int32_t(*fptr)(size_t) = &pf_allocator_is_power_of_two;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
@@ -753,7 +750,8 @@ END_TEST
 // fn pf_allocator_should_bisect_memory ----------------------------------------------------------------------
 
 START_TEST(fn_pf_allocator_should_bisect_memory__is_defined) {
-    int32_t(*fptr)(size_t const, size_t const, size_t*) = &pf_allocator_should_bisect_memory;
+    int32_t(*fptr)(size_t, size_t, size_t*) = &pf_allocator_should_bisect_memory;
+    ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
@@ -1086,14 +1084,85 @@ END_TEST
 START_TEST(fn_pf_allocator_free_list_find_best__is_defined) {
     PFAllocator_FreeListNode_t* (*fptr)(
         PFAllocator_FreeList_t const * free_list,
-        size_t const list_size,
-        size_t const alignment,
-        size_t * padding,
+        size_t list_size,
+        size_t alignment,
+        size_t* padding,
         PFAllocator_FreeListNode_t** previous_node
         ) = &pf_allocator_free_list_find_best;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
+
+START_TEST(fn_pf_allocator_free_list_find_best__returns_null__for_null_free_list_param) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_find_best(NULL, 16, 16, NULL, NULL));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_find_best__sets_correct_error_message__for_null_free_list_param) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_find_best(NULL, 16, 16, NULL, NULL));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Got null ptr to PFAllocator_FreeList_t!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_find_best__returns_null__for_requested_size_smaller_than_node_size) {
+    PFAllocator_FreeList_t const allocator = {0};
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_find_best(&allocator, 15, 16, NULL, NULL));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_find_best__sets_correct_error_message__for_requested_size_smaller_than_node_size) {
+    PFAllocator_FreeList_t const allocator = {0};
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_find_best(&allocator, 15, 16, NULL, NULL));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Got request for too-small allocation!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_find_best__returns_null__for_non_power_of_two_alignment) {
+    PFAllocator_FreeList_t const allocator = {0};
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_find_best(&allocator, sizeof(PFAllocator_FreeListNode_t), 17, NULL, NULL));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_find_best__sets_correct_error_message__for_non_power_of_two_alignment) {
+    PFAllocator_FreeList_t const allocator = {0};
+    PF_SUPPRESS_ERRORS
+    ck_assert_ptr_null(pf_allocator_free_list_find_best(&allocator, sizeof(PFAllocator_FreeListNode_t), 17, NULL, NULL));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Got request for non-power-of-two alignment!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+// fn works w/o optional params
+// fn works w/ optional params
+
+// returns null if all nodes are allocated
+// returns null if unallocated nodes cannot hold allocation request
+// returns best fitting node, not first fitting node
+// correctly returns best fit node, if it's last
+// correctly returns best fit node, if it's first
+
+
+
+
+
+
+
 
 // fn pf_allocator_free_list_malloc --------------------------------------------------------------------------
 

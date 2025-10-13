@@ -180,7 +180,7 @@ typedef struct PFAllocator_FreeList_t {
 
     void* (*pf_malloc)( struct PFAllocator_FreeList_t* allocator, size_t size);
     void* (*pf_realloc)(struct PFAllocator_FreeList_t* allocator, void* ptr, size_t size);
-    void  (*pf_free)(   struct PFAllocator_FreeList_t* allocator, void* ptr);
+    int32_t (*pf_free)( struct PFAllocator_FreeList_t* allocator, void* ptr);
 
 } PFAllocator_FreeList_t;
 
@@ -251,14 +251,18 @@ size_t pf_allocator_free_list_get_allocator_available_memory_size(PFAllocator_Fr
 size_t pf_allocator_free_list_get_memory_overhead_size(PFAllocator_FreeList_t const * pf_free_list);
 
 /**
- * @brief
+ * @brief given an address, a header size, and an alignment width, determines how much padding you should add, the next byte after your header+padding is also aligned
+ * @note In a strict sense, we're aligning something which comes _after_ the header.
+ *       For FreeList nodes, each node is a header, and the padding exists, to make sure the data is aligned.
+ *       This fn does check that the header address is aligned as well.
  *
- * @param ptr 
- * @param alignment 
- * @param header_size 
+ *
+ * @param ptr - the memory address which the header will live at.  This MUST be aligned to the alignment param
+ * @param alignment - usually 16 byte aligned, but no default
+ * @param header_size - the size of the header to calculate padding for
  * @return 
  */
-size_t pf_allocator_free_list_calculate_padding_and_header(uintptr_t ptr, uintptr_t alignment, size_t header_size);
+size_t pf_allocator_free_list_calculate_padding(uintptr_t header_address, uintptr_t alignment, size_t header_size);
 
 /**
  * @brief Searches the PFAllocator_FreeList_t for an empty memory block, and takes the first available
@@ -283,16 +287,16 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_first(
  * @param free_list 
  * @param requested_size 
  * @param alignment 
- * @param out_padding 
- * @param out_previous_node 
+ * @param optional_out_padding - the padding between the node, and its data, fn will work if this is NULL 
+ * @param optional_out_previous_node - the node just prior in the linked list, fn will work if this is NULL
  * @return 
  */
 PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     PFAllocator_FreeList_t const * free_list,
     size_t requested_size,
     size_t alignment,
-    uintptr_t* out_padding,
-    PFAllocator_FreeListNode_t** out_previous_node);
+    uintptr_t* optional_out_padding,
+    PFAllocator_FreeListNode_t** optional_out_previous_node);
 
 /**
  * @brief a Malloc fn which uses the PFAllocator_FreeList_t 
@@ -319,10 +323,12 @@ void* pf_allocator_free_list_realloc(PFAllocator_FreeList_t* allocator, void* pt
  * @param allocator
  * @param ptr 
  */
-void pf_allocator_free_list_free(PFAllocator_FreeList_t* allocator, void* ptr);
+int32_t pf_allocator_free_list_free(PFAllocator_FreeList_t* allocator, void* ptr);
 
 
 
+__attribute__((unused))
+void pf_allocator_free_list_do_compaction(PFAllocator_FreeList_t* allocator);
 
 
 

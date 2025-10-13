@@ -7,6 +7,8 @@
 #include <stdlib.h>
 // framework
 // engine
+#include <memory/hash_table/PFCompactHashTable.h>
+
 #include "core/assert.h"
 #include "core/debug.h"
 #include "core/define.h"
@@ -294,7 +296,7 @@ int32_t pf_allocator_should_bisect_memory(
     return TRUE;
 }
 
-size_t pf_allocator_free_list_get_allocator_available_memory_size(PFAllocator_FreeList_t * free_list) {
+size_t pf_allocator_free_list_get_allocator_available_memory_size(PFAllocator_FreeList_t* free_list) {
     if (free_list == NULL) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t pointer is unexpectedly null!");
         return PFEC_ERROR_NULL_PTR;
@@ -356,35 +358,36 @@ size_t pf_allocator_free_list_get_memory_overhead_size(PFAllocator_FreeList_t co
 }
 
 
-
-size_t pf_allocator_free_list_calculate_padding_and_header(
-    uintptr_t const ptr,
+size_t pf_allocator_free_list_calculate_padding(
+    uintptr_t const header_address,
     uintptr_t const alignment,
     size_t const header_size)
 {
-    PF_ASSERT(pf_allocator_is_power_of_two(alignment));
-
-    uintptr_t padding = 0;
-
-    uintptr_t const modulo = ptr & (alignment - 1);
-    if (modulo != 0) {
-        padding = alignment - modulo;
+    if (!pf_allocator_is_power_of_two(alignment)) {
+        char message[64] ={0};
+        snprintf(message, 64, "Requested alignment is not a power of two! Align=%ld", alignment);
+        PF_LOG_CRITICAL(PF_ALLOCATOR, message);
+        return -1;
+    }
+    if (header_address == 0) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Header_address argument is unexpectedly null!");
+        return -1;
+    }
+    if (header_address % alignment != 0) {
+        char message[80] = {0};
+        snprintf(message,  80, "Header_address is not aligned to given alignment! Align=%ld, OffBy=%ld", alignment, header_address % alignment);
+        PF_LOG_CRITICAL(PF_ALLOCATOR, message);
+        return -1;
     }
 
-    uintptr_t needed_space = (uintptr_t)header_size;
-    if (padding < needed_space) {
-        needed_space -= padding;
-        if ((needed_space & (alignment - 1)) != 0) {
-            padding += alignment * (1 + (needed_space / alignment));
-        } else {
-            padding += alignment * (needed_space / alignment);
-        }
+    // is the header naturally aligned to this boundary?
+    size_t const modular_remainder = header_size % alignment;
+    if (modular_remainder == 0) {
+        return 0;
     }
 
-    return (size_t)padding;
+    return alignment - modular_remainder;
 }
-
-
 
 
 PFAllocator_FreeListNode_t* pf_allocator_free_list_find_first(
@@ -399,18 +402,24 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_first(
 
     uintptr_t padding = 0;
 
+    // there will always be at least 1 unallocated node, unless the allocator is 100% full
     while (node != NULL) {
-        size_t const header_size = sizeof(PFAllocator_FreeListNode_t);
 
-        padding = pf_allocator_free_list_calculate_padding_and_header(
-            (uintptr_t)node,
-            (uintptr_t)alignment,
-            header_size);
+        // find the unallocated node, and see if it can hold this allocation
+        if (!pf_allocator_free_list_node_get_is_allocated(node)) {
 
-        size_t const required_sz = requested_size + padding;
-        size_t const node_sz = pf_allocator_free_list_node_get_block_size(node);
-        if (node_sz >= required_sz) {
-            break;
+            padding = pf_allocator_free_list_calculate_padding(
+                (uintptr_t)node,
+                (uintptr_t)alignment,
+                sizeof(PFAllocator_FreeListNode_t));
+ 
+            size_t const required_sz = requested_size + padding;
+            size_t const node_sz = pf_allocator_free_list_node_get_block_size(node);
+
+            // actually, it can
+            if (node_sz >= required_sz) {
+                break;
+            }
         }
 
         prev_node = node;
@@ -428,9 +437,29 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     PFAllocator_FreeList_t const * free_list,
     size_t const requested_size,
     size_t const alignment,
-    uintptr_t* out_padding,
-    PFAllocator_FreeListNode_t** out_previous_node)
+    uintptr_t* optional_out_padding,
+    PFAllocator_FreeListNode_t** optional_out_previous_node)
 {
+    if (free_list == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Got null ptr to PFAllocator_FreeList_t!");
+        return NULL;
+    }
+    if (requested_size < sizeof(PFAllocator_FreeListNode_t)) {
+        char message[128] = {0};
+        snprintf(message, 128, "Got request for too-small allocation!  Requested=%ld, Minimum=%ld", requested_size, sizeof(PFAllocator_FreeListNode_t));
+        PF_LOG_CRITICAL(PF_ALLOCATOR, message);
+        return NULL;
+    }
+    if (!pf_allocator_is_power_of_two(alignment)) {
+        char message[128] = {0};
+        snprintf(message, 128, "Got request for non-power-of-two alignment! RequestedAlign=%ld", alignment);
+        PF_LOG_CRITICAL(PF_ALLOCATOR, message);
+        return NULL;
+    }
+    // we're not checking for these param, b/c they're optional
+    //if (out_padding == NULL) {}
+    //if (optional_out_previous_node == NULL) {}
+
     // the difference in size, between the requested size, and the discovered size
     // this algorithm takes a size_t, with a 1 in every bit, and progressively
     // finds smaller values as it scans the allocator's backing memory.
@@ -442,39 +471,39 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     PFAllocator_FreeListNode_t* prev_node = NULL;
     PFAllocator_FreeListNode_t* best_node = NULL;
 
-    uintptr_t header_offset = 0;
+    // offset after the header, and before the data
+    uintptr_t padding = 0;
 
     while (node != NULL) {
-        size_t const header_size = sizeof(PFAllocator_FreeListNode_t);
- 
-        header_offset = pf_allocator_free_list_calculate_padding_and_header(
-            (uintptr_t)node,
-            (uintptr_t)alignment,
-            header_size);
 
-        size_t const req_size = requested_size + header_offset;
-        // technically, we are losing part of the information where diff_space would be
-        // negative.  However, in this case, required_size would be greater than the
-        // block size, so we are still checking against that in the first logical
-        // clause here
-        size_t const node_size = pf_allocator_free_list_node_get_block_size(node);
-        size_t const diff_space = node_size - req_size;
-        if (node_size >= req_size && (diff_space < smallest_diff_space)) {
-            best_node = node;
-            smallest_diff_space = diff_space;
+        // only check nodes which aren't allocated
+        if (!pf_allocator_free_list_node_get_is_allocated(node)) {
+            padding = pf_allocator_free_list_calculate_padding(
+                (uintptr_t)node,
+                (uintptr_t)alignment,
+                sizeof(PFAllocator_FreeListNode_t));
+
+            size_t const req_size = requested_size + padding;
+            size_t const node_size = pf_allocator_free_list_node_get_block_size(node);
+            size_t const diff_space = node_size - req_size;
+
+            if (node_size >= req_size && (diff_space < smallest_diff_space)) {
+                best_node = node;
+                smallest_diff_space = diff_space;
+            }
         }
 
         prev_node = node;
         node = node->next;
     }
 
-    if (out_padding){ *out_padding = header_offset;}
-    if (out_previous_node){ *out_previous_node = prev_node; }
+    if (optional_out_padding){ *optional_out_padding = padding;}
+    if (optional_out_previous_node){ *optional_out_previous_node = prev_node; }
 
     return best_node;
 }
 
-void * pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t const requested_size) {
+void* pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t const requested_size) {
     if (allocator == NULL) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Cannot allocate with null ptr to allocator!");
         return NULL;
@@ -502,21 +531,18 @@ void * pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t c
     }
 
     PFAllocator_FreeListNode_t* alloc_owning_node = NULL;
-    uintptr_t alloc_owning_node_padding;
+    PFAllocator_FreeListNode_t* prev_node = NULL;
+    uintptr_t alloc_owning_node_padding = 0;
 
     // get the node we will allocate from, depending on our lookup policy
     if (allocator->policy == EAPFL_POLICY_FIND_BEST) {
-        alloc_owning_node = pf_allocator_free_list_find_best(allocator, requested_size, 16, &alloc_owning_node_padding, NULL);
+        alloc_owning_node = pf_allocator_free_list_find_best(allocator, requested_size, 16, &alloc_owning_node_padding, &prev_node);
     } else {
-        alloc_owning_node = pf_allocator_free_list_find_first(allocator, requested_size, 16, &alloc_owning_node_padding, NULL);
+        alloc_owning_node = pf_allocator_free_list_find_first(allocator, requested_size, 16, &alloc_owning_node_padding, &prev_node);
     }
 
     if (alloc_owning_node == NULL) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Could not find a free node for allocation!");
-        return NULL;
-    }
-    if (pf_allocator_free_list_node_get_is_allocated(alloc_owning_node)) {
-        PF_LOG_CRITICAL(PF_ALLOCATOR, "Tried to allocate memory from a node which is already allocated!");
         return NULL;
     }
 
@@ -530,7 +556,7 @@ void * pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t c
     pf_allocator_free_list_node_set_is_allocated(alloc_owning_node);
     // this memory is now claimed
     allocator->free_memory -= requested_size;
-    
+
     // There is a question of how much memory this gives the user.  Let's measure how much that is,
     // and if we should cut it up, and create a new node to manage it, we will
     size_t const alloc_owning_node_pre_bisect_block_size = pf_allocator_free_list_node_get_block_size(alloc_owning_node);
@@ -583,11 +609,35 @@ void * pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t c
     return (void*)alloc_owning_node_user_memory_offset;
 }
 
-void * pf_allocator_free_list_realloc(PFAllocator_FreeList_t* allocator, void *ptr, size_t const size) {
+void * pf_allocator_free_list_realloc(
+    PFAllocator_FreeList_t* allocator,
+    void* ptr,
+    size_t const size)
+{
     return NULL;
 }
 
-void pf_allocator_free_list_free(PFAllocator_FreeList_t* allocator, void *ptr) {
+int32_t pf_allocator_free_list_free(
+    PFAllocator_FreeList_t* allocator,
+    void* ptr)
+{
+    if (allocator == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Got null ptr to allocator!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+    if (ptr == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Was asked to free ptr to null!");
+        return PFEC_ERROR_NULL_PTR;
+    }
+
+
+
+
+
+
+    
+
+   return PFEC_NO_ERROR; 
 }
 
 

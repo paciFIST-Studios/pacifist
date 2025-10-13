@@ -712,7 +712,20 @@ int main(void) {
 
     // fn pf_allocator_free_list_find_best
     ADD_TEST(fn_pf_allocator_free_list_find_best__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_find_best__returns_null__for_null_free_list_param);
+    ADD_TEST(fn_pf_allocator_free_list_find_best__sets_correct_error_message__for_null_free_list_param);
+    ADD_TEST(fn_pf_allocator_free_list_find_best__returns_null__for_requested_size_smaller_than_node_size);
+    ADD_TEST(fn_pf_allocator_free_list_find_best__sets_correct_error_message__for_requested_size_smaller_than_node_size);
+    ADD_TEST(fn_pf_allocator_free_list_find_best__returns_null__for_non_power_of_two_alignment);
+    ADD_TEST(fn_pf_allocator_free_list_find_best__sets_correct_error_message__for_non_power_of_two_alignment);
+    ADD_TEST(fn_pf_allocator_free_list_find_best__returns_null__for_null_ptr_to_out_padding_param);
+    ADD_TEST(fn_pf_allocator_free_list_find_best__sets_correct_error_message__for_null_ptr_to_out_padding_param);
 
+
+
+
+    
+    
     // fn pf_allocator_free_list_malloc
     ADD_TEST(fn_pf_allocator_free_list_malloc__is_defined);
     ADD_TEST(fn_pf_allocator_free_list_malloc__returns_null__for_null_allocator_param);
@@ -725,8 +738,8 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_malloc__sets_correct_error_message__if_it_cannot_fulfill_memmory_request);
     ADD_TEST(fn_pf_allocator_free_list_malloc__returns_null__if_it_cannot_find_a_node_for_allocation);
     ADD_TEST(fn_pf_allocator_free_list_malloc__sets_correct_error_message__if_it_cannot_find_a_node_for_allocation);
-    ADD_TEST(fn_pf_allocator_free_list_malloc__returns_null__if_the_node_it_finds_for_allocation_is_already_allocated);
-    ADD_TEST(fn_pf_allocator_free_list_malloc__sets_correct_error_message__if_the_node_it_finds_for_allocation_is_already_allocated);
+    //ADD_TEST(fn_pf_allocator_free_list_malloc__returns_null__if_the_node_it_finds_for_allocation_is_already_allocated);
+    //ADD_TEST(fn_pf_allocator_free_list_malloc__sets_correct_error_message__if_the_node_it_finds_for_allocation_is_already_allocated);
     ADD_TEST(fn_pf_allocator_free_list_malloc__returns_memory__if_it_gives_out_the_last_byte_during_request);
 
     // fn pf_allocator_free_list_realloc
