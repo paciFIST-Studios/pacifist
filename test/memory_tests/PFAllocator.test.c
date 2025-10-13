@@ -975,66 +975,66 @@ END_TEST
 
 
 // fn pf_allocator_free_list_calculate_padding_and_header ----------------------------------------------------
-START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__is_defined) {
-    size_t(*fptr)(uintptr_t, uintptr_t, size_t const) = &pf_allocator_free_list_calculate_padding_and_header;
+START_TEST(fn_pf_allocator_free_list_calculate_padding__is_defined) {
+    size_t(*fptr)(uintptr_t, uintptr_t, size_t const) = &pf_allocator_free_list_calculate_padding;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
 
-START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__returns_correct_error_code__for_null_ptr_arg) {
+START_TEST(fn_pf_allocator_free_list_calculate_padding__returns_correct_error_code__for_null_ptr_arg) {
     PF_SUPPRESS_ERRORS
-    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding_and_header((uintptr_t)NULL, 16, 16));
+    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding((uintptr_t)NULL, 16, 16));
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
 
-START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__sets_correct_error_message__for_null_ptr_arg) {
+START_TEST(fn_pf_allocator_free_list_calculate_padding__sets_correct_error_message__for_null_ptr_arg) {
     PF_SUPPRESS_ERRORS
-    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding_and_header((uintptr_t)NULL, 16, 16));
+    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding((uintptr_t)NULL, 16, 16));
     PF_UNSUPPRESS_ERRORS
 
-    char const * message = "Ptr argument is unexpectedly null!";
+    char const * message = "Header_address argument is unexpectedly null!";
     ck_assert_in_error_buffer(message);
 }
 END_TEST
 
-START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__returns_correct_error_code__for_ptr_misaligned) {
+START_TEST(fn_pf_allocator_free_list_calculate_padding__returns_correct_error_code__for_ptr_misaligned) {
     char data[128] = {0};
     char* ptr = data + 3;
 
     PF_SUPPRESS_ERRORS
-    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding_and_header((uintptr_t)ptr, 16, 16));
+    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding((uintptr_t)ptr, 16, 16));
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
 
-START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__sets_correct_error_message__for_ptr_misaligned) {
+START_TEST(fn_pf_allocator_free_list_calculate_padding__sets_correct_error_message__for_ptr_misaligned) {
     char data[128] = {0};
     char* ptr = data + 3;
 
     PF_SUPPRESS_ERRORS
-    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding_and_header((uintptr_t)ptr, 16, 16));
+    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding((uintptr_t)ptr, 16, 16));
     PF_UNSUPPRESS_ERRORS
 
-    char const * message = "Ptr is not aligned to given alignment!";
+    char const * message = "Header_address is not aligned to given alignment!";
     ck_assert_in_error_buffer(message);
 }
 END_TEST
 
-START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__returns_correct_error_code__for_not_power_of_two_alignment) {
+START_TEST(fn_pf_allocator_free_list_calculate_padding__returns_correct_error_code__for_not_power_of_two_alignment) {
     char data[128] = {0};
 
     PF_SUPPRESS_ERRORS
-    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding_and_header((uintptr_t)data, 15, 16));
+    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding((uintptr_t)data, 15, 16));
     PF_UNSUPPRESS_ERRORS
 }
 END_TEST
 
-START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__sets_correct_error_message__for_not_power_of_two_alignment) {
+START_TEST(fn_pf_allocator_free_list_calculate_padding__sets_correct_error_message__for_not_power_of_two_alignment) {
     char const data[128] = {0};
 
     PF_SUPPRESS_ERRORS
-    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding_and_header((uintptr_t)data, 15, 16));
+    ck_assert_int_eq((size_t)(-1), pf_allocator_free_list_calculate_padding((uintptr_t)data, 15, 16));
     PF_UNSUPPRESS_ERRORS
 
     char const * message = "Requested alignment is not a power of two!";
@@ -1042,26 +1042,26 @@ START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__sets_correct_
 }
 END_TEST
 
-START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__returns_zero__if_header_is_naturally_aligned_to_boundary) {
+START_TEST(fn_pf_allocator_free_list_calculate_padding__returns_zero__if_header_is_naturally_aligned_to_boundary) {
     char const data[128] = {0};
 
     for (size_t i = 0; i < 4; i++) {
-        ck_assert_int_eq(0, pf_allocator_free_list_calculate_padding_and_header((uintptr_t)data, 16, 16*i));
+        ck_assert_int_eq(0, pf_allocator_free_list_calculate_padding((uintptr_t)data, 16, 16*i));
     }
 
 }
 END_TEST
 
-START_TEST(fn_pf_allocator_free_list_calculate_padding_and_header__returns_padding_number__when_used_correctly) {
+START_TEST(fn_pf_allocator_free_list_calculate_padding__returns_padding_number__when_used_correctly) {
     char data[128] = {0};
     size_t const alignment = 16;
 
     // check for the mod-zero case
-    ck_assert_int_eq(0, pf_allocator_free_list_calculate_padding_and_header((uintptr_t)data, alignment, alignment));
+    ck_assert_int_eq(0, pf_allocator_free_list_calculate_padding((uintptr_t)data, alignment, alignment));
 
     // check for the other cases
     for (size_t i = 1; i < 16; i++) {
-        ck_assert_int_eq(alignment-i, pf_allocator_free_list_calculate_padding_and_header((uintptr_t)data, alignment, alignment+i));
+        ck_assert_int_eq(alignment-i, pf_allocator_free_list_calculate_padding((uintptr_t)data, alignment, alignment+i));
     }
 }
 
