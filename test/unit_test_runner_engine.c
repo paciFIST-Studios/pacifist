@@ -718,11 +718,14 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_find_best__sets_correct_error_message__for_requested_size_smaller_than_node_size);
     ADD_TEST(fn_pf_allocator_free_list_find_best__returns_null__for_non_power_of_two_alignment);
     ADD_TEST(fn_pf_allocator_free_list_find_best__sets_correct_error_message__for_non_power_of_two_alignment);
-    ADD_TEST(fn_pf_allocator_free_list_find_best__returns_null__for_null_ptr_to_out_padding_param);
-    ADD_TEST(fn_pf_allocator_free_list_find_best__sets_correct_error_message__for_null_ptr_to_out_padding_param);
 
-
-
+    ADD_TEST(fn_pf_allocator_free_list_find_best__returns_correct_node__if_missing_optional_out_padding_param);
+    ADD_TEST(fn_pf_allocator_free_list_find_best__returns_correct_node__if_missing_optional_out_prev_node_param);
+    ADD_TEST(fn_pf_allocator_free_list_find_best__returns_null__if_all_nodes_are_allocated);
+    ADD_TEST(fn_pf_allocator_free_list_find_best__returns_null__if_remaining_memory_cannot_fulfill_allocation_request);
+    ADD_TEST(fn_pf_allocator_free_list_find_best__returns_best_fitting_node_not_first_fitting_node__when_called);
+    ADD_TEST(fn_pf_allocator_free_list_find_best__returns_first_node_with_exact_fit__if_it_finds_one);
+    ADD_TEST(fn_pf_allocator_free_list_find_best__returns_first_node_with_best_fit__for_a_multi_node_best_fit_tie);
 
     
     

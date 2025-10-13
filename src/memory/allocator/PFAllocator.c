@@ -469,6 +469,7 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
 
     PFAllocator_FreeListNode_t* node = free_list->head;
     PFAllocator_FreeListNode_t* prev_node = NULL;
+    PFAllocator_FreeListNode_t* prev_to_best_node = NULL;
     PFAllocator_FreeListNode_t* best_node = NULL;
 
     // offset after the header, and before the data
@@ -483,13 +484,22 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
                 (uintptr_t)alignment,
                 sizeof(PFAllocator_FreeListNode_t));
 
-            size_t const req_size = requested_size + padding;
-            size_t const node_size = pf_allocator_free_list_node_get_block_size(node);
-            size_t const diff_space = node_size - req_size;
+            // the memory needed for this allocation
+            size_t const needed_size = requested_size + padding;
+            // the memory available for this allocation
+            size_t const block_size = pf_allocator_free_list_node_get_block_size(node);
 
-            if (node_size >= req_size && (diff_space < smallest_diff_space)) {
+            // we're looking for the smallest difference between the size we need and the size we have
+            // if we get a negative, it turns into an INT_MAX kind of number, and is rejected by the algorithm
+            size_t const diff_space = block_size - needed_size;
+
+            // is there enough space, and is this a closer fit than our previous best?
+            if (block_size >= needed_size && (diff_space < smallest_diff_space)) {
                 best_node = node;
+                prev_to_best_node = prev_node;
                 smallest_diff_space = diff_space;
+
+                if (smallest_diff_space == 0){ break; }
             }
         }
 
@@ -497,8 +507,10 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
         node = node->next;
     }
 
+
+
     if (optional_out_padding){ *optional_out_padding = padding;}
-    if (optional_out_previous_node){ *optional_out_previous_node = prev_node; }
+    if (optional_out_previous_node){ *optional_out_previous_node = prev_to_best_node; }
 
     return best_node;
 }

@@ -1148,19 +1148,180 @@ START_TEST(fn_pf_allocator_free_list_find_best__sets_correct_error_message__for_
 }
 END_TEST
 
-// fn works w/o optional params
-// fn works w/ optional params
+START_TEST(fn_pf_allocator_free_list_find_best__returns_correct_node__if_missing_optional_out_padding_param) {
+    char memory[512] = {0};
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, 512);
+    ck_assert_ptr_nonnull(allocator);
+    PFAllocator_FreeListNode_t* prev_node;
+    
+    PFAllocator_FreeListNode_t const * node = pf_allocator_free_list_find_best(allocator, 64, 16, NULL, &prev_node);
+    ck_assert_ptr_nonnull(node);
+    // there is no previous node to the head node
+    ck_assert_ptr_null(prev_node);
+    
+    size_t const measured_padding_size = pf_allocator_free_list_node_get_padding(node);
+    size_t const expected_padding_size = 0;
+    ck_assert_int_eq(expected_padding_size, measured_padding_size);
 
-// returns null if all nodes are allocated
-// returns null if unallocated nodes cannot hold allocation request
-// returns best fitting node, not first fitting node
-// correctly returns best fit node, if it's last
-// correctly returns best fit node, if it's first
+    // this should not be allocated
+    ck_assert_int_eq(FALSE, pf_allocator_free_list_node_get_is_allocated(node));
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_find_best__returns_correct_node__if_missing_optional_out_prev_node_param) {
+    char memory[512] = {0};
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, 512);
+    ck_assert_ptr_nonnull(allocator);
+
+    uintptr_t returned_padding_size = 0;
+    PFAllocator_FreeListNode_t const * node = pf_allocator_free_list_find_best(allocator, 64, 16, &returned_padding_size, NULL);
+    ck_assert_ptr_nonnull(node);
+    
+    size_t const measured_padding_size = pf_allocator_free_list_node_get_padding(node);
+    size_t const expected_padding_size = 0;
+    ck_assert_int_eq(expected_padding_size, measured_padding_size);
+    ck_assert_int_eq(expected_padding_size, returned_padding_size);
+    
+    // this should not be allocated
+    ck_assert_int_eq(FALSE, pf_allocator_free_list_node_get_is_allocated(node));
+}
+END_TEST
 
 
+START_TEST(fn_pf_allocator_free_list_find_best__returns_null__if_all_nodes_are_allocated) {
+    PF_SUPPRESS_ERRORS
+    char memory[512] = {0};
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, 512);
+    ck_assert_ptr_nonnull(allocator);
+    pf_allocator_free_list_node_set_is_allocated(allocator->head);
+
+    PFAllocator_FreeListNode_t const * node = pf_allocator_free_list_find_best(allocator, 64, 16, NULL, NULL);
+    ck_assert_ptr_null(node);
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
 
 
+START_TEST(fn_pf_allocator_free_list_find_best__returns_null__if_remaining_memory_cannot_fulfill_allocation_request) {
+    PF_SUPPRESS_ERRORS
+    char memory[128] = {0};
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, 128);
+    ck_assert_ptr_nonnull(allocator);
 
+    ck_assert_ptr_null(pf_allocator_free_list_find_best(allocator, 80, 16, NULL, NULL));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_find_best__returns_best_fitting_node_not_first_fitting_node__when_called) {
+    PF_SUPPRESS_ERRORS
+    char memory[512] = {0};
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, 512);
+    ck_assert_ptr_nonnull(allocator);
+
+    // several nodes which aren't allocated, but which "haven't been cleaned up"
+    // by the coalescing operation during free (or are sticking around for another reason)
+    PFAllocator_FreeListNode_t* node0 = allocator->head;
+    PFAllocator_FreeListNode_t node1 = {0};
+    PFAllocator_FreeListNode_t node2 = {0};
+    PFAllocator_FreeListNode_t node3 = {0};
+    PFAllocator_FreeListNode_t node4 = {0};
+
+    // set the nodes in the free list
+    node0->next = &node1;
+    node1.next = &node2;
+    node2.next = &node3;
+    node3.next = &node4;
+
+    // set hypothetical sizes for the nodes.  We won't be able to access the memory
+    // these nodes think they have, but the fn chooses nodes; and doesn't touch memory
+    pf_allocator_free_list_node_set_block_size(&node1, 128);
+    pf_allocator_free_list_node_set_block_size(&node2, 80);
+    pf_allocator_free_list_node_set_block_size(&node3, 64);
+    pf_allocator_free_list_node_set_block_size(&node4, 62);
+
+    PFAllocator_FreeListNode_t const * node = pf_allocator_free_list_find_best(allocator, 64, 16, NULL, NULL);
+    ck_assert_ptr_nonnull(node);
+    ck_assert_ptr_eq(node, &node3);
+    ck_assert_int_eq(pf_allocator_free_list_node_get_block_size(node), 64);
+    ck_assert_int_eq(FALSE, pf_allocator_free_list_node_get_is_allocated(node));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_find_best__returns_first_node_with_exact_fit__if_it_finds_one) {
+    PF_SUPPRESS_ERRORS
+    char memory[512] = {0};
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, 512);
+    ck_assert_ptr_nonnull(allocator);
+
+    // several nodes which aren't allocated, but which "haven't been cleaned up"
+    // by the coalescing operation during free (or are sticking around for another reason)
+    PFAllocator_FreeListNode_t* node0 = allocator->head;
+    PFAllocator_FreeListNode_t node1 = {0};
+    PFAllocator_FreeListNode_t node2 = {0};
+    PFAllocator_FreeListNode_t node3 = {0};
+    PFAllocator_FreeListNode_t node4 = {0};
+
+    // set the nodes in the free list
+    node0->next = &node1;
+    node1.next = &node2;
+    node2.next = &node3;
+    node3.next = &node4;
+
+    // set hypothetical sizes for the nodes.  We won't be able to access the memory
+    // these nodes think they have, but the fn chooses nodes; and doesn't touch memory
+    pf_allocator_free_list_node_set_block_size(&node1, 128);
+    pf_allocator_free_list_node_set_block_size(&node2, 64);
+    pf_allocator_free_list_node_set_block_size(&node3, 64);
+    pf_allocator_free_list_node_set_block_size(&node4, 64);
+
+    PFAllocator_FreeListNode_t const * node = pf_allocator_free_list_find_best(allocator, 64, 16, NULL, NULL);
+    ck_assert_ptr_nonnull(node);
+    // node3 and node4 are also valid choices, but they shouldn't be returned if an exact match is found
+    ck_assert_ptr_eq(node, &node2);
+    ck_assert_int_eq(pf_allocator_free_list_node_get_block_size(node), 64);
+    ck_assert_int_eq(FALSE, pf_allocator_free_list_node_get_is_allocated(node));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_find_best__returns_first_node_with_best_fit__for_a_multi_node_best_fit_tie) {
+    PF_SUPPRESS_ERRORS
+    char memory[512] = {0};
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, 512);
+    ck_assert_ptr_nonnull(allocator);
+
+    // several nodes which aren't allocated, but which "haven't been cleaned up"
+    // by the coalescing operation during free (or are sticking around for another reason)
+    PFAllocator_FreeListNode_t* node0 = allocator->head;
+    PFAllocator_FreeListNode_t node1 = {0};
+    PFAllocator_FreeListNode_t node2 = {0};
+    PFAllocator_FreeListNode_t node3 = {0};
+    PFAllocator_FreeListNode_t node4 = {0};
+
+    // set the nodes in the free list
+    node0->next = &node1;
+    node1.next = &node2;
+    node2.next = &node3;
+    node3.next = &node4;
+
+    // set hypothetical sizes for the nodes.  We won't be able to access the memory
+    // these nodes think they have, but the fn chooses nodes; and doesn't touch memory
+    pf_allocator_free_list_node_set_block_size(&node1, 128);
+    pf_allocator_free_list_node_set_block_size(&node2, 80);
+    pf_allocator_free_list_node_set_block_size(&node3, 80);
+    pf_allocator_free_list_node_set_block_size(&node4, 80);
+
+    PFAllocator_FreeListNode_t const * node = pf_allocator_free_list_find_best(allocator, 64, 16, NULL, NULL);
+    ck_assert_ptr_nonnull(node);
+    // node3 and node4 are also valid choices, but they aren't "better", so we should be getting node2 back
+    ck_assert_ptr_eq(node, &node2);
+    ck_assert_int_eq(pf_allocator_free_list_node_get_block_size(node), 80);
+    ck_assert_int_eq(FALSE, pf_allocator_free_list_node_get_is_allocated(node));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
 
 
 
