@@ -768,7 +768,7 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_free__sets_correct_error_message__for_null_ptr_to_vacated_memory);
 
 
-    //ADD_TEST(fn_pf_allocator_free_list_free___);
+    ADD_TEST(fn_pf_allocator_free_list_free___);
 
 
     

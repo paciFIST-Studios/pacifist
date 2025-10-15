@@ -7,6 +7,7 @@
 #include <stdlib.h>
 // framework
 // engine
+#include <core/common.h>
 #include <memory/hash_table/PFCompactHashTable.h>
 
 #include "core/assert.h"
@@ -314,7 +315,7 @@ int32_t pf_allocator_should_bisect_memory(
         return FALSE;
     }
     // block size is bigger than request, but too small for an additional block
-    if (block_size < required_size + (sizeof(PFAllocator_FreeListNode_t) + MINIMUM_NODE_ALLOC_MEMORY)) {
+    if (block_size < required_size + (sizeof(PFAllocator_FreeListNode_t) /*+ MINIMUM_NODE_ALLOC_MEMORY*/)) {
         return FALSE;
     }
     // block is big enough to get split in two
@@ -548,6 +549,63 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     return best_node;
 }
 
+int32_t pf_allocator_free_list_coalesce_unallocated_nodes(PFAllocator_FreeList_t const * allocator) {
+    if (allocator == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Got ptr to null PFAllocator_FreeList_t param!");
+        return FALSE;
+    }
+
+    
+    #define COALESCING_POINTER_ARRAY_LENGTH 32
+    PFAllocator_FreeListNode_t* coalescing_ptr_array[COALESCING_POINTER_ARRAY_LENGTH] = {0};
+    int32_t captured_coalescing_pointer_idx = -1;
+
+    PFAllocator_FreeListNode_t* current_node = allocator->head;
+    while (current_node != NULL) {
+        int32_t const current_node_is_allocated = pf_allocator_free_list_node_get_is_allocated(current_node);
+
+        if (!current_node_is_allocated) {
+            coalescing_ptr_array[++captured_coalescing_pointer_idx] = current_node;
+
+        // if the node is allocated, we may have just finished a sequence of unallocated nodes we should coalesce
+        } else {
+            // see if we've found more than 1 unallocated node in a row
+            if (captured_coalescing_pointer_idx > 0) {
+
+                PFAllocator_FreeListNode_t* keep_node = coalescing_ptr_array[0];
+
+                // count the block size of all the contiguous empty nodes we just reviewed
+                size_t erase_node_block_size_accumulator = 0;
+                for (size_t i = 0; i < captured_coalescing_pointer_idx; i++) {
+                    PFAllocator_FreeListNode_t const * erase_node = coalescing_ptr_array[i];
+                    size_t const erase_node_block_size = pf_allocator_free_list_node_get_block_size(erase_node);
+                    erase_node_block_size_accumulator += erase_node_block_size;
+                }
+
+                // this was already calculated when the node was created
+                size_t const padding = pf_allocator_free_list_node_get_padding(keep_node);
+ 
+                // set this data to zero, removing those nodes
+                memset(keep_node, 0, erase_node_block_size_accumulator);
+
+                // reset the block size and padding.  IsAllocated will be 0
+                pf_allocator_free_list_node_set_block_size(keep_node, erase_node_block_size_accumulator);
+                pf_allocator_free_list_node_set_padding(keep_node, padding);
+
+                // repair the linked-list, which now points to the first allocated node
+                keep_node->next = current_node;
+
+                // reset the index so we can capture the next batch of empty nodes
+                captured_coalescing_pointer_idx = -1;
+            }
+        }
+
+        current_node = current_node->next;
+    }
+
+    return TRUE;
+}
+
 void* pf_allocator_free_list_malloc(PFAllocator_FreeList_t* allocator, size_t const requested_size) {
     if (allocator == NULL) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Cannot allocate with null ptr to allocator!");
@@ -680,14 +738,22 @@ int32_t pf_allocator_free_list_free(
         return PFEC_ERROR_NULL_PTR;
     }
 
+    PFAllocator_FreeListNode_t* node = pf_allocator_free_list_get_managing_node(allocator, memory);
+    if (node == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Could not retrieve node which manages this memory!");
+    }
 
-    //PFAllocator_FreeListNode_t* node = NULL;
+    size_t const block_size = pf_allocator_free_list_node_get_block_size(node);
+    size_t const padding_size = pf_allocator_free_list_node_get_padding(node);
+    size_t const node_size = sizeof(PFAllocator_FreeListNode_t);
 
+    size_t const memory_size = block_size - node_size - padding_size; 
+    memset(memory, 0, memory_size);
 
+    pf_allocator_free_list_node_set_is_not_allocated(node);
 
+    // loop the free list and coalesce unallocated nodes
 
-
-    
 
    return PFEC_NO_ERROR; 
 }

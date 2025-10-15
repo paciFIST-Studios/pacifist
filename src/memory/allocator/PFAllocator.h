@@ -308,6 +308,15 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     uintptr_t* optional_out_padding,
     PFAllocator_FreeListNode_t** optional_out_previous_node);
 
+
+/**
+ * 
+ * @param allocator 
+ * @return 
+ */
+int32_t pf_allocator_free_list_coalesce_unallocated_nodes(PFAllocator_FreeList_t const * allocator);
+
+
 /**
  * @brief a Malloc fn which uses the PFAllocator_FreeList_t 
  *
