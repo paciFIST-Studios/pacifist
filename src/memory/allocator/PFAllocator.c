@@ -555,31 +555,38 @@ int32_t pf_allocator_free_list_coalesce_unallocated_nodes(PFAllocator_FreeList_t
         return FALSE;
     }
 
-    
-    #define COALESCING_POINTER_ARRAY_LENGTH 32
-    PFAllocator_FreeListNode_t* coalescing_ptr_array[COALESCING_POINTER_ARRAY_LENGTH] = {0};
-    int32_t captured_coalescing_pointer_idx = -1;
+    PFAllocator_FreeListNode_t* coalesce_node = NULL;
+    size_t coalescing_node_count = 0;
 
     PFAllocator_FreeListNode_t* current_node = allocator->head;
     while (current_node != NULL) {
         int32_t const current_node_is_allocated = pf_allocator_free_list_node_get_is_allocated(current_node);
 
         if (!current_node_is_allocated) {
-            coalescing_ptr_array[++captured_coalescing_pointer_idx] = current_node;
+            if (coalesce_node == NULL) {
+                coalesce_node = current_node;
+            }
+
+            coalescing_node_count++;
 
         // if the node is allocated, we may have just finished a sequence of unallocated nodes we should coalesce
         } else {
             // see if we've found more than 1 unallocated node in a row
-            if (captured_coalescing_pointer_idx > 0) {
+            // if there's a single unallocated block, we can't merge it with anything
+            if (coalescing_node_count > 1) {
 
-                PFAllocator_FreeListNode_t* keep_node = coalescing_ptr_array[0];
+                // the first node in the sequence is going to stay, leaving it at the front of a big block
+                PFAllocator_FreeListNode_t* keep_node = coalesce_node;
 
-                // count the block size of all the contiguous empty nodes we just reviewed
+                // count the block sizes of all the contiguous empty nodes we just reviewed
                 size_t erase_node_block_size_accumulator = 0;
-                for (size_t i = 0; i < captured_coalescing_pointer_idx; i++) {
-                    PFAllocator_FreeListNode_t const * erase_node = coalescing_ptr_array[i];
+                for (size_t i = 0; i < coalescing_node_count; i++) {
+                    PFAllocator_FreeListNode_t const * erase_node = coalesce_node;
                     size_t const erase_node_block_size = pf_allocator_free_list_node_get_block_size(erase_node);
                     erase_node_block_size_accumulator += erase_node_block_size;
+                    if (coalesce_node != NULL) {
+                        coalesce_node = coalesce_node->next;
+                    }
                 }
 
                 // this was already calculated when the node was created
@@ -594,10 +601,9 @@ int32_t pf_allocator_free_list_coalesce_unallocated_nodes(PFAllocator_FreeList_t
 
                 // repair the linked-list, which now points to the first allocated node
                 keep_node->next = current_node;
-
-                // reset the index so we can capture the next batch of empty nodes
-                captured_coalescing_pointer_idx = -1;
             }
+
+            coalescing_node_count = 0;
         }
 
         current_node = current_node->next;

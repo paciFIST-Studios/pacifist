@@ -737,6 +737,11 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_find_best__returns_first_node_with_exact_fit__if_it_finds_one);
     ADD_TEST(fn_pf_allocator_free_list_find_best__returns_first_node_with_best_fit__for_a_multi_node_best_fit_tie);
 
+    // fn pf_allocator_free_list_coalesce_unallocated_nodes
+    ADD_TEST(fn_pf_allocator_free_list_coalesce_unallocated_nodes__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_coalesce_unallocated_nodes__returns_false__for_null_ptr_to_PFallocator_FreeList_t);
+    ADD_TEST(fn_pf_allocator_free_list_coalesce_unallocated_nodes__sets_correct_error_message__for_null_ptr_to_PFallocator_FreeList_t);
+    ADD_TEST(fn_pf_allocator_free_list_coalesce_unallocated_nodes__coalesces_sequential_nodes__when_used);
     
     
     // fn pf_allocator_free_list_malloc
