@@ -13,6 +13,49 @@
 #include <core/define.h>
 #include <core/error.h>
 
+
+
+// a test fn which simplifies the allocation of memory and lookup of the node managing that memory
+static PFAllocator_FreeListNode_t* ck_malloc_and_return_node(PFAllocator_FreeList_t* allocator, size_t const alloc_size) {
+    void* node_memory = allocator->pf_malloc(allocator, alloc_size);
+    ck_assert_ptr_nonnull(node_memory);
+    
+    PFAllocator_FreeListNode_t* node = pf_allocator_free_list_get_managing_node(allocator, node_memory);
+    ck_assert_ptr_nonnull(node);
+    
+    size_t const expected_node_block_size = alloc_size + sizeof(PFAllocator_FreeListNode_t);
+    size_t const expected_node_is_allocated = TRUE;
+    size_t const expected_node_padding = 0;
+ 
+    size_t const node_block_size = pf_allocator_free_list_node_get_block_size(node);
+    size_t const node_is_allocated = pf_allocator_free_list_node_get_is_allocated(node);
+    size_t const node_padding = pf_allocator_free_list_node_get_padding(node);
+
+    ck_assert_int_eq(node_block_size, expected_node_block_size);
+    ck_assert_int_eq(node_is_allocated, expected_node_is_allocated);
+    ck_assert_int_eq(node_padding, expected_node_padding);
+
+    return node;
+}
+
+static void ck_free_pfallocator_memory_using_node(PFAllocator_FreeList_t* allocator, PFAllocator_FreeListNode_t* node) {
+    size_t const padding = pf_allocator_free_list_node_get_padding(node);
+    void* node_memory = (void*)((uintptr_t)node + sizeof(PFAllocator_FreeListNode_t) + padding);
+    allocator->pf_free(allocator, node_memory);
+}
+
+static size_t ck_pfallocator_count_nodes(PFAllocator_FreeList_t const * allocator) {
+    size_t total_nodes = 0;
+    PFAllocator_FreeListNode_t const * node = allocator->head;
+    while (node != NULL) {
+        total_nodes++;
+        node = node->next;
+    }
+    return total_nodes;
+}
+
+
+
 // -----------------------------------------------------------------------------------------------------------
 // PFAllocator FreeList 
 // -----------------------------------------------------------------------------------------------------------
@@ -1460,69 +1503,144 @@ START_TEST(fn_pf_allocator_free_list_coalesce_unallocated_nodes__sets_correct_er
 }
 END_TEST
 
+
+/**
+ * This test creates an allocator and nodes, then tests coalescing.
+ *
+ * Step 1: [0]-[1]-[2]-[3]-[4]-[5]-[6]-[7]
+ * Step 2: [A]-[A]-[A]-[A]-[A]-[A]-[A]-[A]
+ * Step 3: [A]-[ ]-[ ]-[ ]-[ ]-[ ]-[ ]-[A]  <-- coalesce 
+ * Step 4: [A]-[ ]-[A]                      <-- removes center nodes
+ */
 START_TEST(fn_pf_allocator_free_list_coalesce_unallocated_nodes__coalesces_sequential_nodes__when_used) {
-    size_t const memory_size = 16384;
-    void* memory = malloc(memory_size);
+    size_t const node_count = 8;
+    size_t const node_alloc_size = 64;
+    size_t const memory_size = 4096;
 
-    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, memory_size);
-
-    size_t const node_count = 128;
     PFAllocator_FreeListNode_t* node_ptr_array[node_count];
     memset(node_ptr_array, 0, node_count * sizeof(PFAllocator_FreeListNode_t*));
 
+    // create allocator
+    void* memory = malloc(memory_size);
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, memory_size);
+
+    // allocate the nodes
     for (size_t i = 0; i < node_count; i++) {
-        size_t const node_alloc = 64;
-        void* node_memory = allocator->pf_malloc(allocator, node_alloc);
-
-        // fill the memory with some value so we can see it
-        for (size_t j = 0; j < node_alloc; j++) {
-            char* byte = (void*)((uintptr_t)node_memory + j);
-             *byte = (char)(65+i);
-        }
- 
-        PFAllocator_FreeListNode_t* node = pf_allocator_free_list_get_managing_node(allocator, node_memory);
-
-        size_t const expected_node_block_size = node_alloc + sizeof(PFAllocator_FreeListNode_t);
-        size_t const expected_node_is_allocated = TRUE;
-        size_t const expected_node_padding = 0;
- 
-        size_t const node_block_size = pf_allocator_free_list_node_get_block_size(node);
-        size_t const node_is_allocated = pf_allocator_free_list_node_get_is_allocated(node);
-        size_t const node_padding = pf_allocator_free_list_node_get_padding(node);
-
-        ck_assert_int_eq(node_block_size, expected_node_block_size);
-        ck_assert_int_eq(node_is_allocated, expected_node_is_allocated);
-        ck_assert_int_eq(node_padding, expected_node_padding);
-
-        node_ptr_array[i] = node;
+        node_ptr_array[i] = ck_malloc_and_return_node(allocator, node_alloc_size);
     }
 
+    // free some of the nodes
     for (size_t i = 1; i < node_count-1; i++) {
-        PFAllocator_FreeListNode_t* node = node_ptr_array[i];
-        size_t const padding = pf_allocator_free_list_node_get_padding(node);
-        void* node_memory = (void*)((uintptr_t)node + sizeof(PFAllocator_FreeListNode_t) + padding);
-        allocator->pf_free(allocator, node_memory);
+        ck_free_pfallocator_memory_using_node(allocator, node_ptr_array[i]);
         node_ptr_array[i] = NULL;
     }
 
+    // coalesce nodes
     pf_allocator_free_list_coalesce_unallocated_nodes(allocator);
 
-    size_t total_nodes = 0;
-    PFAllocator_FreeListNode_t* node = allocator->head;
-    while (node != NULL) {
-        total_nodes++;
-        node = node->next;
-    }
-
-    ck_assert_int_eq(total_nodes, 3);
+    // check for expected number
+    size_t const total_nodes = ck_pfallocator_count_nodes(allocator);
+    size_t const expected_nodes = 4;
+    ck_assert_int_eq(total_nodes, expected_nodes);
 
     free(memory);
 }
 END_TEST
 
 
+/**
+ * This test creates an allocator and nodes, then tests coalescing.
+ *
+ * Step 1: [0]-[1]-[2]-[3]-[4]-[5]-[6]-[7]
+ * Step 2: [A]-[A]-[A]-[A]-[A]-[A]-[A]-[A]
+ * Step 3: [A]-[ ]-[A]-[ ]-[A]-[ ]-[A]-[ ]  <-- coalesce
+ * Step 4: [A]-[ ]-[A]-[ ]-[A]-[ ]-[A]-[ ]  <-- cannot coalesce isolated nodes 
+ */
+START_TEST(fn_pf_allocator_free_list_coalesce_unallocated_nodes__does_not_coalesce_isolatd_nodes__when_used) {
+    size_t const node_count = 8;
+    size_t const node_alloc_size = 64;
+    size_t const memory_size = 1280;
+
+    PFAllocator_FreeListNode_t* node_ptr_array[node_count];
+    memset(node_ptr_array, 0, node_count * sizeof(PFAllocator_FreeListNode_t*));
+
+    // create allocator
+    void* memory = malloc(memory_size);
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, memory_size);
+
+    // allocate the nodes
+    for (size_t i = 0; i < node_count; i++) {
+        node_ptr_array[i] = ck_malloc_and_return_node(allocator, node_alloc_size);
+    }
+
+    // free some of the nodes
+    for (size_t i = 0; i < node_count; i++) {
+        if (i % 2 == 0) {
+            ck_free_pfallocator_memory_using_node(allocator, node_ptr_array[i]);
+            node_ptr_array[i] = NULL;
+        }
+    }
+
+    // coalesce nodes
+    pf_allocator_free_list_coalesce_unallocated_nodes(allocator);
+
+    // check for expected number
+    size_t const total_nodes = ck_pfallocator_count_nodes(allocator);
+    // here, the +1 is because we're not actually using up all the memory we've been
+    // assigned and after all the nodes are created, there's still one "ready" to
+    // allocate more
+    size_t const expected_nodes = node_count+1;
+    ck_assert_int_eq(total_nodes, expected_nodes);
+
+    free(memory);
+}
+END_TEST
 
 
+/**
+ * This test creates an allocator and nodes, then tests coalescing.
+ *
+ * Step 1: [0]-[1]-[2]-[3]-[4]-[5]-[6]-[7]
+ * Step 2: [A]-[A]-[A]-[A]-[A]-[A]-[A]-[A]
+ * Step 3: [A]-[ ]-[ ]-[A]-[ ]-[ ]-[A]-[ ]  <-- coalesce
+ * Step 4: [A]-[ ]-[A]-[ ]-[A]-[ ]          <-- coalesces multiple touching runs of unallocated nodes
+ */
+START_TEST(fn_pf_allocator_free_list_coalesce_unallocated_nodes__coalesces_multiple_touching_runs_of_unallocated_nodes___when_used) {
+    size_t const node_count = 8;
+    size_t const node_alloc_size = 64;
+    size_t const memory_size = 1280;
+
+    PFAllocator_FreeListNode_t* node_ptr_array[node_count];
+    memset(node_ptr_array, 0, node_count * sizeof(PFAllocator_FreeListNode_t*));
+
+    // create allocator
+    void* memory = malloc(memory_size);
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, memory_size);
+
+    // allocate the nodes
+    for (size_t i = 0; i < node_count; i++) {
+        node_ptr_array[i] = ck_malloc_and_return_node(allocator, node_alloc_size);
+    }
+
+    // free some of the nodes
+    for (size_t i = 0; i < node_count; i++) {
+        if (i == 2 || i == 3 || i == 6 || i == 7) {
+            ck_free_pfallocator_memory_using_node(allocator, node_ptr_array[i]);
+            node_ptr_array[i] = NULL;
+        }
+    }
+
+    // coalesce nodes
+    pf_allocator_free_list_coalesce_unallocated_nodes(allocator);
+
+    // check for expected number
+    size_t const total_nodes = ck_pfallocator_count_nodes(allocator);
+    size_t const expected_nodes = 6;
+    ck_assert_int_eq(total_nodes, expected_nodes);
+
+    free(memory);
+}
+END_TEST
 
 
 

@@ -549,64 +549,93 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     return best_node;
 }
 
+int32_t pf_allocator_free_list_coalesce_n_nodes(
+    PFAllocator_FreeList_t const * allocator,
+    PFAllocator_FreeListNode_t* coalescing_node,
+    size_t coalesce_count)
+{
+    if (allocator == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Got null ptr to PFallocator_FreeList_t");
+        return PFEC_ERROR_NULL_PTR;
+    }
+    if (coalescing_node == NULL) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Got null ptr to PFAllocator_FreeListNode_t");
+        return PFEC_ERROR_NULL_PTR;
+    }
+    if (coalesce_count < 2) {
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Cannot coalesce fewer than 2 nodes!");
+        return PFEC_ERROR_INVALID_LENGTH;
+    }
+
+    PFAllocator_FreeListNode_t* node = coalescing_node;
+    size_t const coalescing_node_padding = pf_allocator_free_list_node_get_padding(node);
+
+    // count the block size of all the nodes we're going to coalesce,
+    // starting with the coalescing_node
+    size_t coalescing_block_size_accumulator = 0;
+    for (size_t i = 0; i < coalesce_count; i++) {
+        // padding is usually going to be zero, but make sure we're taking it into account
+        coalescing_block_size_accumulator += pf_allocator_free_list_node_get_padding(node);
+        coalescing_block_size_accumulator += pf_allocator_free_list_node_get_block_size(node);
+        node = node->next;
+    }
+
+    // zeroing this out sets it to not_allocated as well
+    memset(coalescing_node, 0, coalescing_block_size_accumulator + coalescing_node_padding);
+
+    pf_allocator_free_list_node_set_padding(coalescing_node, coalescing_node_padding);
+    pf_allocator_free_list_node_set_block_size(coalescing_node, coalescing_block_size_accumulator);
+
+    // don't forget to keep the connection to the next node, which might be null,
+    // but probably isn't (because we're probably in the middle of the free-list)
+    coalescing_node->next = node;
+    
+    return TRUE;
+}
+
+
+
 int32_t pf_allocator_free_list_coalesce_unallocated_nodes(PFAllocator_FreeList_t const * allocator) {
     if (allocator == NULL) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "Got ptr to null PFAllocator_FreeList_t param!");
         return FALSE;
     }
 
-    PFAllocator_FreeListNode_t* coalesce_node = NULL;
-    size_t coalescing_node_count = 0;
+    int32_t coalescing_node_count = 0;
+    PFAllocator_FreeListNode_t* coalescing_node = NULL;
 
     PFAllocator_FreeListNode_t* current_node = allocator->head;
     while (current_node != NULL) {
         int32_t const current_node_is_allocated = pf_allocator_free_list_node_get_is_allocated(current_node);
 
+        // node not allocated
         if (!current_node_is_allocated) {
-            if (coalesce_node == NULL) {
-                coalesce_node = current_node;
+            if (coalescing_node == NULL) {
+                coalescing_node = current_node;
             }
 
             coalescing_node_count++;
 
-        // if the node is allocated, we may have just finished a sequence of unallocated nodes we should coalesce
+        // node is allocated
         } else {
             // see if we've found more than 1 unallocated node in a row
             // if there's a single unallocated block, we can't merge it with anything
             if (coalescing_node_count > 1) {
-
-                // the first node in the sequence is going to stay, leaving it at the front of a big block
-                PFAllocator_FreeListNode_t* keep_node = coalesce_node;
-
-                // count the block sizes of all the contiguous empty nodes we just reviewed
-                size_t erase_node_block_size_accumulator = 0;
-                for (size_t i = 0; i < coalescing_node_count; i++) {
-                    PFAllocator_FreeListNode_t const * erase_node = coalesce_node;
-                    size_t const erase_node_block_size = pf_allocator_free_list_node_get_block_size(erase_node);
-                    erase_node_block_size_accumulator += erase_node_block_size;
-                    if (coalesce_node != NULL) {
-                        coalesce_node = coalesce_node->next;
-                    }
-                }
-
-                // this was already calculated when the node was created
-                size_t const padding = pf_allocator_free_list_node_get_padding(keep_node);
- 
-                // set this data to zero, removing those nodes
-                memset(keep_node, 0, erase_node_block_size_accumulator);
-
-                // reset the block size and padding.  IsAllocated will be 0
-                pf_allocator_free_list_node_set_block_size(keep_node, erase_node_block_size_accumulator);
-                pf_allocator_free_list_node_set_padding(keep_node, padding);
-
-                // repair the linked-list, which now points to the first allocated node
-                keep_node->next = current_node;
+                pf_allocator_free_list_coalesce_n_nodes(allocator, coalescing_node, coalescing_node_count);
             }
 
+            // reset the state so we're not coalescing
+            coalescing_node = NULL;
             coalescing_node_count = 0;
         }
 
         current_node = current_node->next;
+    }
+
+    // handles the situation where there is a run of empty nodes, and the last node is also empty,
+    // so we haven't triggered their coalescence yet
+    if (coalescing_node_count > 1) {
+        pf_allocator_free_list_coalesce_n_nodes(allocator, coalescing_node, coalescing_node_count);
     }
 
     return TRUE;

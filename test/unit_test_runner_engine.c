@@ -742,6 +742,8 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_coalesce_unallocated_nodes__returns_false__for_null_ptr_to_PFallocator_FreeList_t);
     ADD_TEST(fn_pf_allocator_free_list_coalesce_unallocated_nodes__sets_correct_error_message__for_null_ptr_to_PFallocator_FreeList_t);
     ADD_TEST(fn_pf_allocator_free_list_coalesce_unallocated_nodes__coalesces_sequential_nodes__when_used);
+    ADD_TEST(fn_pf_allocator_free_list_coalesce_unallocated_nodes__does_not_coalesce_isolatd_nodes__when_used);
+    ADD_TEST(fn_pf_allocator_free_list_coalesce_unallocated_nodes__coalesces_multiple_touching_runs_of_unallocated_nodes___when_used);
     
     
     // fn pf_allocator_free_list_malloc

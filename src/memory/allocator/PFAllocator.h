@@ -310,11 +310,29 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
 
 
 /**
+ * @brief Starting with the supplied coalescing_node, coalesces the next N nodes
+ * @note  this fn will not coalesce allocated nodes
+ *
+ * @param allocator 
+ * @param coalescing_node 
+ * @param coalesce_count 
+ * @return 
+ */
+int32_t pf_allocator_free_list_coalesce_n_nodes(
+    PFAllocator_FreeList_t const * allocator,
+    PFAllocator_FreeListNode_t * coalescing_node,
+    size_t coalesce_count);
+
+
+
+/**
  * 
  * @param allocator 
  * @return 
  */
 int32_t pf_allocator_free_list_coalesce_unallocated_nodes(PFAllocator_FreeList_t const * allocator);
+
+
 
 
 /**
