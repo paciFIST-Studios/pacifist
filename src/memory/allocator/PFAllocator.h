@@ -311,7 +311,7 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
 
 /**
  * @brief Starting with the supplied coalescing_node, coalesces the next N nodes
- * @note  this fn will not coalesce allocated nodes
+ * @note  Will abort operation if ANY node in the request is allocated
  *
  * @param allocator 
  * @param coalescing_node 

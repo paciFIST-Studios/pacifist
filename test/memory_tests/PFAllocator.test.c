@@ -1479,6 +1479,194 @@ START_TEST(fn_pf_allocator_free_list_find_best__returns_first_node_with_best_fit
 }
 END_TEST
 
+// fn pf_allocator_free_list_coalesce_n_nodes ----------------------------------------------------------------
+
+START_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__is_defined) {
+    int32_t(*fptr)(PFAllocator_FreeList_t const *, PFAllocator_FreeListNode_t*, size_t) = pf_allocator_free_list_coalesce_n_nodes;
+    ck_assert_ptr_nonnull(fptr);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__returns_correct_error_code__for_null_ptr_to_allocator) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_coalesce_n_nodes(NULL, NULL, 0));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__sets_correct_error_message__for_null_ptr_to_allocator) {
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_coalesce_n_nodes(NULL, NULL, 0));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Got null ptr to PFAllocator_FreeList_t!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+
+START_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__returns_correct_error_code__for_null_ptr_to_coalescing_node) {
+    PFAllocator_FreeList_t const allocator = {0};
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_coalesce_n_nodes(&allocator, NULL, 0));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__sets_correct_error_message__for_null_ptr_to_coalescing_node) {
+    PFAllocator_FreeList_t const allocator = {0};
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_NULL_PTR, pf_allocator_free_list_coalesce_n_nodes(&allocator, NULL, 0));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Got null ptr to PFAllocator_FreeListNode_t!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__returns_correct_error_code__for_coalesce_count_less_than_two) {
+    PFAllocator_FreeList_t const allocator = {0};
+    PFAllocator_FreeListNode_t node = {0};
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_INVALID_LENGTH, pf_allocator_free_list_coalesce_n_nodes(&allocator, &node, 0));
+    ck_assert_int_eq(PFEC_ERROR_INVALID_LENGTH, pf_allocator_free_list_coalesce_n_nodes(&allocator, &node, 1));
+    PF_UNSUPPRESS_ERRORS
+}
+END_TEST
+
+START_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__sets_correct_error_message__for_coalesce_count_less_than_two) {
+    PFAllocator_FreeList_t const allocator = {0};
+    PFAllocator_FreeListNode_t node = {0};
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(PFEC_ERROR_INVALID_LENGTH, pf_allocator_free_list_coalesce_n_nodes(&allocator, &node, 0));
+    ck_assert_int_eq(PFEC_ERROR_INVALID_LENGTH, pf_allocator_free_list_coalesce_n_nodes(&allocator, &node, 1));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Cannot coalesce fewer than 2 nodes!";
+    ck_assert_in_error_buffer(expected);
+}
+END_TEST
+
+/**
+ * This test creates an allocator and nodes, then tests coalescing.
+ *
+ * Step 1: [0]-[1]-[2]-[3]-[4]-[5]-[6]-[7]
+ * Step 2: [A]-[A]-[A]-[A]-[A]-[A]-[A]-[A]
+ * Step 2: [A]-[A]-[A]-[A]-[A]-[A]-[A]-[A]  <-- coalese
+ * Step 4: Return False
+ */
+START_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__returns_false__when_trying_to_coalesce_an_allocated_node) {
+    size_t const node_count = 8;
+    size_t const node_alloc_size = 64;
+    size_t const memory_size = 4096;
+
+    PFAllocator_FreeListNode_t* node_ptr_array[node_count];
+    memset(node_ptr_array, 0, node_count * sizeof(PFAllocator_FreeListNode_t*));
+
+    // create allocator
+    void* memory = malloc(memory_size);
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, memory_size);
+
+    // allocate the nodes
+    for (size_t i = 0; i < node_count; i++) {
+        node_ptr_array[i] = ck_malloc_and_return_node(allocator, node_alloc_size);
+    }
+
+    // coalesce nodes
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(FALSE, pf_allocator_free_list_coalesce_n_nodes(allocator, node_ptr_array[0], node_count));
+    PF_UNSUPPRESS_ERRORS
+    
+    free(memory);
+}
+END_TEST
+
+
+/**
+ * This test creates an allocator and nodes, then tests coalescing.
+ *
+ * Step 1: [0]-[1]-[2]-[3]-[4]-[5]-[6]-[7]
+ * Step 2: [A]-[A]-[A]-[A]-[A]-[A]-[A]-[A]
+ * Step 2: [A]-[A]-[A]-[A]-[A]-[A]-[A]-[A]  <-- coalesce
+ * Step 4: Return False
+ */
+START_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__sets_correct_error_message__when_trying_to_coalesce_an_allocated_node) {
+    size_t const node_count = 8;
+    size_t const node_alloc_size = 64;
+    size_t const memory_size = 4096;
+
+    PFAllocator_FreeListNode_t* node_ptr_array[node_count];
+    memset(node_ptr_array, 0, node_count * sizeof(PFAllocator_FreeListNode_t*));
+
+    // create allocator
+    void* memory = malloc(memory_size);
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, memory_size);
+
+    // allocate the nodes
+    for (size_t i = 0; i < node_count; i++) {
+        node_ptr_array[i] = ck_malloc_and_return_node(allocator, node_alloc_size);
+    }
+
+    // coalesce nodes
+    PF_SUPPRESS_ERRORS
+    ck_assert_int_eq(FALSE, pf_allocator_free_list_coalesce_n_nodes(allocator, node_ptr_array[0], node_count));
+    PF_UNSUPPRESS_ERRORS
+
+    char const * expected = "Cannot coalesce allocated node!  Aborting operation!";
+    ck_assert_in_error_buffer(expected);
+    
+    free(memory);
+}
+END_TEST
+
+
+
+/**
+ * This test creates an allocator and nodes, then tests coalescing.
+ *
+ * Step 1: [0]-[1]-[2]-[3]-[4]-[5]-[6]-[7]
+ * Step 2: [A]-[A]-[A]-[A]-[A]-[A]-[A]-[A]
+ * Step 3: [ ]-[ ]-[ ]-[ ]-[ ]-[ ]-[ ]-[ ]  <-- coalesce
+ * Step 4: [ ]                              <-- leaves 1 node
+ */
+START_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__coalesces_all_available_unallocated_nodes__when_called) {
+    size_t const node_count = 8;
+    size_t const node_alloc_size = 64;
+    size_t const memory_size = 4096;
+
+    PFAllocator_FreeListNode_t* node_ptr_array[node_count];
+    memset(node_ptr_array, 0, node_count * sizeof(PFAllocator_FreeListNode_t*));
+
+    // create allocator
+    void* memory = malloc(memory_size);
+    PFAllocator_FreeList_t* allocator = pf_allocator_free_list_create_with_memory(memory, memory_size);
+
+    // allocate the nodes
+    for (size_t i = 0; i < node_count; i++) {
+        node_ptr_array[i] = ck_malloc_and_return_node(allocator, node_alloc_size);
+    }
+
+    // free the nodes
+    for (size_t i = 0; i < node_count; i++) {
+        ck_free_pfallocator_memory_using_node(allocator, node_ptr_array[i]);
+    }
+
+    // coalesce nodes
+    // note: there is 1 additional node in the allocator, so if we want to coalesce all of them
+    // we have to add the +1 to node count.  This extra node just always exists, to make it
+    // easier to perform allocations
+    ck_assert_int_eq(TRUE, pf_allocator_free_list_coalesce_n_nodes(allocator, node_ptr_array[0], node_count+1));
+
+    size_t post_coalesce_node_count = ck_pfallocator_count_nodes(allocator);
+    ck_assert_int_eq(post_coalesce_node_count, 1);
+
+    free(memory);
+}
+END_TEST
+
+
+
+
 // fn pf_allocator_free_list_coalesce_unallocated_nodes ------------------------------------------------------
 
 START_TEST(fn_pf_allocator_free_list_coalesce_unallocated_nodes__is_defined) {

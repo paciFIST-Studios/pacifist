@@ -552,14 +552,14 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
 int32_t pf_allocator_free_list_coalesce_n_nodes(
     PFAllocator_FreeList_t const * allocator,
     PFAllocator_FreeListNode_t* coalescing_node,
-    size_t coalesce_count)
+    size_t const coalesce_count)
 {
     if (allocator == NULL) {
-        PF_LOG_CRITICAL(PF_ALLOCATOR, "Got null ptr to PFallocator_FreeList_t");
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Got null ptr to PFAllocator_FreeList_t!");
         return PFEC_ERROR_NULL_PTR;
     }
     if (coalescing_node == NULL) {
-        PF_LOG_CRITICAL(PF_ALLOCATOR, "Got null ptr to PFAllocator_FreeListNode_t");
+        PF_LOG_CRITICAL(PF_ALLOCATOR, "Got null ptr to PFAllocator_FreeListNode_t!");
         return PFEC_ERROR_NULL_PTR;
     }
     if (coalesce_count < 2) {
@@ -574,6 +574,12 @@ int32_t pf_allocator_free_list_coalesce_n_nodes(
     // starting with the coalescing_node
     size_t coalescing_block_size_accumulator = 0;
     for (size_t i = 0; i < coalesce_count; i++) {
+
+        if (pf_allocator_free_list_node_get_is_allocated(node)){
+            PF_LOG_CRITICAL(PF_ALLOCATOR, "Cannot coalesce allocated node!  Aborting operation!");
+            return FALSE;
+        }
+
         // padding is usually going to be zero, but make sure we're taking it into account
         coalescing_block_size_accumulator += pf_allocator_free_list_node_get_padding(node);
         coalescing_block_size_accumulator += pf_allocator_free_list_node_get_block_size(node);
@@ -589,7 +595,7 @@ int32_t pf_allocator_free_list_coalesce_n_nodes(
     // don't forget to keep the connection to the next node, which might be null,
     // but probably isn't (because we're probably in the middle of the free-list)
     coalescing_node->next = node;
-    
+
     return TRUE;
 }
 
@@ -621,7 +627,8 @@ int32_t pf_allocator_free_list_coalesce_unallocated_nodes(PFAllocator_FreeList_t
             // see if we've found more than 1 unallocated node in a row
             // if there's a single unallocated block, we can't merge it with anything
             if (coalescing_node_count > 1) {
-                pf_allocator_free_list_coalesce_n_nodes(allocator, coalescing_node, coalescing_node_count);
+                PF_ASSERT_MESSAGE(pf_allocator_free_list_coalesce_n_nodes(allocator, coalescing_node, coalescing_node_count)
+                    , "Attempted to coalesce an allocated node!");
             }
 
             // reset the state so we're not coalescing
@@ -635,7 +642,8 @@ int32_t pf_allocator_free_list_coalesce_unallocated_nodes(PFAllocator_FreeList_t
     // handles the situation where there is a run of empty nodes, and the last node is also empty,
     // so we haven't triggered their coalescence yet
     if (coalescing_node_count > 1) {
-        pf_allocator_free_list_coalesce_n_nodes(allocator, coalescing_node, coalescing_node_count);
+        PF_ASSERT_MESSAGE(pf_allocator_free_list_coalesce_n_nodes(allocator, coalescing_node, coalescing_node_count)
+            , "Attempted to coalesce an allocated node!");
     }
 
     return TRUE;

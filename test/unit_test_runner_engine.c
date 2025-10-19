@@ -737,6 +737,18 @@ int main(void) {
     ADD_TEST(fn_pf_allocator_free_list_find_best__returns_first_node_with_exact_fit__if_it_finds_one);
     ADD_TEST(fn_pf_allocator_free_list_find_best__returns_first_node_with_best_fit__for_a_multi_node_best_fit_tie);
 
+    // fn pf_allocator_free_list_coalesce_n_nodes
+    ADD_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__is_defined);
+    ADD_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__returns_correct_error_code__for_null_ptr_to_allocator);
+    ADD_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__sets_correct_error_message__for_null_ptr_to_allocator);
+    ADD_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__returns_correct_error_code__for_null_ptr_to_coalescing_node);
+    ADD_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__sets_correct_error_message__for_null_ptr_to_coalescing_node);
+    ADD_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__returns_correct_error_code__for_coalesce_count_less_than_two);
+    ADD_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__sets_correct_error_message__for_coalesce_count_less_than_two);
+    ADD_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__returns_false__when_trying_to_coalesce_an_allocated_node);
+    ADD_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__sets_correct_error_message__when_trying_to_coalesce_an_allocated_node);
+    ADD_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__coalesces_all_available_unallocated_nodes__when_called); 
+    
     // fn pf_allocator_free_list_coalesce_unallocated_nodes
     ADD_TEST(fn_pf_allocator_free_list_coalesce_unallocated_nodes__is_defined);
     ADD_TEST(fn_pf_allocator_free_list_coalesce_unallocated_nodes__returns_false__for_null_ptr_to_PFallocator_FreeList_t);
