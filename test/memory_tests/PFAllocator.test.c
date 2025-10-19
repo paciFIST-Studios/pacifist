@@ -1657,7 +1657,7 @@ START_TEST(fn_pf_allocator_free_list_coalesce_n_nodes__coalesces_all_available_u
     // easier to perform allocations
     ck_assert_int_eq(TRUE, pf_allocator_free_list_coalesce_n_nodes(allocator, node_ptr_array[0], node_count+1));
 
-    size_t post_coalesce_node_count = ck_pfallocator_count_nodes(allocator);
+    size_t const post_coalesce_node_count = ck_pfallocator_count_nodes(allocator);
     ck_assert_int_eq(post_coalesce_node_count, 1);
 
     free(memory);
