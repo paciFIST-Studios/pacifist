@@ -3,7 +3,7 @@
 // include
 #include <check.h>
 #include <pftest_utilities.h>
-#include <memory/allocator/PFAllocator.h>
+#include <memory/allocator/PFAllocator_FreeList.h>
 
 // stdlib
 #include <stdlib.h>
@@ -579,7 +579,7 @@ END_TEST
 // fn pf_allocator_free_list_free_all ------------------------------------------------------------------------
 
 START_TEST(fn_pf_allocator_free_list_free_all__is_defined) {
-    int32_t(*fptr)(PFAllocator_FreeList_t*) = pf_allocator_free_list_free_all;
+    int32_t(*fptr)(PFAllocator_FreeList_t const *) = pf_allocator_free_list_free_all;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST

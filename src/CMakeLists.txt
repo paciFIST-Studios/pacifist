@@ -79,7 +79,6 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log.c
         ${CMAKE_CURRENT_SOURCE_DIR}/log/log_category.h
         # memory
-        ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/PFAllocator.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/allocator_utilities.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/QuickHashTable.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/PFCompactHashTable.h
@@ -90,7 +89,8 @@ set(ENGINE_LIB_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/hash_table/HashTable.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/PFMemoryArena.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/PFMemoryArena.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/PFAllocator.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/PFAllocator_FreeList.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/memory/allocator/PFAllocator_FreeList.c
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/tree/RedBlackTree.h
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/tree/RedBlackTree.c
         # n

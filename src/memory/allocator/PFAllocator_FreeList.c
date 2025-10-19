@@ -1,7 +1,7 @@
 // paciFIST studios. 2025. MIT License
 
 // include
-#include "memory/allocator/PFAllocator.h"
+#include "memory/allocator/PFAllocator_FreeList.h"
 
 // stdlib
 #include <stdlib.h>
@@ -167,7 +167,7 @@ PFAllocator_FreeList_t* pf_allocator_free_list_create_with_memory(void* base_mem
     memset(base_memory, 0, base_memory_size);
 
     // create & initialize the allocator
-    PFAllocator_FreeList_t* pf_free_list = (PFAllocator_FreeList_t*)base_memory;
+    PFAllocator_FreeList_t* pf_free_list = base_memory;
     pf_free_list->base_memory = base_memory;
     pf_free_list->base_memory_size = base_memory_size;
     // set the memory usage fns
@@ -200,7 +200,7 @@ PFAllocator_FreeList_t* pf_allocator_free_list_create_with_memory(void* base_mem
 
 
 
-int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list) {
+int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t const * pf_free_list) {
     if (pf_free_list == NULL) {
         PF_LOG_CRITICAL(PF_ALLOCATOR, "PFAllocator_FreeList_t* pointer is null!");
         return PFEC_ERROR_NULL_PTR;
@@ -542,7 +542,6 @@ PFAllocator_FreeListNode_t* pf_allocator_free_list_find_best(
     }
 
 
-
     if (optional_out_padding){ *optional_out_padding = padding;}
     if (optional_out_previous_node){ *optional_out_previous_node = prev_to_best_node; }
 
@@ -796,7 +795,6 @@ int32_t pf_allocator_free_list_free(
     pf_allocator_free_list_node_set_is_not_allocated(node);
 
     // loop the free list and coalesce unallocated nodes
-
 
    return PFEC_NO_ERROR; 
 }

@@ -192,7 +192,7 @@ typedef struct PFAllocator_FreeList_t {
  * @param base_memory_size 
  * @return 
  */
-PFAllocator_FreeList_t* pf_allocator_free_list_create_with_memory(void* base_memory, size_t const base_memory_size);
+PFAllocator_FreeList_t* pf_allocator_free_list_create_with_memory(void* base_memory, size_t base_memory_size);
 
 /**
  * @brief - zeroes out all memory managed by this allocator, and resets the allocator to a fresh state 
@@ -200,7 +200,7 @@ PFAllocator_FreeList_t* pf_allocator_free_list_create_with_memory(void* base_mem
  * @param pf_free_list 
  * @return 
  */
-int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t* pf_free_list);
+int32_t pf_allocator_free_list_free_all(PFAllocator_FreeList_t const * pf_free_list);
 
 
 /**
@@ -397,9 +397,9 @@ typedef struct PFAllocator_RedBlackTree_t {
     EAllocationPolicy_RedBlackTree policy;
 } PFAllocator_RedBlackTree_t;
 
-int32_t pf_allocator_red_black_tree_initialize(void* base_memory, size_t const size);
+int32_t pf_allocator_red_black_tree_initialize(void* base_memory, size_t size);
 
-void* pf_provided_memory_red_black_tree_allocator(size_t const size);
+void* pf_provided_memory_red_black_tree_allocator(size_t size);
 
 // generic fns -----------------------------------------------------------------------------------------------
 

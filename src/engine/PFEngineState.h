@@ -7,7 +7,7 @@
 // framework
 // engine
 #include <core/error.h>
-#include <memory/allocator/PFAllocator.h>
+#include <memory/allocator/PFAllocator_FreeList.h>
 #include <memory/allocator/PFMemoryArena.h>
 #include <string/PFStringInternmentSingleton.h>
 #include <engine/PFEngineConfiguration.h>
