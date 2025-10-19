@@ -180,7 +180,7 @@ typedef struct PFAllocator_FreeList_t {
 
     void* (*pf_malloc)( struct PFAllocator_FreeList_t* allocator, size_t size);
     void* (*pf_realloc)(struct PFAllocator_FreeList_t* allocator, void* ptr, size_t size);
-    int32_t (*pf_free)( struct PFAllocator_FreeList_t* allocator, void* ptr);
+    int32_t (*pf_free)( struct PFAllocator_FreeList_t const * allocator, void* ptr);
 
 } PFAllocator_FreeList_t;
 
@@ -360,7 +360,7 @@ void* pf_allocator_free_list_realloc(PFAllocator_FreeList_t* allocator, void* me
  * @param allocator
  * @param memory 
  */
-int32_t pf_allocator_free_list_free(PFAllocator_FreeList_t* allocator, void* memory);
+int32_t pf_allocator_free_list_free(PFAllocator_FreeList_t const * allocator, void* memory);
 
 
 

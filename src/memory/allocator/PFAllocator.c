@@ -284,7 +284,7 @@ PFAllocator_FreeListNode_t * pf_allocator_free_list_get_managing_node(
     while (node != NULL) {
         size_t const node_size = sizeof(PFAllocator_FreeListNode_t);
         size_t const node_padding = pf_allocator_free_list_node_get_padding(node);
-        void* data = (void*)((uintptr_t)node + node_size + node_padding);
+        void const * data = (void*)((uintptr_t)node + node_size + node_padding);
         if (memory == data) {
             return node;
         }
@@ -769,7 +769,7 @@ void * pf_allocator_free_list_realloc(
 }
 
 int32_t pf_allocator_free_list_free(
-    PFAllocator_FreeList_t* allocator,
+    PFAllocator_FreeList_t const * allocator,
     void* memory)
 {
     if (allocator == NULL) {

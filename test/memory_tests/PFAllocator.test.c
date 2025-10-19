@@ -2045,7 +2045,7 @@ END_TEST
 // pf_allocator_free_list_free -------------------------------------------------------------------------------
 
 START_TEST(fn_pf_allocator_free_list_free__is_defined) {
-    int32_t(*fptr)(PFAllocator_FreeList_t*, void*) = pf_allocator_free_list_free;
+    int32_t(*fptr)(PFAllocator_FreeList_t const *, void*) = pf_allocator_free_list_free;
     ck_assert_ptr_nonnull(fptr);
 }
 END_TEST
